@@ -5,6 +5,8 @@ extends CanvasLayer
 ## Öffnen: PC F12, Ally L3 + R3 (beide Sticks drücken) 1 s halten. Schließen: B, Esc oder F12.
 
 signal reset_requested
+signal pollen_requested
+signal unlock_all_requested
 
 const HOLD_SECONDS := 1.0
 
@@ -18,6 +20,7 @@ func _ready() -> void:
 	layer = 40
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	visible = false
+	add_to_group(MenuKit.GROUP)
 	var dim := ColorRect.new()
 	dim.color = Color(0.1, 0.12, 0.16, 0.45)
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -37,9 +40,8 @@ func _ready() -> void:
 	title.add_theme_font_size_override("font_size", 32)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_box.add_child(title)
-	# Pollen und Upgrades gibt es erst ab Meilenstein 2; die Knöpfe stehen schon da.
-	_add("Pollen geben (ab Meilenstein 2)", Callable(), true)
-	_add("Alles freischalten (ab Meilenstein 2)", Callable(), true)
+	_add("+10.000 Pollen", func() -> void: pollen_requested.emit())
+	_add("Alles freischalten (alle Upgrades maximal)", func() -> void: unlock_all_requested.emit())
 	_add("Zeit ×10 an/aus", func() -> void: Engine.time_scale = 1.0 if Engine.time_scale > 1.0 else 10.0)
 	_add("Spielstand zurücksetzen", func() -> void:
 		close()
@@ -91,7 +93,7 @@ func _process(delta: float) -> void:
 			held = true
 	# Echte Zeit, damit Zeit ×10 das Halten nicht verkürzt
 	_hold = _hold + delta / maxf(Engine.time_scale, 0.001) if held else 0.0
-	if _hold >= HOLD_SECONDS:
+	if _hold >= HOLD_SECONDS and not MenuKit.any_open(get_tree()):
 		_hold = 0.0
 		open()
 
@@ -101,7 +103,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			and (event as InputEventKey).keycode == KEY_F12:
 		if visible:
 			close()
-		else:
+		elif not MenuKit.any_open(get_tree()):
 			open()
 		get_viewport().set_input_as_handled()
 	elif visible and event.is_action_pressed("ui_cancel"):

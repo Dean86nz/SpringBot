@@ -3,7 +3,7 @@ extends SceneTree
 ## Nicht headless (Fenster öffnet kurz).
 ##   Godot_v4.7.2-stable_win64_console.exe --path . -s tests/screenshot.gd -- <ausgabe.png> [frames] [plan]
 ##   plan: "aktion:von:bis" getrennt durch Komma, z. B. "move_right:2:60,move_down:40:120" ("-" = nichts)
-##   CHEATS=1 öffnet bei Bild 5 das Cheat-Menü.
+##   CHEATS=1 öffnet bei Bild 5 das Cheat-Menü, POLLEN=n gibt bei Bild 5 Pollen.
 ## Gibt am Ende die FPS aus (NOVSYNC=1 misst ungedrosselt).
 
 var _frames := 0
@@ -31,9 +31,11 @@ func _process(_delta: float) -> bool:
 	_frames += 1
 	for s in _plan:
 		if _frames == s["from"]:
-			Input.action_press(s["action"])
+			_send(s["action"], true)
 		elif _frames == s["to"]:
-			Input.action_release(s["action"])
+			_send(s["action"], false)
+	if _frames == 5 and OS.get_environment("POLLEN") != "":
+		current_scene.eco.pollen += float(OS.get_environment("POLLEN"))
 	if _frames == 5 and OS.get_environment("CHEATS") == "1":
 		current_scene.get_node("CheatMenu").open()
 	if _frames == _target:
@@ -42,3 +44,12 @@ func _process(_delta: float) -> bool:
 		print("screenshot %s -> %d, FPS %d" % [_out, err, Engine.get_frames_per_second()])
 		quit(0)
 	return false
+
+
+## Echtes InputEventAction, damit auch _unhandled_input (Menüs) reagiert.
+func _send(action: String, pressed: bool) -> void:
+	var ev := InputEventAction.new()
+	ev.action = action
+	ev.pressed = pressed
+	ev.strength = 1.0 if pressed else 0.0
+	Input.parse_input_event(ev)

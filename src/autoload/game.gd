@@ -2,6 +2,7 @@ extends Node
 ## Globaler Einstieg: Input-Map, Balancing-Daten, Vollbild. Erster und einziger Autoload.
 
 const BALANCE_PATH := "res://data/balance.json"
+const UPGRADES_PATH := "res://data/upgrades.json"
 
 var balance: Dictionary = {}
 

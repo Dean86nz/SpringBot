@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.0 – Meilenstein 2: Pollen und erste Upgrades
+
+- Grüne Zellen bringen Pollen (0,01 je Zelle und Sekunde), Anzeige oben links mit Ertrag pro Sekunde.
+- Upgrade-Menü (Y / Tab) rechts am Rand: Reichweite (+0,5 Zellen Radius je Stufe) und Tempo (+12 % je Stufe), je 10 Stufen.
+  A kauft, das Menü bleibt offen, der Fokus bleibt auf dem Knopf. Pollen fließen weiter, der Roboter steht.
+- Pause-Menü (Start / Esc) mit „Weiterspielen“ und „Spiel beenden“ (Rückmeldung aus dem Test von 0.1.0).
+- Tastenhinweis unten links.
+- Cheat-Menü: „+10.000 Pollen“ und „Alles freischalten“ (alle Upgrades maximal) funktionieren jetzt.
+
 ## 0.1.0 – Meilenstein 1: Prototyp
 
 - Roboter fährt per linkem Stick (analog) oder WASD/Pfeiltasten, bleibt in der Karte.

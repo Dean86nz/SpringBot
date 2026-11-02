@@ -7,6 +7,8 @@ var speed_px := 380.0
 var accel := 10.0
 var bounds := Rect2()
 var velocity := Vector2.ZERO
+## Aus, solange ein Menü offen ist, in dem der Stick navigiert.
+var input_enabled := true
 var _wobble := 0.0
 var _body_box := StyleBoxFlat.new()
 var _head_box := StyleBoxFlat.new()
@@ -24,7 +26,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	var input := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	var input := Input.get_vector("move_left", "move_right", "move_up", "move_down") if input_enabled else Vector2.ZERO
 	var target := input * speed_px
 	velocity = velocity.lerp(target, clampf(accel * delta, 0.0, 1.0))
 	if velocity.length() < 2.0 and input == Vector2.ZERO:

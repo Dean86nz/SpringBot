@@ -1,0 +1,23 @@
+{
+	"pollen_per_cell_per_sec": 0.01,
+	"upgrades": [
+		{
+			"id": "radius",
+			"name": "Reichweite",
+			"unit": "Zellen Radius",
+			"base_cost": 20,
+			"cost_growth": 1.6,
+			"max_level": 10,
+			"per_level": 0.5
+		},
+		{
+			"id": "speed",
+			"name": "Tempo",
+			"unit": "% Tempo",
+			"base_cost": 15,
+			"cost_growth": 1.5,
+			"max_level": 10,
+			"per_level": 12
+		}
+	]
+}
