@@ -1,11 +1,14 @@
 class_name Robot
 extends Node2D
 ## Der kleine Frühlings-Roboter (Platzhalter-Grafik, von oben gesehen, vorne = +x).
-## Linker Stick fährt analog, WASD/Pfeile digital. Bleibt innerhalb der Karte.
+## Linker Stick fährt analog, WASD/Pfeile digital. Bleibt innerhalb der Karte und fährt
+## nicht durch Hindernisse (Kreise, z. B. der Bienenstock), sondern gleitet an ihnen entlang.
 
 var speed_px := 380.0
 var accel := 10.0
 var bounds := Rect2()
+var radius_px := 30.0
+var obstacles: Array[Dictionary] = []   # {"pos": Vector2, "radius": float}
 var velocity := Vector2.ZERO
 ## Aus, solange ein Menü offen ist, in dem der Stick navigiert.
 var input_enabled := true
@@ -32,12 +35,25 @@ func _process(delta: float) -> void:
 	if velocity.length() < 2.0 and input == Vector2.ZERO:
 		velocity = Vector2.ZERO
 	position += velocity * delta
+	for o in obstacles:
+		position = push_out(position, o["pos"], float(o["radius"]) + radius_px)
 	if bounds.has_area():
 		position = position.clamp(bounds.position, bounds.end)
 	if velocity.length() > 20.0:
 		rotation = lerp_angle(rotation, velocity.angle(), clampf(12.0 * delta, 0.0, 1.0))
 		_wobble += delta * velocity.length() * 0.05
 	queue_redraw()
+
+
+## Schiebt p aus dem Kreis (center, min_dist) auf den Rand. Außerhalb bleibt p unverändert.
+static func push_out(p: Vector2, center: Vector2, min_dist: float) -> Vector2:
+	var d := p - center
+	var len := d.length()
+	if len >= min_dist:
+		return p
+	if len < 0.001:
+		return center + Vector2.DOWN * min_dist
+	return center + d / len * min_dist
 
 
 func _draw() -> void:

@@ -2,7 +2,7 @@
 
 Kleines 2D-Incremental-Spiel: Ein Roboter bringt einer grauen Welt den Frühling zurück. Wo er fährt, wird der Boden grün. Godot 4.7.2, GDScript, Gamepad zuerst (ROG Ally X).
 
-Stand: **Meilenstein 4 (Bienen)**, Version 0.4.0. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`.
+Stand: **Meilenstein 4 (Bienen)**, Version 0.4.1. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`.
 
 ## Steuerung
 

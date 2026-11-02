@@ -59,6 +59,8 @@ func _ready() -> void:
 	_robot.accel = Game.num("robot/accel", 10.0)
 	_robot.bounds = Rect2(Vector2.ZERO, size_px).grow(-cell_px * 0.5)
 	_robot.position = _start_px
+	_robot.radius_px = Game.num("robot/radius_px", 30.0)
+	_robot.obstacles = [{"pos": hive_px, "radius": Game.num("bees/hive_radius_px", 32.0)}]
 	add_child(_robot)
 	_camera.zoom = Vector2.ONE * Game.num("camera/zoom", 1.0)
 	_camera.position_smoothing_enabled = true

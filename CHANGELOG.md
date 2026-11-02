@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1 – Bienenstock fest (Rückmeldung zu 0.4.0)
+
+- Der Roboter fährt nicht mehr durch den Bienenstock, sondern gleitet an ihm entlang. Radien in `data/balance.json` (`robot/radius_px`, `bees/hive_radius_px`).
+
 ## 0.4.0 – Meilenstein 4: Bienen
 
 - Bienenstock nahe dem Startpunkt. Bienen fliegen zu grauen Stellen in 6–18 Zellen Entfernung, schweben dort 2 Sekunden und lassen einen runden grünen Fleck (Radius 2,3 Zellen) entstehen.

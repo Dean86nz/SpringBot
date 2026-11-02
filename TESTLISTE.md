@@ -1,6 +1,9 @@
-# Testliste Meilenstein 4 (v0.4.0)
+# Testliste Meilenstein 4 (v0.4.1)
 
-EXEs: `export/windows/SpringBot_v0.4.0.exe` (Release) und `SpringBot_v0.4.0_DEBUG.exe` (Debug mit Cheat-Menü).
+EXEs: `export/windows/SpringBot_v0.4.1.exe` (Release) und `SpringBot_v0.4.1_DEBUG.exe` (Debug mit Cheat-Menü).
+
+## Neu in 0.4.1
+- Gegen den Bienenstock fahren: Der Roboter kommt nicht hindurch, sondern rutscht seitlich daran vorbei. Frontal angefahren bleibt er stehen.
 
 ## Bienen
 1. Neues Spiel: Links oberhalb des Roboters steht ein gelber Bienenstock. Noch keine Bienen.
