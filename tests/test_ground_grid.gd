@@ -61,7 +61,7 @@ func test_spread_grows_only_at_frontier() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 7
 	g.set_green(Vector2i(10, 10))
-	var added := g.spread(30, 1, rng)
+	var added := g.spread(30, 1, 0.5, rng)
 	assert_eq(added, 30)
 	assert_eq(g.green_count, 31)
 	# Ohne Samenflug bleibt das Grün zusammenhängend: jede grüne Zelle hat einen grünen Nachbarn
@@ -78,7 +78,16 @@ func test_spread_fills_map_and_stops() -> void:
 	var g := GroundGrid.new(6, 6)
 	var rng := RandomNumberGenerator.new()
 	g.set_green(Vector2i(0, 0))
-	g.spread(1000, 4, rng)
+	g.spread(1000, 4, 0.5, rng)
 	assert_eq(g.green_count, 36, "ganze Karte grün")
 	assert_true(g.frontier.is_empty())
-	assert_eq(g.spread(10, 4, rng), 0, "nichts mehr zu tun")
+	assert_eq(g.spread(10, 4, 0.5, rng), 0, "nichts mehr zu tun")
+
+
+func test_spread_one_cell_per_event_even_with_seeds() -> void:
+	var g := GroundGrid.new(100, 100)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 3
+	g.set_green(Vector2i(50, 50))
+	assert_eq(g.spread(200, 8, 1.0, rng), 200, "Samenflug ersetzt Wachstum, verdoppelt es nicht")
+	assert_eq(g.green_count, 201)

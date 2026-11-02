@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.1 – Ausbreitung gebremst (Rückmeldung zu 0.3.0)
+
+- Problem: Mit Ausbreitung und Weite war die Karte in wenigen Minuten voll, weil jede Samen-Insel neuen Rand brachte und das Wachstum sich selbst beschleunigte.
+- Ausbreitung ist jetzt eine feste Zahl Zellen pro Sekunde: +3 je Stufe, höchstens 30/s. Allein damit dauert die ganze Karte rund 43 Minuten.
+- Weite ändert nur noch, wo das Grün wächst (30 % der Schritte werden zu Samenflug), nicht wie viel.
+- Kosten steigen steiler: Ausbreitung ×1,9 je Stufe, Weite ×2,0.
+
 ## 0.3.0 – Meilenstein 3: Selbstausbreitung
 
 - Das Grün wächst von allein: Graue Zellen am Rand des Grüns werden nach und nach grün.

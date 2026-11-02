@@ -10,8 +10,9 @@ var cell_px := 24.0
 var _base_radius := 3.0
 var _base_speed := 380.0
 var _green_radius := 3.0
-var _spread_per_sec := 0.0   # Anteil der Grenzzellen, die pro Sekunde wachsen
+var _spread_per_sec := 0.0   # Zellen, die pro Sekunde von allein wachsen
 var _reach := 1
+var _seed_chance := 0.3
 var _spread_carry := 0.0
 var _spread_cap := 3000
 var _rng := RandomNumberGenerator.new()
@@ -35,6 +36,7 @@ func _ready() -> void:
 	var upgrade_data := Game.load_json(Game.UPGRADES_PATH)
 	eco = Economy.new(upgrade_data)
 	_spread_cap = int(upgrade_data.get("spread_max_events_per_frame", 3000))
+	_seed_chance = float(upgrade_data.get("seed_chance", 0.3))
 	eco.changed.connect(_apply_upgrades)
 	var size_px := Vector2(w, h) * cell_px
 	var start: Variant = Game.dig(Game.balance, "robot/start_cell")
@@ -85,20 +87,21 @@ func _paint() -> void:
 	_hud.set_coverage(grid.coverage())
 
 
-## Erwartete Wachstumsereignisse = Grenzzellen × Anteil × Zeit; Bruchteile wandern ins nächste Bild.
-## Obergrenze je Bild schützt die Bildrate (Zeit ×10, sehr lange Grenzen).
+## Feste Zahl Zellen pro Sekunde (lineares Wachstum, unabhängig von der Länge der Grenze);
+## Bruchteile wandern ins nächste Bild. Obergrenze je Bild schützt die Bildrate.
 func _spread(delta: float) -> void:
-	if _spread_per_sec <= 0.0:
+	if _spread_per_sec <= 0.0 or grid.frontier.is_empty():
+		_spread_carry = 0.0
 		return
-	_spread_carry += grid.frontier.size() * _spread_per_sec * delta
+	_spread_carry += _spread_per_sec * delta
 	var events := mini(int(_spread_carry), _spread_cap)
 	_spread_carry = minf(_spread_carry - events, float(_spread_cap))
 	if events > 0:
-		grid.spread(events, _reach, _rng)
+		grid.spread(events, _reach, _seed_chance, _rng)
 
 
 func _apply_upgrades() -> void:
-	_spread_per_sec = eco.bonus("spread") / 100.0
+	_spread_per_sec = eco.bonus("spread")
 	_reach = int(eco.base("reach") + eco.bonus("reach"))
 	_green_radius = _base_radius + eco.bonus("radius")
 	_robot.speed_px = _base_speed * (1.0 + eco.bonus("speed") / 100.0)
