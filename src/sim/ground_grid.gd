@@ -3,6 +3,8 @@ extends RefCounted
 ## Der Boden als Raster: je Zelle ein Byte (0 = grau, 255 = grün).
 ## Reine Logik ohne Darstellung. Der begrünte Anteil wird mitgezählt, nie neu durchsucht.
 ## Geänderte Zellen landen in einem Schmutz-Rechteck, das die Darstellung abholt.
+## Die Grenze (graue Zellen mit grünem Nachbarn) wird laufend mitgeführt: Liste plus
+## Positionsindex, damit Hinzufügen, Entfernen und zufälliges Ziehen O(1) sind.
 
 const GREY := 0
 const GREEN := 255
@@ -11,6 +13,8 @@ var width := 0
 var height := 0
 var cells := PackedByteArray()
 var green_count := 0
+var frontier := PackedInt32Array()   # Zellindizes der Grenze
+var _slot := PackedInt32Array()      # Zellindex → Position in frontier, -1 = nicht in der Grenze
 var _dirty := Rect2i()
 var _has_dirty := false
 
@@ -25,6 +29,10 @@ func setup(w: int, h: int) -> void:
 	height = h
 	cells = PackedByteArray()
 	cells.resize(w * h)
+	frontier = PackedInt32Array()
+	_slot = PackedInt32Array()
+	_slot.resize(w * h)
+	_slot.fill(-1)
 	green_count = 0
 	_dirty = Rect2i(0, 0, w, h)
 	_has_dirty = true
@@ -51,11 +59,8 @@ func coverage() -> float:
 func set_green(c: Vector2i) -> bool:
 	if not in_bounds(c):
 		return false
-	var i := c.y * width + c.x
-	if cells[i] == GREEN:
+	if not _green_index(c.y * width + c.x):
 		return false
-	cells[i] = GREEN
-	green_count += 1
 	_mark(Rect2i(c, Vector2i.ONE))
 	return true
 
@@ -76,12 +81,29 @@ func paint_circle(center: Vector2, radius: float) -> int:
 		var row := y * width
 		for x in range(x0, x1 + 1):
 			var dx := x + 0.5 - center.x
-			if dx * dx + dy * dy <= r2 and cells[row + x] != GREEN:
-				cells[row + x] = GREEN
+			if dx * dx + dy * dy <= r2 and _green_index(row + x):
 				added += 1
 	if added > 0:
-		green_count += added
 		_mark(Rect2i(x0, y0, x1 - x0 + 1, y1 - y0 + 1))
+	return added
+
+
+## Selbstausbreitung: `events`-mal eine zufällige Grenzzelle begrünen. Ist reach ≥ 2,
+## fliegt bei jedem Wachsen zusätzlich ein Samen 2..reach Zellen weit in eine zufällige Richtung.
+## Gibt die Zahl neuer grüner Zellen zurück.
+func spread(events: int, reach: int, rng: RandomNumberGenerator) -> int:
+	var added := 0
+	for e in events:
+		if frontier.is_empty():
+			break
+		var i := frontier[rng.randi_range(0, frontier.size() - 1)]
+		var c := Vector2i(i % width, i / width)
+		if set_green(c):
+			added += 1
+		if reach >= 2:
+			var off := Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(2.0, float(reach))
+			if set_green(c + Vector2i(roundi(off.x), roundi(off.y))):
+				added += 1
 	return added
 
 
@@ -96,6 +118,42 @@ func take_dirty() -> Rect2i:
 		return Rect2i()
 	_has_dirty = false
 	return _dirty
+
+
+## Begrünt Zelle i und pflegt die Grenze. true, wenn sie vorher grau war.
+func _green_index(i: int) -> bool:
+	if cells[i] == GREEN:
+		return false
+	cells[i] = GREEN
+	green_count += 1
+	_frontier_remove(i)
+	var x := i % width
+	if x > 0:
+		_frontier_add(i - 1)
+	if x < width - 1:
+		_frontier_add(i + 1)
+	if i >= width:
+		_frontier_add(i - width)
+	if i < cells.size() - width:
+		_frontier_add(i + width)
+	return true
+
+
+func _frontier_add(i: int) -> void:
+	if cells[i] == GREY and _slot[i] < 0:
+		_slot[i] = frontier.size()
+		frontier.append(i)
+
+
+func _frontier_remove(i: int) -> void:
+	var s := _slot[i]
+	if s < 0:
+		return
+	var last := frontier[frontier.size() - 1]
+	frontier[s] = last
+	_slot[last] = s
+	frontier.resize(frontier.size() - 1)
+	_slot[i] = -1
 
 
 func _mark(r: Rect2i) -> void:

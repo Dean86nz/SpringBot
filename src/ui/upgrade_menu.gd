@@ -23,8 +23,8 @@ func setup(eco: Economy) -> void:
 	anchor.set_anchors_and_offsets_preset(Control.PRESET_RIGHT_WIDE)
 	anchor.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	anchor.add_theme_constant_override("margin_right", 32)
-	anchor.add_theme_constant_override("margin_top", 120)
-	anchor.add_theme_constant_override("margin_bottom", 120)
+	anchor.add_theme_constant_override("margin_top", 90)
+	anchor.add_theme_constant_override("margin_bottom", 60)
 	add_child(anchor)
 	var holder := VBoxContainer.new()
 	holder.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -35,8 +35,17 @@ func setup(eco: Economy) -> void:
 	_pollen.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_pollen.add_theme_color_override("font_color", Color(1.0, 0.90, 0.45))
 	_box.add_child(_pollen)
+	var group := ""
 	for id in eco.order:
-		var b := MenuKit.button(_box, "", 600, 120)
+		var g := str(eco.defs[id].get("group", ""))
+		if g != group:
+			group = g
+			var head := Label.new()
+			head.text = g
+			head.add_theme_font_size_override("font_size", 24)
+			head.add_theme_color_override("font_color", Color(0.70, 0.92, 0.55))
+			_box.add_child(head)
+		var b := MenuKit.button(_box, "", 640, 108)
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.add_theme_font_size_override("font_size", 24)
 		b.pressed.connect(_buy.bind(id))
@@ -71,7 +80,10 @@ func refresh() -> void:
 		var d: Dictionary = _eco.defs[id]
 		var lvl := _eco.level(id)
 		var line1 := "%s   ·   Stufe %d / %d" % [d["name"], lvl, _eco.max_level(id)]
-		var line2 := "+%s %s je Stufe (jetzt +%s)" % [Fmt.num(float(d["per_level"])), d["unit"], Fmt.num(_eco.bonus(id))]
+		# Ohne Grundwert zeigt "jetzt" den Bonus (+1), mit Grundwert den Gesamtwert (3)
+		var has_base := d.has("base")
+		var now := ("" if has_base else "+") + Fmt.num(_eco.base(id) + _eco.bonus(id))
+		var line2 := "+%s %s je Stufe (jetzt %s)" % [Fmt.num(float(d["per_level"])), d["unit"], now]
 		var line3: String
 		var col := COLOR_OK
 		if _eco.is_maxed(id):

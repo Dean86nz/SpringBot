@@ -1,6 +1,7 @@
 extends Node2D
 ## Hauptszene: Raster, Boden, Roboter, Kamera, HUD, Menüs und (nur Debug) Cheat-Menü.
 ## Jedes Bild begrünt der Roboter die Zellen in seinem Radius; grüne Zellen bringen Pollen.
+## Mit den Wachstums-Upgrades wächst die Grenze des Grüns von allein weiter.
 ## Läuft auch während der Pause (Menü-Eingaben), Roboter und Boden pausieren.
 
 var grid: GroundGrid
@@ -9,6 +10,11 @@ var cell_px := 24.0
 var _base_radius := 3.0
 var _base_speed := 380.0
 var _green_radius := 3.0
+var _spread_per_sec := 0.0   # Anteil der Grenzzellen, die pro Sekunde wachsen
+var _reach := 1
+var _spread_carry := 0.0
+var _spread_cap := 3000
+var _rng := RandomNumberGenerator.new()
 var _start_px := Vector2.ZERO
 var _ground := GroundView.new()
 var _robot := Robot.new()
@@ -26,7 +32,9 @@ func _ready() -> void:
 	_base_radius = Game.num("robot/green_radius_cells", 3.0)
 	_base_speed = Game.num("robot/speed_px", 380.0)
 	grid = GroundGrid.new(w, h)
-	eco = Economy.new(Game.load_json(Game.UPGRADES_PATH))
+	var upgrade_data := Game.load_json(Game.UPGRADES_PATH)
+	eco = Economy.new(upgrade_data)
+	_spread_cap = int(upgrade_data.get("spread_max_events_per_frame", 3000))
 	eco.changed.connect(_apply_upgrades)
 	var size_px := Vector2(w, h) * cell_px
 	var start: Variant = Game.dig(Game.balance, "robot/start_cell")
@@ -67,6 +75,7 @@ func _process(delta: float) -> void:
 	if get_tree().paused:
 		return
 	_paint()
+	_spread(delta)
 	eco.tick(delta, grid.green_count)
 	_hud.set_pollen(eco.pollen, eco.rate(grid.green_count))
 
@@ -76,7 +85,21 @@ func _paint() -> void:
 	_hud.set_coverage(grid.coverage())
 
 
+## Erwartete Wachstumsereignisse = Grenzzellen × Anteil × Zeit; Bruchteile wandern ins nächste Bild.
+## Obergrenze je Bild schützt die Bildrate (Zeit ×10, sehr lange Grenzen).
+func _spread(delta: float) -> void:
+	if _spread_per_sec <= 0.0:
+		return
+	_spread_carry += grid.frontier.size() * _spread_per_sec * delta
+	var events := mini(int(_spread_carry), _spread_cap)
+	_spread_carry = minf(_spread_carry - events, float(_spread_cap))
+	if events > 0:
+		grid.spread(events, _reach, _rng)
+
+
 func _apply_upgrades() -> void:
+	_spread_per_sec = eco.bonus("spread") / 100.0
+	_reach = int(eco.base("reach") + eco.bonus("reach"))
 	_green_radius = _base_radius + eco.bonus("radius")
 	_robot.speed_px = _base_speed * (1.0 + eco.bonus("speed") / 100.0)
 
@@ -107,6 +130,7 @@ func reset_game() -> void:
 	Engine.time_scale = 1.0
 	grid.clear()
 	eco.reset()
+	_spread_carry = 0.0
 	_robot.position = _start_px
 	_robot.velocity = Vector2.ZERO
 	_camera.reset_smoothing()

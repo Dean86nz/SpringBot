@@ -1,8 +1,10 @@
 {
 	"pollen_per_cell_per_sec": 0.01,
+	"spread_max_events_per_frame": 3000,
 	"upgrades": [
 		{
 			"id": "radius",
+			"group": "Roboter",
 			"name": "Reichweite",
 			"unit": "Zellen Radius",
 			"base_cost": 20,
@@ -12,12 +14,34 @@
 		},
 		{
 			"id": "speed",
+			"group": "Roboter",
 			"name": "Tempo",
 			"unit": "% Tempo",
 			"base_cost": 15,
 			"cost_growth": 1.5,
 			"max_level": 10,
 			"per_level": 12
+		},
+		{
+			"id": "spread",
+			"group": "Wachstum",
+			"name": "Ausbreitung",
+			"unit": "% Randwachstum pro Sekunde",
+			"base_cost": 40,
+			"cost_growth": 1.7,
+			"max_level": 10,
+			"per_level": 2
+		},
+		{
+			"id": "reach",
+			"group": "Wachstum",
+			"name": "Weite",
+			"unit": "Zellen Samenflug",
+			"base_cost": 150,
+			"cost_growth": 1.9,
+			"max_level": 8,
+			"per_level": 1,
+			"base": 1
 		}
 	]
 }

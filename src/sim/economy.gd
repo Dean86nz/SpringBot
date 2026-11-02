@@ -68,6 +68,11 @@ func bonus(id: String, lvl: int = -1) -> float:
 	return float(defs[id].get("per_level", 0.0)) * (level(id) if lvl < 0 else lvl)
 
 
+## Grundwert vor allen Stufen (Feld "base", Standard 0).
+func base(id: String) -> float:
+	return float(defs[id].get("base", 0.0)) if defs.has(id) else 0.0
+
+
 func max_all() -> void:
 	for id in order:
 		levels[id] = max_level(id)

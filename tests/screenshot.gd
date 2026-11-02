@@ -3,13 +3,16 @@ extends SceneTree
 ## Nicht headless (Fenster öffnet kurz).
 ##   Godot_v4.7.2-stable_win64_console.exe --path . -s tests/screenshot.gd -- <ausgabe.png> [frames] [plan]
 ##   plan: "aktion:von:bis" getrennt durch Komma, z. B. "move_right:2:60,move_down:40:120" ("-" = nichts)
-##   CHEATS=1 öffnet bei Bild 5 das Cheat-Menü, POLLEN=n gibt bei Bild 5 Pollen.
+##   CHEATS=1 öffnet bei Bild 5 das Cheat-Menü, POLLEN=n gibt bei Bild 5 Pollen,
+##   MAXALL=1 setzt alle Upgrades auf Maximum, TIMEX=n beschleunigt die Zeit.
 ## Gibt am Ende die FPS aus (NOVSYNC=1 misst ungedrosselt).
 
 var _frames := 0
 var _target := 120
 var _out := "user://screenshot.png"
 var _plan: Array = []
+var _last_us := 0
+var _worst_ms := 0.0
 
 
 func _initialize() -> void:
@@ -36,12 +39,20 @@ func _process(_delta: float) -> bool:
 			_send(s["action"], false)
 	if _frames == 5 and OS.get_environment("POLLEN") != "":
 		current_scene.eco.pollen += float(OS.get_environment("POLLEN"))
+	if _frames == 5 and OS.get_environment("MAXALL") == "1":
+		current_scene.eco.max_all()
+	if _frames == 5 and OS.get_environment("TIMEX") != "":
+		Engine.time_scale = float(OS.get_environment("TIMEX"))
 	if _frames == 5 and OS.get_environment("CHEATS") == "1":
 		current_scene.get_node("CheatMenu").open()
+	var now := Time.get_ticks_usec()
+	if _frames > 30 and _last_us > 0:
+		_worst_ms = maxf(_worst_ms, (now - _last_us) / 1000.0)
+	_last_us = now
 	if _frames == _target:
 		var img := root.get_viewport().get_texture().get_image()
 		var err := img.save_png(_out)
-		print("screenshot %s -> %d, FPS %d" % [_out, err, Engine.get_frames_per_second()])
+		print("screenshot %s -> %d, FPS %d, langsamstes Bild %.1f ms, Grün %.1f %%" % [_out, err, Engine.get_frames_per_second(), _worst_ms, current_scene.grid.coverage() * 100.0])
 		quit(0)
 	return false
 
