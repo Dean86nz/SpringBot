@@ -30,7 +30,7 @@ func _ready() -> void:
 	_hint.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	_hint.offset_left = 24
 	_hint.offset_bottom = -10
-	_hint.text = "Y / Tab: Upgrades   ·   Start / Esc: Pause"
+	_hint.text = "Y / Tab: Skilltree   ·   Start / Esc: Pause"
 	_hint.add_theme_font_size_override("font_size", 22)
 	_hint.add_theme_color_override("font_color", Color(1, 1, 1, 0.9))
 	_hint.add_theme_color_override("font_outline_color", Color(0.3, 0.3, 0.35))

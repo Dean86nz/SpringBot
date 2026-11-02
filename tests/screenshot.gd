@@ -38,9 +38,9 @@ func _process(_delta: float) -> bool:
 		elif _frames == s["to"]:
 			_send(s["action"], false)
 	if _frames == 5 and OS.get_environment("POLLEN") != "":
-		current_scene.eco.pollen += float(OS.get_environment("POLLEN"))
+		current_scene.skills.pollen += float(OS.get_environment("POLLEN"))
 	if _frames == 5 and OS.get_environment("MAXALL") == "1":
-		current_scene.eco.max_all()
+		current_scene.skills.max_all()
 	if _frames == 5 and OS.get_environment("TIMEX") != "":
 		Engine.time_scale = float(OS.get_environment("TIMEX"))
 	if _frames == 5 and OS.get_environment("CHEATS") == "1":

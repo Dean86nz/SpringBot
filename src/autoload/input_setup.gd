@@ -1,7 +1,7 @@
 class_name InputSetup
 extends RefCounted
 ## Registriert alle Spielaktionen zur Laufzeit in der InputMap (übernommen aus Scrap Empire).
-## Gamepad zuerst: linker Stick fährt, Y öffnet Upgrades, Start pausiert. Tastatur: WASD/Pfeile, Tab, Esc.
+## Gamepad zuerst: linker Stick fährt, Y öffnet den Skilltree, Start pausiert. Tastatur: WASD/Pfeile, Tab, Esc.
 
 const DEADZONE := 0.2
 
@@ -51,7 +51,7 @@ static func apply() -> void:
 	_ensure("ui_down", _btn(JOY_BUTTON_DPAD_DOWN))
 	_ensure("ui_left", _btn(JOY_BUTTON_DPAD_LEFT))
 	_ensure("ui_right", _btn(JOY_BUTTON_DPAD_RIGHT))
-	# Tab öffnet/schließt das Upgrade-Menü; Godot würde es sonst als Fokuswechsel schlucken.
+	# Tab öffnet/schließt den Skilltree; Godot würde es sonst als Fokuswechsel schlucken.
 	InputMap.action_erase_event("ui_focus_next", _key_plain(KEY_TAB))
 	InputMap.action_erase_event("ui_focus_prev", _key_plain(KEY_TAB, true))
 

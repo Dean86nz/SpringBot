@@ -40,8 +40,8 @@ func _ready() -> void:
 	title.add_theme_font_size_override("font_size", 32)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_box.add_child(title)
-	_add("+10.000 Pollen", func() -> void: pollen_requested.emit())
-	_add("Alles freischalten (alle Upgrades maximal)", func() -> void: unlock_all_requested.emit())
+	_add("+100.000 Pollen", func() -> void: pollen_requested.emit())
+	_add("Alles freischalten (ganzer Skilltree)", func() -> void: unlock_all_requested.emit())
 	_add("Zeit ×10 an/aus", func() -> void: Engine.time_scale = 1.0 if Engine.time_scale > 1.0 else 10.0)
 	_add("Spielstand zurücksetzen", func() -> void:
 		close()

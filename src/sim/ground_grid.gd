@@ -92,15 +92,15 @@ func paint_circle(center: Vector2, radius: float) -> int:
 ## Ist reach ≥ 2, wird mit Wahrscheinlichkeit seed_chance stattdessen ein Samen 2..reach Zellen
 ## weit geworfen (landet er auf Grün oder außerhalb, wächst doch die Grenzzelle).
 ## Jedes Ereignis begrünt also genau eine Zelle: Die Weite ändert den Ort, nicht das Tempo.
-func spread(events: int, reach: int, seed_chance: float, rng: RandomNumberGenerator) -> int:
+func spread(events: int, reach: float, seed_chance: float, rng: RandomNumberGenerator) -> int:
 	var added := 0
 	for e in events:
 		if frontier.is_empty():
 			break
 		var i := frontier[rng.randi_range(0, frontier.size() - 1)]
 		var c := Vector2i(i % width, i / width)
-		if reach >= 2 and rng.randf() < seed_chance:
-			var off := Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(2.0, float(reach))
+		if reach >= 2.0 and rng.randf() < seed_chance:
+			var off := Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(2.0, reach)
 			if set_green(c + Vector2i(roundi(off.x), roundi(off.y))):
 				added += 1
 				continue

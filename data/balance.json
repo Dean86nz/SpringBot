@@ -1,7 +1,7 @@
 {
 	"map": {
-		"width_cells": 320,
-		"height_cells": 240,
+		"width_cells": 640,
+		"height_cells": 480,
 		"cell_px": 24
 	},
 	"robot": {
@@ -9,10 +9,10 @@
 		"accel": 10.0,
 		"green_radius_cells": 3.0,
 		"radius_px": 30,
-		"start_cell": [160, 120]
+		"start_cell": [320, 240]
 	},
 	"bees": {
-		"hive_cell": [154, 115],
+		"hive_cell": [314, 235],
 		"hive_radius_px": 32,
 		"speed_px": 260.0,
 		"bloom_radius_cells": 2.3,

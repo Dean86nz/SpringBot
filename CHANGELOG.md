@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.5.0 – Meilenstein 5: Skilltree
+
+- Der Skilltree ersetzt das Upgrade-Menü (Y / Tab): 45 Knoten, drei Äste um den Startknoten „Frühlingsfunke“:
+  Roboter (oben: Reichweite, Tempo), Wachstum (rechts: Ausbreitung, Samenflug), Bienen (links: Anzahl, Flugtempo, Blütengröße, Schwebezeit).
+  Pollen-Knoten sind in allen drei Ästen verteilt.
+- Viele Knoten mit mehreren Stufen (Punkte unter dem Knoten), 9 besondere Knoten mit großer Wirkung (goldener Stern), z. B. Frühlingsherz, Löwenzahn-Sturm, Bienenkönigin, Ewiger Frühling.
+- Verdeckte Knoten: Kaufbare Knoten sind sichtbar, ihre Nachbarn als „?“ angedeutet, alles Weitere ist unsichtbar. Anzeige „Entdeckt: x / 45“.
+- Komplett per Gamepad: Stick/D-Pad springt zum nächsten Knoten in diese Richtung, die Ansicht fährt mit, A kauft, das Menü bleibt offen. Infofeld mit Name, Beschreibung, Wirkung je Stufe, Stufe und Kosten.
+  Bezahlbare Knoten leuchten, beim Kauf dehnt sich ein Ring aus, reicht es nicht, wackelt der Auswahlring rot.
+- Größere Welt: 640 × 480 Zellen (vorher 320 × 240), damit Skilltree und Bienen bis zum Ende gebraucht werden.
+  Pollen 0,005 je Zelle und Sekunde. Grobe Modellrechnung: Welt voll nach ca. 40 Minuten bei ständigem Spielen; echte Spieldauer muss der Test zeigen.
+- Cheat-Menü: „+100.000 Pollen“, „Alles freischalten“ kauft den ganzen Skilltree.
+- Leistung: Der Skilltree zeichnet Knoten und Linien nur bei Änderungen neu (vorher jedes Bild: 77 statt 365 FPS ungedrosselt am PC).
+- Entfernt: altes Upgrade-Menü und `data/upgrades.json`.
+
 ## 0.4.1 – Bienenstock fest (Rückmeldung zu 0.4.0)
 
 - Der Roboter fährt nicht mehr durch den Bienenstock, sondern gleitet an ihm entlang. Radien in `data/balance.json` (`robot/radius_px`, `bees/hive_radius_px`).
