@@ -40,4 +40,6 @@ Die Engine liegt in `Godot_v4.7.2-stable_win64.exe/` im Projektordner oder wird 
 ..\ScrapEmpire\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe --path . -s tests/screenshot.gd -- shot.png 240 "move_right:2:200"
 # Release- und Debug-EXE nach export/windows/
 .\build.ps1
+# Grobe Spieldauer-Rechnung nach Preisänderungen im Skilltree
+python tools/balance_sim.py data/skilltree.json 0.4 640 480 1 0.005
 ```
