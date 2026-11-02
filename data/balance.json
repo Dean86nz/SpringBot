@@ -1,0 +1,17 @@
+{
+	"map": {
+		"width_cells": 320,
+		"height_cells": 240,
+		"cell_px": 24
+	},
+	"robot": {
+		"speed_px": 380.0,
+		"accel": 10.0,
+		"green_radius_cells": 3.0,
+		"start_cell": [160, 120]
+	},
+	"camera": {
+		"zoom": 1.0,
+		"smoothing": 6.0
+	}
+}
