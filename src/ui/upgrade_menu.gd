@@ -23,13 +23,13 @@ func setup(eco: Economy) -> void:
 	anchor.set_anchors_and_offsets_preset(Control.PRESET_RIGHT_WIDE)
 	anchor.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	anchor.add_theme_constant_override("margin_right", 32)
-	anchor.add_theme_constant_override("margin_top", 90)
-	anchor.add_theme_constant_override("margin_bottom", 60)
+	anchor.add_theme_constant_override("margin_top", 70)
+	anchor.add_theme_constant_override("margin_bottom", 50)
 	add_child(anchor)
 	var holder := VBoxContainer.new()
 	holder.alignment = BoxContainer.ALIGNMENT_CENTER
 	anchor.add_child(holder)
-	_box = MenuKit.panel(holder)
+	_box = MenuKit.panel(holder, 20, 8)
 	MenuKit.title(_box, "Upgrades")
 	_pollen.add_theme_font_size_override("font_size", 28)
 	_pollen.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -42,12 +42,12 @@ func setup(eco: Economy) -> void:
 			group = g
 			var head := Label.new()
 			head.text = g
-			head.add_theme_font_size_override("font_size", 24)
+			head.add_theme_font_size_override("font_size", 22)
 			head.add_theme_color_override("font_color", Color(0.70, 0.92, 0.55))
 			_box.add_child(head)
-		var b := MenuKit.button(_box, "", 640, 108)
+		var b := MenuKit.button(_box, "", 680, 76)
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		b.add_theme_font_size_override("font_size", 24)
+		b.add_theme_font_size_override("font_size", 22)
 		b.pressed.connect(_buy.bind(id))
 		_buttons[id] = b
 	var hint := Label.new()
@@ -79,21 +79,20 @@ func refresh() -> void:
 		var b: Button = _buttons[id]
 		var d: Dictionary = _eco.defs[id]
 		var lvl := _eco.level(id)
-		var line1 := "%s   ·   Stufe %d / %d" % [d["name"], lvl, _eco.max_level(id)]
+		var line1 := "%s   ·   Stufe %d / %d   ·   " % [d["name"], lvl, _eco.max_level(id)]
 		# Ohne Grundwert zeigt "jetzt" den Bonus (+1), mit Grundwert den Gesamtwert (3)
 		var has_base := d.has("base")
 		var now := ("" if has_base else "+") + Fmt.num(_eco.base(id) + _eco.bonus(id))
 		var line2 := "+%s %s je Stufe (jetzt %s)" % [Fmt.num(float(d["per_level"])), d["unit"], now]
-		var line3: String
 		var col := COLOR_OK
 		if _eco.is_maxed(id):
-			line3 = "Maximal"
+			line1 += "Maximal"
 			col = COLOR_MAX
 		else:
-			line3 = "Kosten: %s Pollen" % Fmt.int_str(_eco.cost(id))
+			line1 += "%s Pollen" % Fmt.int_str(_eco.cost(id))
 			if not _eco.can_buy(id):
 				col = COLOR_POOR
-		b.text = "%s\n%s\n%s" % [line1, line2, line3]
+		b.text = "%s\n%s" % [line1, line2]
 		for key in ["font_color", "font_focus_color", "font_hover_color", "font_pressed_color"]:
 			b.add_theme_color_override(key, col)
 

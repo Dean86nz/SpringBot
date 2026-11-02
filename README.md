@@ -2,7 +2,7 @@
 
 Kleines 2D-Incremental-Spiel: Ein Roboter bringt einer grauen Welt den Frühling zurück. Wo er fährt, wird der Boden grün. Godot 4.7.2, GDScript, Gamepad zuerst (ROG Ally X).
 
-Stand: **Meilenstein 3 (Selbstausbreitung)**, Version 0.3.1. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`.
+Stand: **Meilenstein 4 (Bienen)**, Version 0.4.0. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`.
 
 ## Steuerung
 
@@ -17,9 +17,10 @@ Stand: **Meilenstein 3 (Selbstausbreitung)**, Version 0.3.1. Siehe `CHANGELOG.md
 
 ## Aufbau
 
-- `data/balance.json`: Kartengröße, Zellgröße, Grundtempo, Begrünungsradius, Kamera.
+- `data/balance.json`: Kartengröße, Zellgröße, Grundtempo, Begrünungsradius, Bienen (Stock, Flugtempo, Blütengröße, Schwebezeit, Sprungweite), Kamera.
 - `data/upgrades.json`: Pollen je grüner Zelle und Sekunde, Upgrades (Kosten, Wachstum, Maximalstufe, Wirkung je Stufe).
 - `src/sim/economy.gd`: Pollen und Upgrade-Stufen (reine Logik, getestet).
+- `src/sim/bee_swarm.gd`: Bienen-Logik (Zielwahl, Schweben, Begrünen), `src/world/bee_view.gd` zeichnet Stock und Bienen.
 - `src/sim/ground_grid.gd`: Boden-Raster (1 Byte je Zelle), Begrünen im Kreis, Zähler, Schmutz-Rechteck,
   laufend gepflegte Grenze (graue Zellen mit grünem Nachbarn) und Selbstausbreitung mit Samenflug.
 - `src/world/ground_view.gd`: Boden als ein Rechteck mit Shader; eine Maske (1 Pixel je Zelle, linear gefiltert) plus Rauschen ergibt weiche, organische Grenzen.

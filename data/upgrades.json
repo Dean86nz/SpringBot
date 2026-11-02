@@ -43,6 +43,26 @@
 			"max_level": 8,
 			"per_level": 1,
 			"base": 1
+		},
+		{
+			"id": "bees",
+			"group": "Bienen",
+			"name": "Bienenvolk",
+			"unit": "Bienen",
+			"base_cost": 120,
+			"cost_growth": 1.8,
+			"max_level": 10,
+			"per_level": 1
+		},
+		{
+			"id": "bee_speed",
+			"group": "Bienen",
+			"name": "Flügelschlag",
+			"unit": "% Flugtempo",
+			"base_cost": 200,
+			"cost_growth": 1.7,
+			"max_level": 8,
+			"per_level": 15
 		}
 	]
 }

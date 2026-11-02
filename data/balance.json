@@ -10,6 +10,15 @@
 		"green_radius_cells": 3.0,
 		"start_cell": [160, 120]
 	},
+	"bees": {
+		"hive_cell": [154, 115],
+		"speed_px": 260.0,
+		"bloom_radius_cells": 2.3,
+		"hover_sec": 2.0,
+		"hop_min_cells": 6,
+		"hop_max_cells": 18,
+		"target_tries": 8
+	},
 	"camera": {
 		"zoom": 1.0,
 		"smoothing": 6.0

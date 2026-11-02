@@ -1,27 +1,21 @@
-# Testliste Meilenstein 3 (v0.3.1)
+# Testliste Meilenstein 4 (v0.4.0)
 
-EXEs: `export/windows/SpringBot_v0.3.1.exe` (Release) und `SpringBot_v0.3.1_DEBUG.exe` (Debug mit Cheat-Menü).
+EXEs: `export/windows/SpringBot_v0.4.0.exe` (Release) und `SpringBot_v0.4.0_DEBUG.exe` (Debug mit Cheat-Menü).
 
-## Neu in 0.3.1
-- Ausbreitung wächst gleichmäßig: Stufe 1 = 3 Zellen pro Sekunde, Stufe 10 = 30. Das Grün wird nicht mehr von selbst immer schneller.
-- Nur mit Ausbreitung und Weite sollte die Karte jetzt deutlich länger dauern (bei Maximum rund 43 Minuten ohne Fahren).
-
-## Ausbreitung
-1. Neues Spiel: Ohne Wachstums-Upgrade wächst nichts von allein (Spur bleibt, wie gefahren).
-2. Upgrade-Menü (Y / Tab): Es gibt jetzt die Überschriften „Roboter“ und „Wachstum“, darunter „Ausbreitung“ und „Weite“.
-3. „Ausbreitung“ Stufe 1 kaufen (40 Pollen), Menü schließen, kurz stehen bleiben: Die Ränder wachsen langsam nach außen (3 Zellen pro Sekunde).
-4. Weitere Stufen: Das Wachsen wird sichtbar schneller. Die Prozentanzeige und der Pollen-Ertrag steigen auch ohne Fahren, aber gleichmäßig.
-5. „Weite“ kaufen (150 Pollen): Vor dem Rand tauchen einzelne grüne Inseln auf, die selbst weiterwachsen.
-6. Die Grenze sieht organisch aus (keine geraden Kanten, kein Flackern).
-7. Läuft es flüssig, auch wenn viel gleichzeitig wächst?
+## Bienen
+1. Neues Spiel: Links oberhalb des Roboters steht ein gelber Bienenstock. Noch keine Bienen.
+2. Upgrade-Menü (Y / Tab): Unten die neue Gruppe „Bienen“ mit „Bienenvolk“ und „Flügelschlag“. Alle sechs Upgrades passen aufs Bild, jedes in zwei Zeilen, Kosten oben rechts in der Zeile.
+3. „Bienenvolk“ kaufen (120 Pollen): Eine Biene fliegt aus dem Stock zu einer grauen Stelle, schwebt dort kurz (flattert) und hinterlässt einen runden grünen Fleck. Dann fliegt sie weiter.
+4. Mehr Stufen = mehr Bienen. „Flügelschlag“ macht sie sichtbar schneller.
+5. Die Flecken der Bienen wachsen mit „Ausbreitung“ auch von selbst weiter.
+6. Sind die Bienen gut zu erkennen auf dem Ally-Bildschirm?
 
 ## Cheat-Menü (nur Debug-EXE: L3 + R3 eine Sekunde halten, PC F12)
-8. „Alles freischalten“ + „Zeit ×10“: Das Grün wächst mit 300 Zellen pro Sekunde (Karte in rund 4 Minuten). Ruckelt es dabei auf dem Ally?
-9. „Spielstand zurücksetzen“: Alles grau, Wachstum steht wieder still, bis man neu kauft.
+7. „Alles freischalten“ + „Zeit ×10“: 10 Bienen schwirren über die Karte. Gegen Ende fliegen sie die letzten grauen Lücken an. Ruckelt etwas?
+8. „Spielstand zurücksetzen“: Alle Bienen weg, Stock bleibt.
 
 ## Wie bisher
-10. Start / Esc: Pause-Menü mit „Spiel beenden“. Kaufen mit A lässt das Menü offen.
+9. Start / Esc: Pause-Menü mit „Spiel beenden“. Kaufen mit A lässt das Menü offen.
 
 ## Offen für Feedback
-- Wachstum zu langsam oder zu schnell? Werte in `data/upgrades.json` (`spread`, `reach`, `seed_chance`).
-- Das Spielende bei 100 % kommt erst mit Meilenstein 7; bis dahin passiert bei voller Karte nichts Besonderes.
+- Sind Bienen zu stark oder zu schwach im Vergleich zur Ausbreitung? Werte in `data/balance.json` (`bees`) und `data/upgrades.json` (`bees`, `bee_speed`).

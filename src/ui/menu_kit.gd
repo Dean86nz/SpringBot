@@ -14,7 +14,7 @@ static func any_open(tree: SceneTree) -> bool:
 
 
 ## Panel mit Innenabstand; gibt die VBox zurück, in die der Inhalt kommt.
-static func panel(parent: Control, margin: int = 24) -> VBoxContainer:
+static func panel(parent: Control, margin: int = 24, gap: int = 12) -> VBoxContainer:
 	var p := PanelContainer.new()
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0.20, 0.27, 0.24, 0.94)
@@ -28,7 +28,7 @@ static func panel(parent: Control, margin: int = 24) -> VBoxContainer:
 		m.add_theme_constant_override("margin_" + side, margin)
 	p.add_child(m)
 	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 12)
+	box.add_theme_constant_override("separation", gap)
 	m.add_child(box)
 	return box
 

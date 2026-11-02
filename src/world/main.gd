@@ -1,7 +1,8 @@
 extends Node2D
 ## Hauptszene: Raster, Boden, Roboter, Kamera, HUD, Menüs und (nur Debug) Cheat-Menü.
 ## Jedes Bild begrünt der Roboter die Zellen in seinem Radius; grüne Zellen bringen Pollen.
-## Mit den Wachstums-Upgrades wächst die Grenze des Grüns von allein weiter.
+## Mit den Wachstums-Upgrades wächst die Grenze des Grüns von allein weiter,
+## Bienen tragen das Grün zu neuen Stellen.
 ## Läuft auch während der Pause (Menü-Eingaben), Roboter und Boden pausieren.
 
 var grid: GroundGrid
@@ -16,6 +17,9 @@ var _seed_chance := 0.3
 var _spread_carry := 0.0
 var _spread_cap := 3000
 var _rng := RandomNumberGenerator.new()
+var _bees := BeeSwarm.new()
+var _bee_speed := 1.0
+var _bee_view := BeeView.new()
 var _start_px := Vector2.ZERO
 var _ground := GroundView.new()
 var _robot := Robot.new()
@@ -45,6 +49,12 @@ func _ready() -> void:
 	_ground.process_mode = Node.PROCESS_MODE_PAUSABLE
 	_ground.bind(grid, cell_px)
 	add_child(_ground)
+	var hive: Variant = Game.dig(Game.balance, "bees/hive_cell")
+	var hive_px := (Vector2(hive[0], hive[1]) + Vector2(0.5, 0.5)) * cell_px if hive is Array else _start_px
+	_bees.configure(Game.dig(Game.balance, "bees") if Game.dig(Game.balance, "bees") is Dictionary else {}, hive_px, cell_px)
+	_bee_view.process_mode = Node.PROCESS_MODE_PAUSABLE
+	_bee_view.bind(_bees)
+	add_child(_bee_view)
 	_robot.process_mode = Node.PROCESS_MODE_PAUSABLE
 	_robot.accel = Game.num("robot/accel", 10.0)
 	_robot.bounds = Rect2(Vector2.ZERO, size_px).grow(-cell_px * 0.5)
@@ -78,6 +88,7 @@ func _process(delta: float) -> void:
 		return
 	_paint()
 	_spread(delta)
+	_bees.update(delta, grid, _rng, _bee_speed)
 	eco.tick(delta, grid.green_count)
 	_hud.set_pollen(eco.pollen, eco.rate(grid.green_count))
 
@@ -105,6 +116,8 @@ func _apply_upgrades() -> void:
 	_reach = int(eco.base("reach") + eco.bonus("reach"))
 	_green_radius = _base_radius + eco.bonus("radius")
 	_robot.speed_px = _base_speed * (1.0 + eco.bonus("speed") / 100.0)
+	_bees.set_count(int(eco.bonus("bees")))
+	_bee_speed = 1.0 + eco.bonus("bee_speed") / 100.0
 
 
 ## Menüs öffnen und schließen. Das Cheat-Menü verwaltet sich selbst.
@@ -134,6 +147,7 @@ func reset_game() -> void:
 	grid.clear()
 	eco.reset()
 	_spread_carry = 0.0
+	_bees.set_count(0)
 	_robot.position = _start_px
 	_robot.velocity = Vector2.ZERO
 	_camera.reset_smoothing()
