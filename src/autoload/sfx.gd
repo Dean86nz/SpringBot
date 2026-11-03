@@ -1,0 +1,158 @@
+extends Node
+## Ton: Effekte und Musik (Aufbau übernommen aus Scrap Empire, ohne Fahrgeräusch).
+## Effekte liegen unter assets/audio/sfx/<id>_<n>.ogg, mehrere Dateien = Varianten, dazu leichte
+## Tonhöhen-Variation. Musik: mehrere Stücke von ruhig nach voller; je mehr Fläche blüht,
+## desto weiter wird zum nächsten Stück übergeblendet (Schwellen in data/audio.json).
+## Rein kosmetisch, keine Spiellogik.
+
+const AUDIO_PATH := "res://data/audio.json"
+const SFX_DIR := "res://assets/audio/sfx/"
+const VOICES := 8
+const JITTER := 0.05
+const BUS_SFX := "SFX"
+const BUS_MUSIC := "Music"
+
+var cfg: Dictionary = {}
+var music := AudioStreamPlayer.new()
+var _music_old := AudioStreamPlayer.new()   # zweiter Abspieler fürs Überblenden
+var _tracks: Array[AudioStream] = []
+var _playing := -1
+var _streams: Dictionary = {}           # id → Array[AudioStream]
+var _players: Array[AudioStreamPlayer] = []
+var _next := 0
+var _last_play: Dictionary = {}
+var _coverage := 0.0
+
+
+func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	cfg = Game.load_json(AUDIO_PATH)
+	_ensure_bus(BUS_SFX, float(cfg.get("sfx_db", 0.0)))
+	_ensure_bus(BUS_MUSIC, float(cfg.get("music_db", 0.0)))
+	for i in VOICES:
+		var p := AudioStreamPlayer.new()
+		p.bus = BUS_SFX
+		add_child(p)
+		_players.append(p)
+	for m in [music, _music_old]:
+		m.bus = BUS_MUSIC
+		add_child(m)
+	_load_sfx()
+	# Ohne Ausgabe (Tests, --audio-driver Dummy) läuft der Mischer nie,
+	# gestartete Musik bliebe beim Beenden hängen
+	if DisplayServer.get_name() != "headless" and AudioServer.get_driver_name() != "Dummy":
+		_start_music()
+
+
+## Beendet das Spiel. Erst alles stoppen und den Mischer kurz laufen lassen,
+## sonst bleiben laufende Ogg-Abspieler im AudioServer hängen (Fehlermeldung beim Beenden).
+func quit_game() -> void:
+	stop_all()
+	await get_tree().create_timer(0.15, true, false, true).timeout
+	get_tree().quit()
+
+
+func stop_all() -> void:
+	music.stop()
+	_music_old.stop()
+	for p in _players:
+		p.stop()
+
+
+func _ensure_bus(bus_name: String, db: float) -> void:
+	var idx := AudioServer.get_bus_index(bus_name)
+	if idx < 0:
+		AudioServer.add_bus()
+		idx = AudioServer.bus_count - 1
+		AudioServer.set_bus_name(idx, bus_name)
+	AudioServer.set_bus_volume_db(idx, db)
+
+
+func play(id: String, pitch: float = 1.0, pitch_jitter: float = JITTER) -> void:
+	var list: Array = _streams.get(id, [])
+	if list.is_empty():
+		return
+	var p := _players[_next]
+	_next = (_next + 1) % VOICES
+	p.stream = list[randi() % list.size()]
+	p.pitch_scale = pitch * (1.0 + randf_range(-pitch_jitter, pitch_jitter))
+	p.volume_db = float(cfg.get("sfx_level_db", {}).get(id, -6.0))
+	p.play()
+
+
+## Wie play, aber höchstens einmal je min_gap Sekunden (Echtzeit).
+func play_throttled(id: String, min_gap: float, pitch: float = 1.0) -> void:
+	var now := Time.get_ticks_msec()
+	if now - int(_last_play.get(id, -100000)) < int(min_gap * 1000.0):
+		return
+	_last_play[id] = now
+	play(id, pitch)
+
+
+## Begrünter Anteil 0..1; bestimmt, welches Musikstück läuft.
+func set_progress(coverage: float) -> void:
+	_coverage = coverage
+
+
+## Index des Stücks für diesen Fortschritt: das letzte, dessen Schwelle erreicht ist.
+static func track_for(tracks: Array, coverage: float) -> int:
+	var idx := 0
+	for i in tracks.size():
+		if coverage >= float(tracks[i].get("from_coverage", 0.0)):
+			idx = i
+	return idx
+
+
+## Wechselt das Stück, sobald eine neue Schwelle erreicht ist: das alte blendet aus,
+## das neue beginnt von vorn und blendet gleichzeitig ein (zwei Abspieler).
+func _process(delta: float) -> void:
+	if _tracks.is_empty():
+		return
+	var tracks: Array = cfg.get("tracks", [])
+	var off := float(cfg.get("off_db", -60.0))
+	var step := delta * absf(off) / maxf(float(cfg.get("fade_sec", 5.0)), 0.1)
+	var want := track_for(tracks, _coverage)
+	if want != _playing:
+		var tmp := _music_old
+		_music_old = music
+		music = tmp
+		music.stream = _tracks[want]
+		music.volume_db = off
+		music.play()
+		_playing = want
+	music.volume_db = move_toward(music.volume_db, float(tracks[_playing].get("db", 0.0)), step)
+	if _music_old.playing:
+		_music_old.volume_db = move_toward(_music_old.volume_db, off, step)
+		if _music_old.volume_db <= off:
+			_music_old.stop()
+
+
+func _start_music() -> void:
+	for t: Dictionary in cfg.get("tracks", []):
+		var path := str(t.get("file", ""))
+		var s: AudioStream = load(path) if ResourceLoader.exists(path) else null
+		if s is AudioStreamOggVorbis:
+			(s as AudioStreamOggVorbis).loop = true
+		_tracks.append(s)
+	_playing = -1   # erstes _process startet das passende Stück
+
+## Lädt assets/audio/sfx/<id>_<n>.ogg als Varianten von <id>.
+func _load_sfx() -> void:
+	var dir := DirAccess.open(SFX_DIR)
+	if dir == null:
+		return
+	for f in dir.get_files():
+		var fname := f.trim_suffix(".import").trim_suffix(".remap")
+		if not fname.ends_with(".ogg"):
+			continue
+		var id := fname.get_basename()
+		var cut := id.rfind("_")
+		if cut > 0:
+			id = id.substr(0, cut)
+		var stream: AudioStream = load(SFX_DIR + fname)
+		if stream == null:
+			continue
+		if not _streams.has(id):
+			_streams[id] = []
+		if not (_streams[id] as Array).has(stream):
+			_streams[id].append(stream)

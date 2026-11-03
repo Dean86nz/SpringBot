@@ -33,6 +33,13 @@ static var ACTIONS: Dictionary = {
 	"upgrades": [_btn(JOY_BUTTON_Y), _key(KEY_TAB)],
 	"pause": [_btn(JOY_BUTTON_START), _key(KEY_ESCAPE)],
 	"toggle_fullscreen": [_key(KEY_F11)],
+	# Skilltree: rechter Stick schiebt die Ansicht, Schultertasten zoomen
+	"tree_pan_left": [_key(KEY_J), _axis(JOY_AXIS_RIGHT_X, -1.0)],
+	"tree_pan_right": [_key(KEY_L), _axis(JOY_AXIS_RIGHT_X, 1.0)],
+	"tree_pan_up": [_key(KEY_I), _axis(JOY_AXIS_RIGHT_Y, -1.0)],
+	"tree_pan_down": [_key(KEY_K), _axis(JOY_AXIS_RIGHT_Y, 1.0)],
+	"tree_zoom_in": [_btn(JOY_BUTTON_RIGHT_SHOULDER), _key(KEY_E)],
+	"tree_zoom_out": [_btn(JOY_BUTTON_LEFT_SHOULDER), _key(KEY_Q)],
 }
 
 

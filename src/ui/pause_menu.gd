@@ -21,7 +21,7 @@ func _ready() -> void:
 	_box = MenuKit.panel(center, 32)
 	MenuKit.title(_box, "Pause")
 	MenuKit.button(_box, "Weiterspielen").pressed.connect(close)
-	MenuKit.button(_box, "Spiel beenden").pressed.connect(func() -> void: get_tree().quit())
+	MenuKit.button(_box, "Spiel beenden").pressed.connect(Sfx.quit_game)
 
 
 func open() -> void:

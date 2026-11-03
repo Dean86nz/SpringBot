@@ -3,3 +3,4 @@
 Hier landen Einfälle, die nicht zum verbindlichen Umfang gehören. Nichts davon wird ohne Freigabe umgesetzt.
 
 - Minikarte oder Übersichtskarte, die zeigt, wo noch Grau ist.
+- Lautstärke-Regler für Musik und Klänge im Pause-Menü (wie in Scrap Empire).

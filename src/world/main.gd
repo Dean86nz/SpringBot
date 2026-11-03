@@ -24,6 +24,9 @@ var _base_hover := 2.0
 var _bee_view := BeeView.new()
 var _start_px := Vector2.ZERO
 var _ground := GroundView.new()
+var _petals := PetalFx.new()
+var _petal_carry := 0.0
+var _milestone := 0          # erreichte Zehntel der Fläche (für Klang und Blätterregen)
 var _robot := Robot.new()
 var _camera := Camera2D.new()
 var _hud := Hud.new()
@@ -58,6 +61,8 @@ func _ready() -> void:
 	_bee_view.process_mode = Node.PROCESS_MODE_PAUSABLE
 	_bee_view.bind(_bees)
 	add_child(_bee_view)
+	_petals.process_mode = Node.PROCESS_MODE_PAUSABLE
+	add_child(_petals)   # vor dem Roboter: Blätter liegen unter ihm
 	_robot.process_mode = Node.PROCESS_MODE_PAUSABLE
 	_robot.accel = Game.num("robot/accel", 10.0)
 	_robot.bounds = Rect2(Vector2.ZERO, size_px).grow(-cell_px * 0.5)
@@ -94,13 +99,43 @@ func _process(delta: float) -> void:
 	_paint()
 	_spread(delta)
 	_bees.update(delta, grid, _rng, _bee_speed)
+	_bee_blooms()
 	skills.tick(delta, grid.green_count)
 	_hud.set_pollen(skills.pollen, skills.rate(grid.green_count))
 
 
 func _paint() -> void:
-	grid.paint_circle(_robot.position / cell_px, _green_radius)
-	_hud.set_coverage(grid.coverage())
+	var fresh := grid.paint_circle(_robot.position / cell_px, _green_radius)
+	_robot_petals(fresh)
+	var cov := grid.coverage()
+	_hud.set_coverage(cov)
+	Sfx.set_progress(cov)
+	var m := floori(cov * 10.0)
+	if m > _milestone:
+		_milestone = m
+		Sfx.play("milestone", 1.0, 0.0)
+		_petals.burst(_robot.position, 90, Vector2(160, 520), Vector2(1.0, 1.8), Vector2(7, 12))
+		_hud.pulse()
+
+
+## Frisch begrünte Zellen unter dem Roboter werfen ein paar Blätter nach hinten.
+func _robot_petals(fresh: int) -> void:
+	if fresh <= 0 or _robot.velocity.length() < 20.0:
+		return
+	_petal_carry += fresh * 0.3
+	var n := mini(int(_petal_carry), 4)
+	_petal_carry -= n
+	var back := -_robot.velocity.normalized()
+	for i in n:
+		var p := _robot.position + back * _robot.radius_px * 0.8 + Vector2(randf_range(-1, 1), randf_range(-1, 1)) * _robot.radius_px * 0.6
+		_petals.burst(p, 1, Vector2(40, 140), Vector2(0.7, 1.2), Vector2(6, 10), back, 1.1)
+
+
+## Wo eine Biene etwas erblühen ließ, fliegen ein paar Blätter.
+func _bee_blooms() -> void:
+	for p in _bees.blooms:
+		_petals.burst(p, 6, Vector2(30, 130), Vector2(0.6, 1.1), Vector2(5, 8))
+	_bees.blooms.clear()
 
 
 ## Feste Zahl Zellen pro Sekunde (lineares Wachstum, unabhängig von der Länge der Grenze);
@@ -133,20 +168,24 @@ func _unhandled_input(event: InputEvent) -> void:
 	if _tree.visible:
 		if event.is_action_pressed("upgrades") or event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause"):
 			_tree.close()
+			Sfx.play("close")
 			_robot.input_enabled = true
 			get_viewport().set_input_as_handled()
 	elif _pause.visible:
 		if event.is_action_pressed("pause") or event.is_action_pressed("ui_cancel"):
 			_pause.close()
+			Sfx.play("close")
 			get_viewport().set_input_as_handled()
 	elif MenuKit.any_open(get_tree()):
 		return
 	elif event.is_action_pressed("upgrades"):
 		_robot.input_enabled = false
 		_tree.open()
+		Sfx.play("open")
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("pause"):
 		_pause.open()
+		Sfx.play("open")
 		get_viewport().set_input_as_handled()
 
 
@@ -155,6 +194,7 @@ func reset_game() -> void:
 	grid.clear()
 	skills.reset()
 	_spread_carry = 0.0
+	_milestone = 0
 	_bees.set_count(0)
 	_robot.position = _start_px
 	_robot.velocity = Vector2.ZERO

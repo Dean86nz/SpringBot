@@ -1,5 +1,5 @@
 extends Node
-## Globaler Einstieg: Input-Map, Balancing-Daten, Vollbild. Erster und einziger Autoload.
+## Globaler Einstieg: Input-Map, Balancing-Daten, Vollbild. Erster Autoload (vor Sfx).
 
 const BALANCE_PATH := "res://data/balance.json"
 const SKILLTREE_PATH := "res://data/skilltree.json"

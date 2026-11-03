@@ -2,7 +2,7 @@
 
 Kleines 2D-Incremental-Spiel: Ein Roboter bringt einer grauen Welt den Frühling zurück. Wo er fährt, wird der Boden grün. Godot 4.7.2, GDScript, Gamepad zuerst (ROG Ally X).
 
-Stand: **Meilenstein 5 (Skilltree)**, Version 0.5.0. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`.
+Stand: **Meilenstein 6 (Musik, Klänge, Partikel)**, Version 0.6.0. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`, fremde Inhalte in `CREDITS.md`.
 
 ## Steuerung
 
@@ -10,7 +10,8 @@ Stand: **Meilenstein 5 (Skilltree)**, Version 0.5.0. Siehe `CHANGELOG.md`, Testl
 |---|---|---|
 | Fahren | linker Stick | WASD oder Pfeiltasten |
 | Skilltree auf/zu | Y | Tab |
-| Skilltree: Knoten wählen / kaufen | Stick oder D-Pad / A | Pfeile oder WASD / Enter, Maus: Klick wählt, zweiter Klick kauft |
+| Skilltree: Ansicht schieben / zoomen | rechter Stick / LB, RB | Maus ziehen oder I/J/K/L / Mausrad, Q, E |
+| Skilltree: Knoten wählen / kaufen | linker Stick oder D-Pad / A | Pfeile oder WASD / Enter, Maus: Klick wählt, zweiter Klick kauft |
 | Pause-Menü (Weiterspielen, Spiel beenden) | Start | Esc |
 | Vollbild ein/aus | – | F11 |
 | Cheat-Menü (nur Debug-EXE) | L3 + R3 eine Sekunde halten | F12 |
@@ -27,6 +28,9 @@ Stand: **Meilenstein 5 (Skilltree)**, Version 0.5.0. Siehe `CHANGELOG.md`, Testl
   laufend gepflegte Grenze (graue Zellen mit grünem Nachbarn) und Selbstausbreitung mit Samenflug.
 - `src/world/ground_view.gd`: Boden als ein Rechteck mit Shader; eine Maske (1 Pixel je Zelle, linear gefiltert) plus Rauschen ergibt weiche, organische Grenzen.
 - `src/world/robot.gd`, `src/world/main.gd` (öffnet/schließt die Menüs), `src/ui/hud.gd`.
+- `src/autoload/sfx.gd` (Autoload „Sfx“): Klänge mit Varianten, Musikstücke je Fortschritt mit Überblenden.
+  Dateien in `assets/audio/`, Lautstärken und Schwellen in `data/audio.json`.
+- `src/world/petal_fx.gd`: Blütenblätter-Partikel (fester Vorrat, ein Zeichenaufruf für alle).
 - `src/ui/skill_tree_menu.gd` (statische Ebene, nur bei Änderungen neu gezeichnet), `src/ui/pause_menu.gd`, `src/ui/cheat_menu.gd`, gemeinsame Bausteine in `src/ui/menu_kit.gd`.
 
 ## Entwickeln
@@ -36,8 +40,8 @@ Die Engine liegt in `Godot_v4.7.2-stable_win64.exe/` im Projektordner oder wird 
 ```
 # Tests (headless)
 ..\ScrapEmpire\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe --headless --path . -s tests/run_tests.gd
-# Screenshot-Lauf (Fenster öffnet kurz)
-..\ScrapEmpire\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe --path . -s tests/screenshot.gd -- shot.png 240 "move_right:2:200"
+# Screenshot-Lauf (Fenster öffnet kurz, stumm)
+..\ScrapEmpire\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe --audio-driver Dummy --path . -s tests/screenshot.gd -- shot.png 240 "move_right:2:200"
 # Release- und Debug-EXE nach export/windows/
 .\build.ps1
 # Grobe Spieldauer-Rechnung nach Preisänderungen im Skilltree

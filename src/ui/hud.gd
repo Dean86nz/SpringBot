@@ -53,6 +53,16 @@ func set_coverage(fraction: float) -> void:
 	_percent.text = "Frühling: %s %%" % format_percent(fraction)
 
 
+## Prozentanzeige springt kurz auf (bei jedem vollen Zehntel).
+func pulse() -> void:
+	_percent.pivot_offset = _percent.size * 0.5
+	var tw := create_tween()
+	_percent.scale = Vector2.ONE * 1.4
+	_percent.modulate = Color(1.0, 0.95, 0.6)
+	tw.tween_property(_percent, "scale", Vector2.ONE, 0.7).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+	tw.parallel().tween_property(_percent, "modulate", Color.WHITE, 0.9)
+
+
 func set_pollen(amount: float, per_sec: float) -> void:
 	_pollen.text = "Pollen: %s  (+%s/s)" % [Fmt.int_str(floori(amount)), Fmt.num(snappedf(per_sec, 0.1))]
 

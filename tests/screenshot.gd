@@ -47,13 +47,18 @@ func _process(_delta: float) -> bool:
 		current_scene.get_node("CheatMenu").open()
 	var now := Time.get_ticks_usec()
 	if _frames > 30 and _last_us > 0:
-		_worst_ms = maxf(_worst_ms, (now - _last_us) / 1000.0)
+		var ms := (now - _last_us) / 1000.0
+		if ms > 30.0:
+			print("langsames Bild %d: %.1f ms, Grün %.1f %%" % [_frames, ms, current_scene.grid.coverage() * 100.0])
+		_worst_ms = maxf(_worst_ms, ms)
 	_last_us = now
 	if _frames == _target:
 		var img := root.get_viewport().get_texture().get_image()
 		var err := img.save_png(_out)
 		print("screenshot %s -> %d, FPS %d, langsamstes Bild %.1f ms, Grün %.1f %%" % [_out, err, Engine.get_frames_per_second(), _worst_ms, current_scene.grid.coverage() * 100.0])
-		quit(0)
+		Engine.time_scale = 1.0
+		_target = -1
+		root.get_node("Sfx").quit_game()
 	return false
 
 

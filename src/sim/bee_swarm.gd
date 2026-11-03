@@ -21,6 +21,7 @@ var hover_sec := 2.0
 var hop_min := 6.0        # Zellen
 var hop_max := 18.0
 var tries := 8
+var blooms := PackedVector2Array()   # Orte (Pixel), an denen seit dem letzten Abholen etwas erblüht ist
 
 
 func configure(cfg: Dictionary, p_hive: Vector2, p_cell_px: float) -> void:
@@ -54,7 +55,10 @@ func update(delta: float, grid: GroundGrid, rng: RandomNumberGenerator, speed_fa
 			if b.hover <= 0.0:
 				# Kleiner Versatz unterhalb einer Zelle: Flecken werden rund und verschieden statt rautenförmig
 				var jitter := Vector2(rng.randf_range(-0.5, 0.5), rng.randf_range(-0.5, 0.5))
-				added += grid.paint_circle(b.pos / cell_px + jitter, bloom_radius)
+				var n := grid.paint_circle(b.pos / cell_px + jitter, bloom_radius)
+				added += n
+				if n > 0:
+					blooms.append(b.pos)
 				b.target = pick_target(b.pos, grid, rng)
 				b.flying = true
 			continue

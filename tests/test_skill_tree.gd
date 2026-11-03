@@ -82,6 +82,20 @@ func test_gamepad_navigation_finds_branches() -> void:
 	menu.free()
 
 
+func test_free_pan_selects_center_and_stays_in_bounds() -> void:
+	var t := SkillTree.new(Game.load_json("res://data/skilltree.json"))
+	var menu := SkillTreeMenu.new()
+	menu.setup(t)
+	var r1: Array = t.nodes["r1"]["pos"]
+	var r1_px := Vector2(float(r1[0]), float(r1[1])) * SkillTreeMenu.UNIT_PX
+	assert_eq(menu.nearest_node(r1_px, 50.0), "r1", "kaufbarer Knoten in der Mitte wird gewählt")
+	assert_eq(menu.nearest_node(r1_px * 3.0, 50.0), "", "verdeckte Knoten werden nicht gewählt")
+	menu.pan_by(Vector2(1e6, 1e6))
+	menu.pan_by(r1_px - Vector2(1e6, 1e6))
+	assert_true(menu._view.x < 1e5, "Ansicht bleibt am Rand des Baums hängen")
+	menu.free()
+
+
 func test_number_format() -> void:
 	assert_eq(Fmt.int_str(1234567), "1.234.567")
 	assert_eq(Fmt.num(2.5), "2,5")

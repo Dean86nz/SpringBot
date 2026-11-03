@@ -2,6 +2,8 @@ class_name SkillTreeMenu
 extends CanvasLayer
 ## Der Skilltree als Vollbild-Menü. Stick/D-Pad/Pfeile springen zum nächsten sichtbaren Knoten
 ## in diese Richtung, die Ansicht fährt mit. A/Enter kauft eine Stufe, das Menü bleibt offen.
+## Rechter Stick (Maus ziehen, I/J/K/L) schiebt die Ansicht frei, gewählt ist dann der Knoten
+## nahe der Bildmitte. LB/RB (Mausrad, Q/E) zoomen.
 ## Maus: Klick wählt, zweiter Klick kauft. Öffnen/Schließen steuert main.gd.
 ## Das Spiel läuft weiter (Pollen fließen), nur der Roboter steht.
 ## Leistung: Knoten, Linien und Symbole liegen auf einer statischen Ebene, die nur bei Änderungen
@@ -14,6 +16,13 @@ const SPECIAL_R := 50.0
 const VIEW_Y := 470.0           # Bildschirmhöhe, auf der der gewählte Knoten steht
 const REPEAT_FIRST := 0.30
 const REPEAT_NEXT := 0.15
+const PAN_SPEED := 1300.0       # Bildschirm-Pixel pro Sekunde bei vollem Stick
+const ZOOM_MIN := 0.45
+const ZOOM_MAX := 1.2
+const ZOOM_START := 0.8
+const ZOOM_RATE := 1.6          # Zoom-Faktor pro Sekunde beim Halten (exponentiell)
+const WHEEL_STEP := 1.12
+const DRAG_START_PX := 10.0
 const BRANCH_COLORS := {
 	"root": Color(1.0, 0.62, 0.76),
 	"robot": Color(0.47, 0.72, 0.98),
@@ -26,6 +35,7 @@ const POOR := Color(1.0, 0.70, 0.66)
 var _tree: SkillTree
 var _layer := Node2D.new()         # statisch: Linien, Knoten, Symbole
 var _fx := Node2D.new()            # jedes Bild: Schein, Auswahl, Kauf-Effekt
+var _petals := PetalFx.new()       # Blütenblätter beim Kauf
 var _input := Control.new()        # fängt Mausklicks über die ganze Fläche
 var _static_key := PackedByteArray()
 var _title := Label.new()
@@ -42,6 +52,11 @@ var _time := 0.0
 var _pop: Dictionary = {}        # id → Restzeit des Kauf-Effekts
 var _shake := 0.0
 var _font: Font
+var _zoom := ZOOM_START
+var _free := false               # Ansicht frei geschoben statt der Auswahl folgend
+var _bounds := Rect2()           # alle Knoten plus Rand, in Baum-Pixeln
+var _press := false              # linke Maustaste gedrückt
+var _dragged := 0.0              # Mausweg seit dem Drücken
 
 
 func setup(tree: SkillTree) -> void:
@@ -50,6 +65,10 @@ func setup(tree: SkillTree) -> void:
 	visible = false
 	add_to_group(MenuKit.GROUP)
 	_font = ThemeDB.fallback_font
+	_bounds = Rect2(_pos("root"), Vector2.ZERO)
+	for id in _tree.order:
+		_bounds = _bounds.expand(_pos(id))
+	_bounds = _bounds.grow(UNIT_PX)
 	var bg := ColorRect.new()
 	bg.color = Color(0.11, 0.17, 0.14, 0.97)
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -62,6 +81,7 @@ func setup(tree: SkillTree) -> void:
 	add_child(_fx)
 	_layer.draw.connect(_draw_tree)
 	add_child(_layer)
+	_layer.add_child(_petals)   # eigene Zeichenfläche: Blätter fliegen über den Knoten
 	# Streifen hinter der Kopfzeile, damit Knoten den Titel nicht überdecken
 	var strip := ColorRect.new()
 	strip.color = Color(0.09, 0.14, 0.12, 0.92)
@@ -104,7 +124,8 @@ func _build_info() -> void:
 	_info_desc.add_theme_color_override("font_color", Color(0.85, 0.90, 0.85))
 	_info_effect.add_theme_color_override("font_color", Color(0.72, 0.95, 0.60))
 	var hint := Label.new()
-	hint.text = "Stick / D-Pad: wählen   ·   A / Enter: kaufen   ·   B / Esc: schließen"
+	hint.text = "Linker Stick / D-Pad: wählen  ·  Rechter Stick: schieben  ·  LB / RB: zoomen  ·  A: kaufen  ·  B: schließen\n" \
+		+ "PC: Pfeile wählen  ·  Maus ziehen schiebt  ·  Mausrad / Q / E zoomt  ·  Enter oder zweiter Klick kauft  ·  Esc schließt"
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint.add_theme_font_size_override("font_size", 18)
 	hint.modulate = Color(1, 1, 1, 0.65)
@@ -116,6 +137,8 @@ func open() -> void:
 	if _tree.state(_selected) < SkillTree.State.AVAILABLE:
 		_selected = "root"
 	_view = _pos(_selected)
+	_free = false
+	_press = false
 	_held = true   # Der Stick ist vom Fahren evtl. noch geneigt: erst nach dem Loslassen navigieren
 	_static_key = PackedByteArray()
 	_refresh()
@@ -135,9 +158,13 @@ func _process(delta: float) -> void:
 		if _pop[id] <= 0.0:
 			_pop.erase(id)
 	_navigate(delta)
-	_view = _view.lerp(_pos(_selected), clampf(10.0 * delta, 0.0, 1.0))
+	_zoom_and_pan(delta)
+	if not _free:
+		_view = _view.lerp(_pos(_selected), clampf(10.0 * delta, 0.0, 1.0))
 	_layer.position = _offset()
+	_layer.scale = Vector2.ONE * _zoom
 	_fx.position = _layer.position
+	_fx.scale = _layer.scale
 	_refresh()
 	# Statische Ebene nur neu zeichnen, wenn sich Stufen oder Bezahlbarkeit geändert haben
 	var key := _state_key()
@@ -157,10 +184,47 @@ func _state_key() -> PackedByteArray:
 	return k
 
 
-## Verschiebung von Baum-Pixeln auf Bildschirm-Pixel.
+## Verschiebung von Baum-Pixeln auf Bildschirm-Pixel (vor dem Zoom: Bildschirm = Baum × Zoom + Offset).
 func _offset() -> Vector2:
 	var size := get_viewport().get_visible_rect().size if is_inside_tree() else Vector2(1920, 1080)
-	return Vector2(size.x * 0.5, VIEW_Y) - _view
+	return Vector2(size.x * 0.5, VIEW_Y) - _view * _zoom
+
+
+func _to_tree(screen: Vector2) -> Vector2:
+	return (screen - _offset()) / _zoom
+
+
+## Zoom mit LB/RB bzw. Q/E (Halten), freies Schieben mit dem rechten Stick bzw. I/J/K/L.
+func _zoom_and_pan(delta: float) -> void:
+	var z := Input.get_axis("tree_zoom_out", "tree_zoom_in")
+	if z != 0.0:
+		_zoom = clampf(_zoom * exp(z * ZOOM_RATE * delta), ZOOM_MIN, ZOOM_MAX)
+	var v := Input.get_vector("tree_pan_left", "tree_pan_right", "tree_pan_up", "tree_pan_down")
+	if v != Vector2.ZERO:
+		pan_by(v * PAN_SPEED * delta / _zoom)
+
+
+## Schiebt die Ansicht um d Baum-Pixel; gewählt wird der sichtbare Knoten nahe der Mitte.
+func pan_by(d: Vector2) -> void:
+	_free = true
+	_view = (_view + d).clamp(_bounds.position, _bounds.end)
+	var near := nearest_node(_view, UNIT_PX * 0.75)
+	if near != "":
+		_select(near)
+
+
+## Sichtbarer Knoten (gekauft oder kaufbar), der p am nächsten liegt, höchstens max_dist entfernt.
+func nearest_node(p: Vector2, max_dist: float) -> String:
+	var best := ""
+	var best_d := max_dist
+	for id in _tree.order:
+		if _tree.state(id) < SkillTree.State.AVAILABLE:
+			continue
+		var d := _pos(id).distance_to(p)
+		if d <= best_d:
+			best_d = d
+			best = id
+	return best
 
 
 ## Richtung aus Stick, D-Pad, Pfeilen und WASD; Halten wiederholt nach kurzer Pause.
@@ -181,7 +245,8 @@ func _navigate(delta: float) -> void:
 		_repeat = REPEAT_FIRST
 	var next := pick_neighbor(_selected, v.normalized())
 	if next != "":
-		_selected = next
+		_select(next)
+	_free = false
 
 
 ## Nächster sichtbarer Knoten in Richtung dir (Einheitsvektor). Bevorzugt nahe Knoten mit kleinem
@@ -211,24 +276,65 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
+## Maus: Ziehen (links, rechts oder Mitte) schiebt, Rad zoomt zur Mausposition,
+## Loslassen ohne Ziehen wählt bzw. kauft.
 func _on_canvas_input(event: InputEvent) -> void:
-	var mb := event as InputEventMouseButton
-	if mb == null or not mb.pressed or mb.button_index != MOUSE_BUTTON_LEFT:
+	var mm := event as InputEventMouseMotion
+	if mm != null:
+		if mm.button_mask & (MOUSE_BUTTON_MASK_LEFT | MOUSE_BUTTON_MASK_RIGHT | MOUSE_BUTTON_MASK_MIDDLE):
+			_dragged += mm.relative.length()
+			if _dragged >= DRAG_START_PX:
+				pan_by(-mm.relative / _zoom)
 		return
+	var mb := event as InputEventMouseButton
+	if mb == null:
+		return
+	if mb.pressed and mb.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+		# Der Baum-Punkt unter der Maus bleibt beim Zoomen stehen
+		var before := _to_tree(mb.position)
+		_zoom = clampf(_zoom * (WHEEL_STEP if mb.button_index == MOUSE_BUTTON_WHEEL_UP else 1.0 / WHEEL_STEP), ZOOM_MIN, ZOOM_MAX)
+		_free = true
+		_view = (_view + before - _to_tree(mb.position)).clamp(_bounds.position, _bounds.end)
+		return
+	if mb.button_index != MOUSE_BUTTON_LEFT:
+		if mb.pressed:
+			_dragged = 0.0
+		return
+	if mb.pressed:
+		_press = true
+		_dragged = 0.0
+		return
+	if not _press or _dragged >= DRAG_START_PX:
+		_press = false
+		return
+	_press = false
+	var p := _to_tree(mb.position)
 	for id in _tree.order:
-		if _tree.state(id) >= SkillTree.State.AVAILABLE and (mb.position - _offset()).distance_to(_pos(id)) <= _radius(id):
+		if _tree.state(id) >= SkillTree.State.AVAILABLE and p.distance_to(_pos(id)) <= _radius(id):
 			if id == _selected:
 				_buy(id)
 			else:
-				_selected = id
+				_select(id)
+				_free = false
 			return
 
 
 func _buy(id: String) -> void:
 	if _tree.buy(id):
 		_pop[id] = 0.35
+		var special := _tree.is_special(id)
+		# Höhere Stufen klingen etwas heller
+		Sfx.play("special" if special else "buy", 1.0 + 0.04 * (_tree.level(id) - 1))
+		_petals.burst(_pos(id), 40 if special else 22, Vector2(140, 420), Vector2(0.5, 1.0), Vector2(7, 12))
 	else:
 		_shake = 0.3
+		Sfx.play("deny")
+
+
+func _select(id: String) -> void:
+	if id != _selected:
+		_selected = id
+		Sfx.play_throttled("select", float(Sfx.cfg.get("select_min_gap_sec", 0.06)))
 
 
 func _refresh() -> void:

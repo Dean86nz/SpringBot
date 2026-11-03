@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.0 – Meilenstein 6: Gefühl (Musik, Klänge, Partikel)
+
+- Skilltree frei verschiebbar und zoombar (Rückmeldung zu 0.5.0): rechter Stick schiebt (gewählt ist der Knoten in der Bildmitte), LB/RB zoomen; PC: Maus ziehen, Mausrad, Q/E, I/J/K/L.
+- Musik wird mit dem Fortschritt voller: vier CC0-Stücke von ruhig nach fröhlich, ab 0 %, 5 %, 30 % und 60 % Fläche, mit Überblenden. Auswahl durch den Auftraggeber aus `sound_kandidaten/` (nicht im Repo). Quellen in `CREDITS.md`.
+- Klänge (Kenney, CC0): Kauf (heller je Stufe), besonderer Knoten, „reicht nicht“, Knoten wählen, Menü auf/zu, jedes volle Zehntel Fläche. Kein Fahrgeräusch.
+- Partikel: Blütenblätter hinter dem Roboter, wo frisch begrünt wird; kleines Büschel, wo Bienen etwas erblühen lassen; Blätterwolke beim Kauf im Skilltree; großer Blätterregen und aufspringende Prozentanzeige bei jedem vollen Zehntel.
+  Alle Blätter werden mit einem einzigen Zeichenaufruf gezeichnet.
+- Spiel beenden stoppt erst den Ton (keine Fehlermeldung beim Beenden).
+- Lautstärken und Musik-Schwellen in `data/audio.json`.
 ## 0.5.0 – Meilenstein 5: Skilltree
 
 - Der Skilltree ersetzt das Upgrade-Menü (Y / Tab): 45 Knoten, drei Äste um den Startknoten „Frühlingsfunke“:

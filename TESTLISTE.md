@@ -1,30 +1,29 @@
-# Testliste Meilenstein 5 (v0.5.0)
+# Testliste Meilenstein 6 (v0.6.0)
 
-EXEs: `export/windows/SpringBot_v0.5.0.exe` (Release) und `SpringBot_v0.5.0_DEBUG.exe` (Debug mit Cheat-Menü).
+EXEs: `export/windows/SpringBot_v0.6.0.exe` (Release) und `SpringBot_v0.6.0_DEBUG.exe` (Debug mit Cheat-Menü).
 
-Hinweis: Die Welt ist jetzt viermal so groß (640 × 480 Zellen). Kosten und Pollen sind neu abgestimmt.
+## Skilltree scrollen (deine Rückmeldung zu 0.5.0)
+1. Im Skilltree (Y / Tab): **rechter Stick** schiebt die Ansicht frei. Gewählt ist immer der Knoten nahe der Bildmitte, **A** kauft ihn.
+2. **LB / RB** zoomen heraus / hinein. Ganz heraus passt fast der ganze Baum aufs Bild.
+3. Linker Stick / D-Pad springt wie bisher von Knoten zu Knoten, die Ansicht folgt wieder der Auswahl.
+4. PC: Maus ziehen schiebt, Mausrad (oder Q / E) zoomt, Klick wählt, zweiter Klick kauft.
 
-## Skilltree öffnen
-1. **Y** (PC: **Tab**) öffnet den Skilltree als Vollbild. Der Roboter steht, die Pollen zählen oben weiter.
-2. Am Anfang: Mitte rosa „Frühlingsfunke“, darum drei Knoten (oben blau Roboter, rechts grün Wachstum, links gelb Bienen), dahinter graue „?“-Knoten. Oben „Entdeckt: 4 / 45“.
+## Musik
+5. Am Anfang leises Klavier („A Simple Trifle“). Bei 5 % Fläche Wechsel zu „Another August“, bei 30 % zu „Up in the Sky“, bei 60 % zu „Champ de tournesol“, jeweils weich übergeblendet.
+6. Musik nicht zu laut im Verhältnis zu den Klängen?
 
-## Bedienen
-3. Stick oder D-Pad springt zum nächsten Knoten in diese Richtung, die Ansicht fährt weich mit. Halten wiederholt.
-4. Unten das Infofeld: Name, Beschreibung, „Je Stufe: …“, Stufe und Kosten (rötlich, wenn es nicht reicht).
-5. **A** kauft eine Stufe: Ring dehnt sich aus, Punkte unter dem Knoten füllen sich, das Menü bleibt offen. Mehrmals A kauft weitere Stufen.
-6. Reicht es nicht: Der weiße Auswahlring wackelt rot, nichts wird abgezogen.
-7. Nach dem Kauf werden die Nachbarn sichtbar, dahinter neue „?“. Bezahlbare Knoten leuchten golden.
-8. B, Y oder Start schließt. Danach wirken die Käufe: breitere Spur, schneller, Ausbreitung, Bienen.
-9. Besondere Knoten (goldener Stern, „Besonderer Knoten“ im Infofeld) haben spürbar große Wirkung.
-10. PC: Maus-Klick wählt einen Knoten, zweiter Klick kauft.
+## Klänge (Kenney, wie in Scrap Empire)
+7. Kauf: kurzer Zupf-Klang (höhere Stufen etwas heller). Besonderer Knoten: eigener Klang.
+8. Reicht es nicht: dumpfer, leiser Ton. Knoten wechseln: leises Klicken. Skilltree und Pause auf / zu: leiser Klick.
+9. Bei jedem vollen Zehntel Fläche (10 %, 20 % …): Glockenklang. Beim Fahren gibt es bewusst kein Geräusch.
+10. Gefallen dir diese Klänge? Sonst suche ich Kandidaten wie bei der Musik.
 
-## Spielgefühl
-11. Wann ist der erste Knoten bezahlbar? (gedacht: nach ca. einer halben Minute Fahren)
-12. Ist der Fortschritt angenehm, oder gibt es lange Durststrecken? Wie lange dauert es bis 25 % und 50 %?
+## Partikel
+11. Beim Fahren über Grau fliegen hinter dem Roboter bunte Blütenblätter.
+12. Wo Bienen etwas erblühen lassen, ein kleines Büschel Blätter.
+13. Kauf im Skilltree: Blätterwolke am Knoten. Bei jedem vollen Zehntel: großer Blätterregen um den Roboter, die Prozentanzeige springt kurz auf.
 
 ## Cheat-Menü (nur Debug-EXE: L3 + R3 eine Sekunde halten, PC F12)
-13. „+100.000 Pollen“ und „Alles freischalten“ (ganzer Baum gekauft, „Entdeckt: 45 / 45“). Läuft der offene Skilltree flüssig auf dem Ally, auch beim schnellen Durchwandern?
-14. „Spielstand zurücksetzen“: Baum wieder am Anfang, alles grau.
-
-## Offen für Feedback
-- Spieldauer und Preise sind nur grob vorgerechnet. Alle Zahlen in `data/skilltree.json`.
+14. Mit „Alles freischalten“ und „Zeit ×10“ schnell durch alle Musik-Wechsel. Läuft es auf dem Ally flüssig?
+15. „Spielstand zurücksetzen“: Musik blendet zurück zum Klavier.
+16. Pause → „Spiel beenden“ schließt sauber.
