@@ -23,6 +23,14 @@
 	},
 	"camera": {
 		"zoom": 1.0,
-		"smoothing": 6.0
+		"smoothing": 6.0,
+		"title_offset_px": 330
+	},
+	"save": {
+		"autosave_sec": 30
+	},
+	"end": {
+		"coverage": 1.0,
+		"delay_sec": 2.5
 	}
 }

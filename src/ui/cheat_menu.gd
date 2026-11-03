@@ -7,6 +7,7 @@ extends CanvasLayer
 signal reset_requested
 signal pollen_requested
 signal unlock_all_requested
+signal almost_done_requested
 
 const HOLD_SECONDS := 1.0
 
@@ -42,6 +43,9 @@ func _ready() -> void:
 	_box.add_child(title)
 	_add("+100.000 Pollen", func() -> void: pollen_requested.emit())
 	_add("Alles freischalten (ganzer Skilltree)", func() -> void: unlock_all_requested.emit())
+	_add("Welt fast fertig (Ende testen)", func() -> void:
+		close()
+		almost_done_requested.emit())
 	_add("Zeit ×10 an/aus", func() -> void: Engine.time_scale = 1.0 if Engine.time_scale > 1.0 else 10.0)
 	_add("Spielstand zurücksetzen", func() -> void:
 		close()

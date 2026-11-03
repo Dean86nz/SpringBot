@@ -4,6 +4,8 @@ extends Node2D
 ## Mit den Wachstums-Knoten wächst die Grenze des Grüns von allein weiter,
 ## Bienen tragen das Grün zu neuen Stellen. Alle Werte kommen aus dem Skilltree.
 ## Läuft auch während der Pause (Menü-Eingaben), Roboter und Boden pausieren.
+## Rahmen: Start mit Titelbildschirm (dahinter der gespeicherte Garten), Speichern alle
+## paar Sekunden und bei jedem Menü, Endbildschirm, sobald die ganze Welt blüht.
 
 var grid: GroundGrid
 var skills: SkillTree
@@ -32,6 +34,14 @@ var _camera := Camera2D.new()
 var _hud := Hud.new()
 var _tree := SkillTreeMenu.new()
 var _pause := PauseMenu.new()
+var _title := TitleScreen.new()
+var _end := EndScreen.new()
+var _store := SaveStore.new()
+var _play_sec := 0.0         # Spielzeit in echten Sekunden (ohne Pause und Menüs)
+var _finished := false       # Ende schon erreicht (Endbildschirm kommt nur einmal)
+var _end_wait := -1.0        # Sekunden bis zum Endbildschirm, < 0 = keiner geplant
+var _autosave := 0.0
+var _save_task := -1         # WorkerThreadPool-Aufgabe, die gerade schreibt
 
 
 func _ready() -> void:
@@ -50,7 +60,7 @@ func _ready() -> void:
 	var start: Variant = Game.dig(Game.balance, "robot/start_cell")
 	_start_px = (Vector2(start[0], start[1]) + Vector2(0.5, 0.5)) * cell_px if start is Array else size_px * 0.5
 
-	_ground.process_mode = Node.PROCESS_MODE_PAUSABLE
+	_ground.process_mode = Node.PROCESS_MODE_ALWAYS   # zeigt den geladenen Garten auch hinter dem Titel
 	_ground.bind(grid, cell_px)
 	add_child(_ground)
 	var hive: Variant = Game.dig(Game.balance, "bees/hive_cell")
@@ -70,6 +80,7 @@ func _ready() -> void:
 	_robot.radius_px = Game.num("robot/radius_px", 30.0)
 	_robot.obstacles = [{"pos": hive_px, "radius": Game.num("bees/hive_radius_px", 32.0)}]
 	add_child(_robot)
+	_camera.process_mode = Node.PROCESS_MODE_ALWAYS   # Versatz für den Titel greift auch in der Pause
 	_camera.zoom = Vector2.ONE * Game.num("camera/zoom", 1.0)
 	_camera.position_smoothing_enabled = true
 	_camera.position_smoothing_speed = Game.num("camera/smoothing", 6.0)
@@ -81,16 +92,31 @@ func _ready() -> void:
 	add_child(_hud)
 	_tree.setup(skills)
 	add_child(_tree)
+	_pause.title_requested.connect(show_title)
+	_pause.quit_requested.connect(quit)
 	add_child(_pause)
+	_end.title_requested.connect(show_title)
+	add_child(_end)
+	_title.continue_requested.connect(_start_playing)
+	_title.new_game_requested.connect(func() -> void:
+		reset_game()
+		save()
+		_start_playing())
+	_title.quit_requested.connect(quit)
+	add_child(_title)
 	if OS.is_debug_build():
 		var cheats := CheatMenu.new()
 		cheats.name = "CheatMenu"
 		cheats.reset_requested.connect(reset_game)
 		cheats.pollen_requested.connect(func() -> void: skills.pollen += 100000.0)
 		cheats.unlock_all_requested.connect(skills.max_all)
+		cheats.almost_done_requested.connect(func() -> void:
+			grid.fill_except(_robot.position / cell_px + Vector2(20, 0), 2.5)
+			_milestone = floori(grid.coverage() * 10.0))
 		add_child(cheats)
 	_apply_upgrades()
-	_paint()
+	load_game(_store.read())
+	show_title()
 
 
 func _process(delta: float) -> void:
@@ -102,6 +128,12 @@ func _process(delta: float) -> void:
 	_bee_blooms()
 	skills.tick(delta, grid.green_count)
 	_hud.set_pollen(skills.pollen, skills.rate(grid.green_count))
+	var real := delta / maxf(Engine.time_scale, 0.001)
+	_play_sec += real
+	_check_end(delta)
+	_autosave += real
+	if _autosave >= Game.num("save/autosave_sec", 30.0):
+		save()
 
 
 func _paint() -> void:
@@ -116,6 +148,20 @@ func _paint() -> void:
 		Sfx.play("milestone", 1.0, 0.0)
 		_petals.burst(_robot.position, 90, Vector2(160, 520), Vector2(1.0, 1.8), Vector2(7, 12))
 		_hud.pulse()
+
+
+## Sobald die ganze Welt blüht: kurz warten (Blätterregen, Glocke), dann der Endbildschirm.
+func _check_end(delta: float) -> void:
+	if _end_wait >= 0.0:
+		_end_wait -= delta
+		if _end_wait < 0.0:
+			Sfx.play("special", 1.0, 0.0)
+			save()
+			_end.open(_play_sec, skills.earned, skills.count_bought(), skills.order.size() - 1, _bees.bees.size())
+	elif not _finished and grid.coverage() >= Game.num("end/coverage", 1.0):
+		_finished = true
+		_end_wait = Game.num("end/delay_sec", 2.5)
+		_petals.burst(_robot.position, 200, Vector2(200, 700), Vector2(1.5, 2.5), Vector2(8, 14))
 
 
 ## Frisch begrünte Zellen unter dem Roboter werfen ein paar Blätter nach hinten.
@@ -170,7 +216,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			_tree.close()
 			Sfx.play("close")
 			_robot.input_enabled = true
-			get_viewport().set_input_as_handled()
+			save()
+		get_viewport().set_input_as_handled()
 	elif _pause.visible:
 		if event.is_action_pressed("pause") or event.is_action_pressed("ui_cancel"):
 			_pause.close()
@@ -184,6 +231,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		Sfx.play("open")
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("pause"):
+		save()
 		_pause.open()
 		Sfx.play("open")
 		get_viewport().set_input_as_handled()
@@ -195,8 +243,101 @@ func reset_game() -> void:
 	skills.reset()
 	_spread_carry = 0.0
 	_milestone = 0
+	_play_sec = 0.0
+	_finished = false
+	_end_wait = -1.0
 	_bees.set_count(0)
 	_robot.position = _start_px
 	_robot.velocity = Vector2.ZERO
 	_camera.reset_smoothing()
 	_paint()
+
+
+# --- Rahmen: Titel, Speichern, Beenden ---
+
+func show_title() -> void:
+	save()
+	Engine.time_scale = 1.0
+	_hud.visible = false
+	_robot.input_enabled = false
+	_camera.offset = Vector2(0, -Game.num("camera/title_offset_px", 330.0))   # Roboter unter dem Menü
+	_title.open(_save_info())
+
+
+func _start_playing() -> void:
+	_title.close()
+	_hud.visible = true
+	_robot.input_enabled = true
+	_autosave = 0.0
+	get_tree().paused = false
+	create_tween().tween_property(_camera, "offset", Vector2.ZERO, 0.8).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+
+## Kurzinfo zum Spielstand für den Titelbildschirm ("" = noch nie gespielt).
+func _save_info() -> String:
+	if _play_sec <= 0.0:
+		return ""
+	var state := "Die Welt blüht!" if _finished else "Frühling: %s %%" % Hud.format_percent(grid.coverage())
+	return "%s   ·   Spielzeit %s" % [state, EndScreen.format_time(_play_sec)]
+
+
+## Packen und Schreiben (ca. 10 ms am PC) laufen in einem Hintergrund-Thread, damit das
+## automatische Speichern kein Bild verschluckt. Die Zellen werden vorher kopiert.
+func save() -> void:
+	_autosave = 0.0
+	if _play_sec <= 0.0:
+		return   # noch nicht gespielt: nichts zu sichern
+	finish_saving()
+	var data := {
+		"game_version": Game.version(),
+		"play_sec": _play_sec,
+		"finished": _finished or _end_wait >= 0.0,
+		"robot": [_robot.position.x, _robot.position.y],
+		"grid": {"w": grid.width, "h": grid.height},
+		"skills": skills.to_dict(),
+	}
+	var cells := grid.cells.duplicate()
+	_save_task = WorkerThreadPool.add_task(func() -> void:
+		data["grid"]["cells"] = Marshalls.raw_to_base64(cells.compress(FileAccess.COMPRESSION_DEFLATE))
+		_store.write(data))
+
+
+## Wartet, bis ein laufendes Speichern fertig ist (vor dem Beenden).
+func finish_saving() -> void:
+	if _save_task >= 0:
+		WorkerThreadPool.wait_for_task_completion(_save_task)
+		_save_task = -1
+
+
+## Übernimmt einen Spielstand. Leer oder unpassend = frisches Spiel.
+func load_game(data: Dictionary) -> void:
+	reset_game()
+	var g: Dictionary = data.get("grid", {})
+	var fits := int(g.get("w", 0)) == grid.width and int(g.get("h", 0)) == grid.height
+	if not fits or not grid.load_bytes(Marshalls.base64_to_raw(str(g.get("cells", "")))):
+		if not data.is_empty():
+			push_warning("Spielstand passt nicht zur Karte, neues Spiel")
+		_paint()
+		return
+	skills.from_dict(data.get("skills", {}))
+	_play_sec = float(data.get("play_sec", 0.0))
+	_finished = bool(data.get("finished", false))
+	var r: Array = data.get("robot", [])
+	if r.size() == 2:
+		_robot.position = Vector2(float(r[0]), float(r[1])).clamp(_robot.bounds.position, _robot.bounds.end)
+	_camera.reset_smoothing()
+	_milestone = floori(grid.coverage() * 10.0)
+	_paint()
+
+
+func quit() -> void:
+	save()
+	finish_saving()
+	Sfx.quit_game()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		save()
+	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_PREDELETE:
+		finish_saving()

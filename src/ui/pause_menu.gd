@@ -1,7 +1,10 @@
 class_name PauseMenu
 extends CanvasLayer
-## Pause-Menü: Weiterspielen oder Spiel beenden. Öffnen/Schließen steuert main.gd
-## (Start / Esc). Pausiert das Spiel, solange es offen ist.
+## Pause-Menü: Weiterspielen, Titelbildschirm oder Spiel beenden. Öffnen/Schließen steuert
+## main.gd (Start / Esc), dort wird auch gespeichert. Pausiert das Spiel, solange es offen ist.
+
+signal title_requested
+signal quit_requested
 
 var _box: VBoxContainer
 
@@ -21,7 +24,10 @@ func _ready() -> void:
 	_box = MenuKit.panel(center, 32)
 	MenuKit.title(_box, "Pause")
 	MenuKit.button(_box, "Weiterspielen").pressed.connect(close)
-	MenuKit.button(_box, "Spiel beenden").pressed.connect(Sfx.quit_game)
+	MenuKit.button(_box, "Zum Titelbildschirm").pressed.connect(func() -> void:
+		visible = false
+		title_requested.emit())
+	MenuKit.button(_box, "Spiel beenden").pressed.connect(func() -> void: quit_requested.emit())
 
 
 func open() -> void:

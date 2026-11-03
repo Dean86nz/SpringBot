@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.7.0 – Meilenstein 7: Rahmen (Titel, Speichern, Ende)
+
+- Titelbildschirm mit Blätterregen; dahinter sieht man den eigenen gespeicherten Garten. „Weiterspielen“ (mit Fläche und Spielzeit), „Neues Spiel“ (fragt nach, wenn schon ein Garten existiert), „Beenden“.
+- Speichern automatisch alle 30 Sekunden, beim Öffnen von Pause, beim Schließen des Skilltrees, beim Wechsel zum Titel, beim Beenden und beim Schließen des Fensters.
+  Gespeichert werden Boden, Pollen, Skilltree, Roboterposition, Spielzeit und ob das Ende erreicht ist.
+  Zwei abwechselnd beschriebene Dateien (Ansatz aus Scrap Empire): Ein Absturz beim Schreiben kostet höchstens den letzten Stand. Packen und Schreiben laufen im Hintergrund, damit kein Bild hängt.
+  Die Debug-EXE speichert in einen eigenen Ordner (`saves_debug`), Cheats berühren den echten Spielstand nie.
+- Ende: Blüht die ganze Welt, gibt es einen großen Blätterregen und nach 2,5 Sekunden den Endbildschirm mit Spielzeit, gesammelten Pollen, gekauften Knoten und Bienen. „Weiterfahren“ oder „Zum Titelbildschirm“. Erscheint nur einmal je Spielstand.
+- Pause-Menü: neu „Zum Titelbildschirm“.
+- Cheat-Menü: „Welt fast fertig (Ende testen)“ lässt nur einen kleinen grauen Fleck rechts vom Roboter übrig.
+- Werte in `data/balance.json`: `save/autosave_sec`, `end/coverage`, `end/delay_sec`, `camera/title_offset_px`.
+
 ## 0.6.0 – Meilenstein 6: Gefühl (Musik, Klänge, Partikel)
 
 - Skilltree frei verschiebbar und zoombar (Rückmeldung zu 0.5.0): rechter Stick schiebt (gewählt ist der Knoten in der Bildmitte), LB/RB zoomen; PC: Maus ziehen, Mausrad, Q/E, I/J/K/L.

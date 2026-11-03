@@ -114,6 +114,37 @@ func clear() -> void:
 	setup(width, height)
 
 
+## Begrünt alles außer einem Kreis (center, radius in Zellen). Nur fürs Cheat-Menü.
+func fill_except(center: Vector2, radius: float) -> void:
+	for i in cells.size():
+		if Vector2(i % width + 0.5, i / width + 0.5).distance_to(center) > radius:
+			_green_index(i)
+	_mark(Rect2i(0, 0, width, height))
+
+
+## Zellen als gepackte Bytes (für den Spielstand; main.gd packt eine Kopie im Hintergrund).
+func to_bytes() -> PackedByteArray:
+	return cells.compress(FileAccess.COMPRESSION_DEFLATE)
+
+
+## Gegenstück zu to_bytes: übernimmt die Zellen und baut Zähler und Grenze neu auf.
+## false (und nichts geändert), wenn die Daten nicht zu dieser Kartengröße passen.
+func load_bytes(packed: PackedByteArray) -> bool:
+	var raw := packed.decompress(width * height, FileAccess.COMPRESSION_DEFLATE)
+	if raw.size() != width * height:
+		return false
+	setup(width, height)
+	for i in raw.size():
+		if raw[i] != GREY:
+			cells[i] = GREEN
+	green_count = cells.count(GREEN)
+	for i in cells.size():
+		if cells[i] == GREY and _has_green_neighbor(i):
+			_slot[i] = frontier.size()
+			frontier.append(i)
+	return true
+
+
 ## Gibt das seit dem letzten Aufruf geänderte Rechteck zurück (leer, wenn nichts geändert wurde).
 func take_dirty() -> Rect2i:
 	if not _has_dirty:
@@ -139,6 +170,13 @@ func _green_index(i: int) -> bool:
 	if i < cells.size() - width:
 		_frontier_add(i + width)
 	return true
+
+
+func _has_green_neighbor(i: int) -> bool:
+	var x := i % width
+	if (x > 0 and cells[i - 1] == GREEN) or (x < width - 1 and cells[i + 1] == GREEN):
+		return true
+	return (i >= width and cells[i - width] == GREEN) or (i < cells.size() - width and cells[i + width] == GREEN)
 
 
 func _frontier_add(i: int) -> void:

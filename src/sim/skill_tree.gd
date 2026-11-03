@@ -10,6 +10,7 @@ signal changed
 enum State { HIDDEN, MYSTERY, AVAILABLE, OWNED }
 
 var pollen := 0.0
+var earned := 0.0                # insgesamt gesammelte Pollen (für den Endbildschirm)
 var pollen_per_cell := 0.005
 var nodes: Dictionary = {}       # id → Definition
 var order: Array[String] = []
@@ -43,7 +44,9 @@ func rate(green_cells: int) -> float:
 
 
 func tick(delta: float, green_cells: int) -> void:
-	pollen += rate(green_cells) * delta
+	var gain := rate(green_cells) * delta
+	pollen += gain
+	earned += gain
 
 
 # --- Knoten ---
@@ -119,6 +122,15 @@ func effect_text(id: String) -> String:
 	return ", ".join(parts)
 
 
+## Gekaufte Knoten ohne den Startknoten.
+func count_bought() -> int:
+	var n := 0
+	for id in order:
+		if level(id) > 0 and not nodes[id].get("requires", []).is_empty():
+			n += 1
+	return n
+
+
 func count_discovered() -> int:
 	var n := 0
 	for id in order:
@@ -135,6 +147,7 @@ func max_all() -> void:
 
 func reset() -> void:
 	pollen = 0.0
+	earned = 0.0
 	for id in order:
 		# Knoten ohne Vorgänger (die Wurzel) sind von Anfang an gekauft
 		levels[id] = max_level(id) if nodes[id].get("requires", []).is_empty() else 0
@@ -149,3 +162,25 @@ func _is_unlocked(id: String) -> bool:
 		if level(str(r)) > 0:
 			return true
 	return false
+
+
+# --- Spielstand ---
+
+func to_dict() -> Dictionary:
+	var lv := {}
+	for id in order:
+		if level(id) > 0:
+			lv[id] = level(id)
+	return {"pollen": pollen, "earned": earned, "levels": lv}
+
+
+## Unbekannte Knoten (aus einer älteren skilltree.json) werden übergangen, Stufen auf das Maximum begrenzt.
+func from_dict(d: Dictionary) -> void:
+	reset()
+	pollen = maxf(float(d.get("pollen", 0.0)), 0.0)
+	earned = maxf(float(d.get("earned", pollen)), pollen)
+	var lv: Dictionary = d.get("levels", {})
+	for id: String in lv:
+		if nodes.has(id):
+			levels[id] = clampi(int(lv[id]), int(levels[id]), max_level(id))
+	changed.emit()

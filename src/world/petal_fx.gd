@@ -10,6 +10,7 @@ const COLORS := [
 const RIM := 6
 
 var capacity := 400
+var fall := 0.0   # Zug nach unten (Pixel/s²), für langsam fallenden Blätterregen
 var _rim := PackedVector2Array()     # Einheitskreis, RIM Punkte
 var _pos := PackedVector2Array()
 var _vel := PackedVector2Array()
@@ -69,7 +70,7 @@ func _process(delta: float) -> void:
 			_alive -= 1
 			continue
 		_pos[i] += _vel[i] * delta
-		_vel[i] *= damp
+		_vel[i] = _vel[i] * damp + Vector2(0.0, fall * delta)
 		_rot[i] += _spin[i] * delta
 	queue_redraw()
 
@@ -107,3 +108,10 @@ func _draw() -> void:
 			k += 3
 		v += RIM + 1
 	RenderingServer.canvas_item_add_triangle_array(get_canvas_item(), idx, pts, cols)
+
+
+## Blätterregen für Menüs: Blätter fallen langsam von oben über die ganze Breite.
+## Jedes Bild aufrufen; rate = Blätter pro Sekunde.
+func rain(width: float, rate: float, delta: float) -> void:
+	if randf() < rate * delta:
+		burst(Vector2(randf() * width, -20.0), 1, Vector2(20, 60), Vector2(14, 20), Vector2(8, 14), Vector2.DOWN, 1.2)

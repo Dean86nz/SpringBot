@@ -1,29 +1,24 @@
-# Testliste Meilenstein 6 (v0.6.0)
+# Testliste Meilenstein 7 (v0.7.0)
 
-EXEs: `export/windows/SpringBot_v0.6.0.exe` (Release) und `SpringBot_v0.6.0_DEBUG.exe` (Debug mit Cheat-Menü).
+EXEs: `export/windows/SpringBot_v0.7.0.exe` (Release) und `SpringBot_v0.7.0_DEBUG.exe` (Debug mit Cheat-Menü).
+Release und Debug haben getrennte Spielstände. Die Musik aus Meilenstein 6 steht noch aus (Punkte 5, 6 und 10 der alten Liste).
 
-## Skilltree scrollen (deine Rückmeldung zu 0.5.0)
-1. Im Skilltree (Y / Tab): **rechter Stick** schiebt die Ansicht frei. Gewählt ist immer der Knoten nahe der Bildmitte, **A** kauft ihn.
-2. **LB / RB** zoomen heraus / hinein. Ganz heraus passt fast der ganze Baum aufs Bild.
-3. Linker Stick / D-Pad springt wie bisher von Knoten zu Knoten, die Ansicht folgt wieder der Auswahl.
-4. PC: Maus ziehen schiebt, Mausrad (oder Q / E) zoomt, Klick wählt, zweiter Klick kauft.
+## Titelbildschirm
+1. Erster Start: Titel „Frühlings-Roboter“, leichter Blätterregen, Knöpfe „Spielen“ und „Beenden“. Bedienung mit D-Pad und A.
+2. „Spielen“: Die Ansicht gleitet zum Roboter, das Spiel läuft.
 
-## Musik
-5. Am Anfang leises Klavier („A Simple Trifle“). Bei 5 % Fläche Wechsel zu „Another August“, bei 30 % zu „Up in the Sky“, bei 60 % zu „Champ de tournesol“, jeweils weich übergeblendet.
-6. Musik nicht zu laut im Verhältnis zu den Klängen?
+## Speichern
+3. Ein paar Minuten spielen, etwas kaufen, dann Pause → „Spiel beenden“. Neu starten: Hinter dem Titel ist dein Garten zu sehen, darüber Fläche und Spielzeit. „Weiterspielen“: Boden, Pollen, Skilltree und Position stimmen.
+4. Gleiches, aber das Spiel einfach mit dem Fenster-X (oder Alt+F4) schließen: Höchstens die letzten 30 Sekunden fehlen.
+5. Pause → „Zum Titelbildschirm“ → „Weiterspielen“ geht nahtlos weiter.
+6. Titel → „Neues Spiel“: Es kommt eine Nachfrage. „Zurück“ (oder B) ändert nichts, „Ja, neu beginnen“ startet mit grauer Welt.
+7. Ruckelt es auf dem Ally alle 30 Sekunden kurz (automatisches Speichern)? Es sollte nicht.
 
-## Klänge (Kenney, wie in Scrap Empire)
-7. Kauf: kurzer Zupf-Klang (höhere Stufen etwas heller). Besonderer Knoten: eigener Klang.
-8. Reicht es nicht: dumpfer, leiser Ton. Knoten wechseln: leises Klicken. Skilltree und Pause auf / zu: leiser Klick.
-9. Bei jedem vollen Zehntel Fläche (10 %, 20 % …): Glockenklang. Beim Fahren gibt es bewusst kein Geräusch.
-10. Gefallen dir diese Klänge? Sonst suche ich Kandidaten wie bei der Musik.
+## Ende (Debug-EXE, Cheat-Menü: L3 + R3 eine Sekunde halten, PC F12)
+8. Cheat „Welt fast fertig (Ende testen)“, dann nach rechts über den letzten grauen Fleck fahren: Glocke, großer Blätterregen, nach 2,5 Sekunden der Endbildschirm mit Spielzeit, Pollen, Knoten und Bienen.
+9. „Weiterfahren“ (oder B): Man kann weiter herumfahren und kaufen, der Endbildschirm kommt nicht noch einmal.
+10. Danach im Titel steht „Die Welt blüht!“ statt der Prozentzahl.
+11. Endbildschirm → „Zum Titelbildschirm“ funktioniert.
 
-## Partikel
-11. Beim Fahren über Grau fliegen hinter dem Roboter bunte Blütenblätter.
-12. Wo Bienen etwas erblühen lassen, ein kleines Büschel Blätter.
-13. Kauf im Skilltree: Blätterwolke am Knoten. Bei jedem vollen Zehntel: großer Blätterregen um den Roboter, die Prozentanzeige springt kurz auf.
-
-## Cheat-Menü (nur Debug-EXE: L3 + R3 eine Sekunde halten, PC F12)
-14. Mit „Alles freischalten“ und „Zeit ×10“ schnell durch alle Musik-Wechsel. Läuft es auf dem Ally flüssig?
-15. „Spielstand zurücksetzen“: Musik blendet zurück zum Klavier.
-16. Pause → „Spiel beenden“ schließt sauber.
+## Allgemein
+12. Text und Knöpfe auf dem Ally gut lesbar?
