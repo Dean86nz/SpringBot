@@ -91,3 +91,26 @@ func test_spread_one_cell_per_event_even_with_seeds() -> void:
 	g.set_green(Vector2i(50, 50))
 	assert_eq(g.spread(200, 8, 1.0, rng), 200, "Samenflug ersetzt Wachstum, verdoppelt es nicht")
 	assert_eq(g.green_count, 201)
+
+
+## Die sichtbare Spur liegt mittig unter dem Roboter, auch wenn er nicht auf einer Zellmitte fährt.
+func test_visible_edge_follows_circle_not_cells() -> void:
+	for cx: float in [10.0, 10.25, 10.5, 10.8]:
+		var g := GroundGrid.new(24, 24)
+		g.paint_circle(Vector2(cx, 12.5), 3.0)
+		var left := _crossing(g, 12, -1, cx)
+		var right := _crossing(g, 12, 1, cx)
+		assert_true(absf((left + right) * 0.5 - cx) < 0.1, "Mitte %.2f statt %.2f" % [(left + right) * 0.5, cx])
+		assert_true(absf(right - left - 6.0) < 0.3, "Breite %.2f statt 6" % (right - left))
+
+
+## Wo die weich gefilterte Maske (Werte an Zellmitten x + 0,5) in Zeile y die 0,5 kreuzt.
+func _crossing(g: GroundGrid, y: int, step: int, from: float) -> float:
+	var x := int(from)
+	while true:
+		var a := g.vis[y * g.width + x] / 255.0
+		var b := g.vis[y * g.width + x + step] / 255.0
+		if a >= 0.5 and b < 0.5:
+			return x + 0.5 + step * (a - 0.5) / (a - b)
+		x += step
+	return 0.0

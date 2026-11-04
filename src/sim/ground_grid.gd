@@ -5,6 +5,8 @@ extends RefCounted
 ## Geänderte Zellen landen in einem Schmutz-Rechteck, das die Darstellung abholt.
 ## Die Grenze (graue Zellen mit grünem Nachbarn) wird laufend mitgeführt: Liste plus
 ## Positionsindex, damit Hinzufügen, Entfernen und zufälliges Ziehen O(1) sind.
+## Daneben eine Anzeige-Maske (vis): wie cells, aber der Roboter-Kreis setzt am Rand Teilwerte,
+## damit der sichtbare Rand genau auf dem Kreis liegt statt am Zellraster einzurasten.
 
 const GREY := 0
 const GREEN := 255
@@ -12,6 +14,7 @@ const GREEN := 255
 var width := 0
 var height := 0
 var cells := PackedByteArray()
+var vis := PackedByteArray()         # nur Darstellung: 0..255, ab 128 sichtbar grün
 var green_count := 0
 var frontier := PackedInt32Array()   # Zellindizes der Grenze
 var _slot := PackedInt32Array()      # Zellindex → Position in frontier, -1 = nicht in der Grenze
@@ -29,6 +32,8 @@ func setup(w: int, h: int) -> void:
 	height = h
 	cells = PackedByteArray()
 	cells.resize(w * h)
+	vis = PackedByteArray()
+	vis.resize(w * h)
 	frontier = PackedInt32Array()
 	_slot = PackedInt32Array()
 	_slot.resize(w * h)
@@ -67,23 +72,39 @@ func set_green(c: Vector2i) -> bool:
 
 ## Begrünt alle Zellen, deren Mittelpunkt im Kreis liegt. center und radius in Zelleinheiten
 ## (Zelle (x, y) hat ihren Mittelpunkt bei x + 0,5 / y + 0,5). Gibt die Zahl neuer grüner Zellen zurück.
+## Anzeige: Zellen nahe dem Rand bekommen 0,5 + (radius − Abstand), so liegt die 0,5-Linie der
+## weich gefilterten Maske genau auf dem Kreis (zählt nicht als grün).
 func paint_circle(center: Vector2, radius: float) -> int:
-	var x0 := maxi(int(floor(center.x - radius)), 0)
-	var x1 := mini(int(ceil(center.x + radius)), width - 1)
-	var y0 := maxi(int(floor(center.y - radius)), 0)
-	var y1 := mini(int(ceil(center.y + radius)), height - 1)
+	var reach := radius + 0.5
+	var x0 := maxi(int(floor(center.x - reach)), 0)
+	var x1 := mini(int(ceil(center.x + reach)), width - 1)
+	var y0 := maxi(int(floor(center.y - reach)), 0)
+	var y1 := mini(int(ceil(center.y + reach)), height - 1)
 	if x0 > x1 or y0 > y1:
 		return 0
 	var r2 := radius * radius
+	var inner2 := maxf(radius - 0.5, 0.0) ** 2
+	var reach2 := reach * reach
 	var added := 0
+	var touched := false
 	for y in range(y0, y1 + 1):
 		var dy := y + 0.5 - center.y
 		var row := y * width
 		for x in range(x0, x1 + 1):
 			var dx := x + 0.5 - center.x
-			if dx * dx + dy * dy <= r2 and _green_index(row + x):
+			var d2 := dx * dx + dy * dy
+			if d2 >= reach2:
+				continue
+			var i := row + x
+			var old := vis[i]
+			if d2 <= r2 and _green_index(i):
 				added += 1
-	if added > 0:
+			if d2 > inner2:
+				var v := mini(int((0.5 + radius - sqrt(d2)) * 255.0), 255)
+				vis[i] = maxi(old, v)
+			if vis[i] != old:
+				touched = true
+	if added > 0 or touched:
 		_mark(Rect2i(x0, y0, x1 - x0 + 1, y1 - y0 + 1))
 	return added
 
@@ -138,6 +159,7 @@ func load_bytes(packed: PackedByteArray) -> bool:
 		if raw[i] != GREY:
 			cells[i] = GREEN
 	green_count = cells.count(GREEN)
+	vis = cells.duplicate()
 	for i in cells.size():
 		if cells[i] == GREY and _has_green_neighbor(i):
 			_slot[i] = frontier.size()
@@ -158,6 +180,7 @@ func _green_index(i: int) -> bool:
 	if cells[i] == GREEN:
 		return false
 	cells[i] = GREEN
+	vis[i] = GREEN
 	green_count += 1
 	_frontier_remove(i)
 	var x := i % width

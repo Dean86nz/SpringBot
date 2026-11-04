@@ -1,6 +1,6 @@
 class_name GroundView
 extends Node2D
-## Zeichnet den Boden: eine Maske (1 Pixel je Zelle, weich gefiltert) entscheidet im Shader
+## Zeichnet den Boden: eine Maske (GroundGrid.vis, 1 Pixel je Zelle, weich gefiltert) entscheidet im Shader
 ## zwischen grauem und grünem Boden. Rauschen im Shader macht die Grenze organisch.
 ## Prinzip aus Scrap Empire (DirtView). Die Maske wird höchstens 30× pro Sekunde hochgeladen.
 
@@ -60,7 +60,7 @@ var _timer := 0.0
 func bind(grid: GroundGrid, cell_px: float) -> void:
 	_grid = grid
 	_size_px = Vector2(grid.width, grid.height) * cell_px
-	_img = Image.create_from_data(grid.width, grid.height, false, Image.FORMAT_R8, grid.cells)
+	_img = Image.create_from_data(grid.width, grid.height, false, Image.FORMAT_R8, grid.vis)
 	_tex = ImageTexture.create_from_image(_img)
 	var sh := Shader.new()
 	sh.code = SHADER
@@ -88,5 +88,5 @@ func _process(delta: float) -> void:
 	if _grid.take_dirty().has_area():
 		_timer = UPLOAD_SECONDS
 		# Ganze Maske neu setzen: bei 320×240 sind das 77 KB, billiger als Pixel einzeln zu schreiben.
-		_img.set_data(_grid.width, _grid.height, false, Image.FORMAT_R8, _grid.cells)
+		_img.set_data(_grid.width, _grid.height, false, Image.FORMAT_R8, _grid.vis)
 		_tex.update(_img)

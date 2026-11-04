@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.1 – Spur mittig (Rückmeldung zu 0.8.0)
+
+- Die grüne Spur lag bis zu einer halben Zelle (12 px) neben dem Roboter, weil sie am Zellraster einrastete.
+  Jetzt bekommt der Rand der Spur in der Anzeige Teilwerte (`GroundGrid.vis`), der sichtbare Rand liegt genau auf dem Kreis um den Roboter.
+  Rein optisch: Welche Zellen als grün zählen, Pollen und Fläche bleiben gleich. Die Spur wirkt dadurch etwas breiter (vorher am Raster abgeschnitten).
+
 ## 0.8.0 – Phase 2, Meilenstein 1: Kamera am Kartenrand
 
 - Die Kamera bleibt auf der Karte, man sieht am Rand keine leere Fläche mehr (`camera/edge_margin_px`, 0).
