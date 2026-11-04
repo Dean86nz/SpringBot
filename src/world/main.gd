@@ -3,9 +3,12 @@ extends Node2D
 ## Jedes Bild begrünt der Roboter die Zellen in seinem Radius; grüne Zellen bringen Pollen.
 ## Mit den Wachstums-Knoten wächst die Grenze des Grüns von allein weiter,
 ## Bienen tragen das Grün zu neuen Stellen. Alle Werte kommen aus dem Skilltree.
+## Wege, Flüsse und Brücken kommen aus data/world.json (WorldMap); sie werden nie grün.
 ## Läuft auch während der Pause (Menü-Eingaben), Roboter und Boden pausieren.
 ## Rahmen: Start mit Titelbildschirm (dahinter der gespeicherte Garten), Speichern alle
 ## paar Sekunden und bei jedem Menü, Endbildschirm, sobald die ganze Welt blüht.
+
+const WORLD_PATH := "res://data/world.json"
 
 var grid: GroundGrid
 var skills: SkillTree
@@ -26,6 +29,7 @@ var _base_hover := 2.0
 var _bee_view := BeeView.new()
 var _start_px := Vector2.ZERO
 var _ground := GroundView.new()
+var _bridge_view := BridgeView.new()
 var _petals := PetalFx.new()
 var _petal_carry := 0.0
 var _milestone := 0          # erreichte Zehntel der Fläche (für Klang und Blätterregen)
@@ -53,6 +57,9 @@ func _ready() -> void:
 	_base_radius = Game.num("robot/green_radius_cells", 3.0)
 	_base_speed = Game.num("robot/speed_px", 380.0)
 	grid = GroundGrid.new(w, h)
+	var t0 := Time.get_ticks_msec()
+	var bridges := WorldMap.build(grid, Game.load_json(WORLD_PATH))
+	print("Wege und Wasser: %d Brücken, %d ms" % [bridges.size(), Time.get_ticks_msec() - t0])
 	var tree_data := Game.load_json(Game.SKILLTREE_PATH)
 	skills = SkillTree.new(tree_data)
 	_spread_cap = int(tree_data.get("spread_max_events_per_frame", 3000))
@@ -65,6 +72,8 @@ func _ready() -> void:
 	var ground_cfg: Variant = Game.dig(Game.balance, "ground")
 	_ground.bind(grid, cell_px, ground_cfg if ground_cfg is Dictionary else {})
 	add_child(_ground)
+	_bridge_view.bind(bridges, cell_px)
+	add_child(_bridge_view)
 	var hive: Variant = Game.dig(Game.balance, "bees/hive_cell")
 	var hive_px := (Vector2(hive[0], hive[1]) + Vector2(0.5, 0.5)) * cell_px if hive is Array else _start_px
 	_bees.configure(Game.dig(Game.balance, "bees") if Game.dig(Game.balance, "bees") is Dictionary else {}, hive_px, cell_px)
@@ -82,6 +91,8 @@ func _ready() -> void:
 	_robot.bounds = Rect2(Vector2.ZERO, size_px).grow(-Game.num("robot/edge_margin_px", 46.0))
 	_robot.position = _start_px
 	_robot.obstacles = [{"pos": hive_px, "radius": Game.num("bees/hive_radius_px", 32.0)}]
+	_robot.water_radius_px = Game.num("robot/water_radius_px", 24.0)
+	_robot.walkable = func(p: Vector2) -> bool: return grid.is_walkable(Vector2i(p / cell_px))
 	add_child(_robot)
 	_camera.process_mode = Node.PROCESS_MODE_ALWAYS   # Versatz für den Titel greift auch in der Pause
 	_camera.zoom = Vector2.ONE * Game.num("camera/zoom", 1.0)
@@ -354,6 +365,8 @@ func load_game(data: Dictionary) -> void:
 	var r: Array = data.get("robot", [])
 	if r.size() == 2:
 		_robot.position = Vector2(float(r[0]), float(r[1])).clamp(_robot.bounds.position, _robot.bounds.end)
+		if not _robot.can_stand(_robot.position):
+			_robot.position = _start_px   # alter Spielstand: Platz liegt jetzt im Wasser
 	_camera.reset_smoothing()
 	_milestone = floori(grid.coverage() * 10.0)
 	_paint()

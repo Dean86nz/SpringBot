@@ -2,7 +2,7 @@
 
 Kleines 2D-Incremental-Spiel: Ein Roboter bringt einer grauen Welt den Frühling zurück. Wo er fährt, wird der Boden grün. Godot 4.7.2, GDScript, Gamepad zuerst (ROG Ally X).
 
-Stand: **Phase 2, Meilenstein 2 (Abwechslungsreiches Grün)**, Version 0.9.1. Plan der Phase 2 in `PHASE2.md`. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`, fremde Inhalte in `CREDITS.md`.
+Stand: **Phase 2, Meilenstein 3 (Wege und Wasser)**, Version 0.10.0. Plan der Phase 2 in `PHASE2.md`. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`, fremde Inhalte in `CREDITS.md`.
 
 ## Steuerung
 
@@ -22,6 +22,8 @@ Stand: **Phase 2, Meilenstein 2 (Abwechslungsreiches Grün)**, Version 0.9.1. Pl
 - `data/balance.json`: Kartengröße, Zellgröße, Grundtempo, Begrünungsradius, Bienen (Stock, Flugtempo, Blütengröße, Schwebezeit, Sprungweite), Kamera.
 - `data/skilltree.json`: Pollen je grüner Zelle und Sekunde, Grundwerte, Texte der Werte und alle 45 Knoten
   (Position, Voraussetzungen, Stufen, Kosten, Wirkung, besondere Knoten).
+- `data/world.json` + `src/sim/world_map.gd`: Flüsse und Wege als Kurven, daraus je Zelle Land, Weg, Wasser oder Brücke (GroundGrid.terrain).
+  Nur Land wird grün und zählt zur Fläche; Wasser ist ohne Brücke nicht befahrbar. `src/world/bridge_view.gd` zeichnet die Brücken.
 - `src/sim/skill_tree.gd`: Pollen, Knoten-Stufen, Sichtbarkeit (gekauft / kaufbar / „?“ / verdeckt), Summen der Werte (reine Logik, getestet).
 - `src/sim/bee_swarm.gd`: Bienen-Logik (Zielwahl, Schweben, Begrünen), `src/world/bee_view.gd` zeichnet Stock und Bienen.
 - `src/sim/ground_grid.gd`: Boden-Raster (1 Byte je Zelle), Begrünen im Kreis, Zähler, Schmutz-Rechteck,
@@ -50,6 +52,8 @@ Die Engine liegt in `Godot_v4.7.2-stable_win64.exe/` im Projektordner oder wird 
 .\build.ps1
 # Stil-Vorschaubild (Phase 2) nach docs/
 ..\ScrapEmpire\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe --audio-driver Dummy --path . -s tools/style_preview.gd -- docs/stil_vorschlag_phase2.png
+# Ganze Karte als Bild (Wege, Wasser, Brücken; links grau, rechts grün)
+..\ScrapEmpire\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe --audio-driver Dummy --path . -s tools/map_preview.gd -- karte.png
 # Grobe Spieldauer-Rechnung nach Preisänderungen im Skilltree
 python tools/balance_sim.py data/skilltree.json 0.4 640 480 1 0.005
 ```

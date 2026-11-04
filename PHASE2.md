@@ -10,6 +10,7 @@ Arbeitsweise wie bisher: ein Meilenstein, dann anhalten, Release- und Debug-EXE,
    - Erdwege, die sich durch die Landschaft schlängeln, mit Gras am Rand.
    - Flüsse und Bäche mit kleinen Holzbrücken, über die der Roboter fährt. Ohne Brücke kann der Roboter nicht übers Wasser.
    - Wege und Wasser werden nicht begrünt und zählen nicht zur Prozentanzeige (100 % bleiben erreichbar). Das Grün wächst bis an ihren Rand.
+   (erledigt in 0.10.0)
 4. **Dinge, die zum Leben erwachen:** kahle Bäume, ausgetrocknete Teiche, verwelkte Büsche, kahle Felsen. Erreicht sie das Grün, verwandeln sie sich mit kleinem Effekt und Klang (Blüten, Wasser und Seerosen, Beeren, Moos).
    Reine Dekoration und Orientierungspunkte, keine Hindernisse für das Grün. Der Roboter fährt um Bäume und Felsen herum.
    Dazu Baumstämme, Zäune und Steine als Details am Wegrand.

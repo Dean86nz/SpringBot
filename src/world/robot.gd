@@ -3,12 +3,16 @@ extends Node2D
 ## Der kleine Frühlings-Roboter (Platzhalter-Grafik, von oben gesehen, vorne = +x).
 ## Linker Stick fährt analog, WASD/Pfeile digital. Bleibt innerhalb der Karte und fährt
 ## nicht durch Hindernisse (Kreise, z. B. der Bienenstock), sondern gleitet an ihnen entlang.
+## Über Wasser fährt er nicht (walkable sagt, ob ein Punkt befahrbar ist); am Ufer gleitet er
+## entlang, indem er die Bewegung in x und y getrennt versucht.
 
 var speed_px := 380.0
 var accel := 10.0
 var bounds := Rect2()
 var radius_px := 30.0
 var obstacles: Array[Dictionary] = []   # {"pos": Vector2, "radius": float}
+var walkable := Callable()                # func(p: Vector2) -> bool, leer = überall befahrbar
+var water_radius_px := 24.0               # so weit um die Mitte muss der Boden befahrbar sein
 var velocity := Vector2.ZERO
 ## Aus, solange ein Menü offen ist, in dem der Stick navigiert.
 var input_enabled := true
@@ -34,7 +38,20 @@ func _process(delta: float) -> void:
 	velocity = velocity.lerp(target, clampf(accel * delta, 0.0, 1.0))
 	if velocity.length() < 2.0 and input == Vector2.ZERO:
 		velocity = Vector2.ZERO
-	position += velocity * delta
+	var next := position + velocity * delta
+	if not can_stand(next):
+		var nx := Vector2(next.x, position.y)
+		var ny := Vector2(position.x, next.y)
+		if can_stand(nx):
+			next = nx
+			velocity.y = 0.0
+		elif can_stand(ny):
+			next = ny
+			velocity.x = 0.0
+		else:
+			next = position
+			velocity = Vector2.ZERO
+	position = next
 	for o in obstacles:
 		position = push_out(position, o["pos"], float(o["radius"]) + radius_px)
 	if bounds.has_area():
@@ -43,6 +60,18 @@ func _process(delta: float) -> void:
 		rotation = lerp_angle(rotation, velocity.angle(), clampf(12.0 * delta, 0.0, 1.0))
 		_wobble += delta * velocity.length() * 0.05
 	queue_redraw()
+
+
+## Mitte und 8 Punkte im Kreis water_radius_px befahrbar?
+func can_stand(p: Vector2) -> bool:
+	if not walkable.is_valid():
+		return true
+	if not walkable.call(p):
+		return false
+	for k in 8:
+		if not walkable.call(p + Vector2.from_angle(k * TAU / 8.0) * water_radius_px):
+			return false
+	return true
 
 
 ## Schiebt p aus dem Kreis (center, min_dist) auf den Rand. Außerhalb bleibt p unverändert.

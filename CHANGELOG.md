@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.10.0 – Phase 2, Meilenstein 3: Wege und Wasser
+
+- Ein Fluss von Nord nach Süd und ein Bach, der nach Osten abzweigt; vier Erdwege schlängeln sich durch die Landschaft.
+  Wo ein Weg Wasser kreuzt, steht eine Holzbrücke (4 Brücken). Ohne Brücke kommt der Roboter nicht übers Wasser, am Ufer gleitet er entlang.
+- Wege und Wasser werden nie grün und zählen nicht zur Prozentanzeige: 100 % = alles Land (95,9 % der Karte). Das Grün wächst bis an ihren Rand.
+- Wege und Wasser reagieren auf das Grün daneben: staubiger Weg und trübes Wasser in der grauen Welt, warmes Braun mit Grassaum und klares, glitzerndes Blau neben Grün.
+- Bienen fliegen über Wasser hinweg, lassen aber nur auf grauem Land etwas erblühen.
+- Karte in `data/world.json`: Flüsse und Wege als Punktlisten (in Zellen) mit Breite und Schlängeln; Brückenbreite. Aufbau beim Start ca. 50 ms.
+- Alte Spielstände: Grün auf jetzigen Wegen und Wasser verfällt; stand der Roboter im Wasser, startet er am Startpunkt.
+- Nebenwirkung: Weil Wege und Wasser 4,1 % der Karte einnehmen, ist die Welt etwas schneller voll.
+- Werkzeug `tools/map_preview.gd`: ganze Karte als Bild (links grau, rechts grün).
+
 ## 0.9.1 – Blumen in Gruppen (Rückmeldung zu 0.9.0)
 
 - Blumen wachsen nicht mehr überall gleich dicht, sondern in großen Blumenwiesen (ca. 26 % des Grüns) und kleinen Blumeninseln (ca. 7 %).

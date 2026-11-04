@@ -5,10 +5,14 @@
 // Grün: Grüntöne, Grasbüschel, Blumen; je länger grün (lush 0..1), desto dichter und bunter.
 // Blumen nur in Gruppen: große Blumenwiesen und kleine Inseln (Rauschen), dazwischen ruhiges Gras.
 // Grau: Risse, Steinchen, trockene Halme. Werte setzt ground_view.gd aus data/balance.json.
+// terrain_tex: weiche Masken für Wege (R) und Wasser (G), 0,5 genau auf dem Rand. Wege und Wasser
+// liegen über dem Boden; sie werden lebendiger (warmes Braun, klares Blau), wenn daneben Grün ist.
 shader_type canvas_item;
 
 uniform sampler2D mask : filter_linear, repeat_disable;
 uniform sampler2D since_tex : filter_nearest, repeat_disable;
+uniform sampler2D terrain_tex : filter_linear, repeat_disable;
+uniform float cell_px = 24.0;
 uniform vec2 map_size;
 uniform float now = 0.0;
 uniform float lush_sec = 300.0;
@@ -185,6 +189,45 @@ vec4 stalk(vec2 p) {
 	return vec4(vec3(0.62, 0.55, 0.42), (1.0 - smoothstep(0.5, 1.4, d)) * 0.85);
 }
 
+// Wie grün ist es rund um p (Mittel aus 8 Richtungen, 4 Zellen weit)? Für Wege und Wasser,
+// die selbst nie grün werden; das Mittel gibt weiche Übergänge statt harter Kanten.
+float green_near(vec2 p) {
+	vec2 uv = p / map_size;
+	vec2 d = vec2(4.0 * cell_px) / map_size;
+	float sum = 0.0;
+	for (int k = 0; k < 8; k++) {
+		float a = float(k) * 0.7854;
+		sum += texture(mask, uv + vec2(cos(a), sin(a)) * d).r;
+	}
+	return smoothstep(0.08, 0.45, sum / 8.0);
+}
+
+vec3 paths_and_water(vec2 p, vec3 col, vec2 tr, float big, float small) {
+	float near = green_near(p);
+	// Erdweg: staubig im Grau, warmes Braun neben Grün, kleine Steinchen; Grassaum am Rand
+	float pv = tr.x + (small - 0.5) * 0.22;
+	float pe = smoothstep(0.45, 0.55, pv);
+	vec3 dirt = mix(vec3(0.60, 0.56, 0.49), vec3(0.76, 0.61, 0.43), near) + (big - 0.5) * 0.06 + (small - 0.5) * 0.05;
+	vec4 pb = pebble(p * 1.6 + 17.0);
+	dirt = mix(dirt, pb.rgb * vec3(1.04, 0.98, 0.9), pb.a * 0.7);
+	float fringe = smoothstep(0.40, 0.5, pv) * (1.0 - smoothstep(0.52, 0.64, pv));
+	col = mix(col, dirt, pe);
+	col = mix(col, vec3(0.34, 0.63, 0.27), fringe * near * 0.8);
+	// Wasser: Uferstreifen, Wasser mit leichtem Glitzern, dunkle Uferlinie
+	float wv = tr.y + (small - 0.5) * 0.12;
+	float bank = smoothstep(0.30, 0.46, wv);
+	float we = smoothstep(0.48, 0.55, wv);
+	vec3 shore = mix(vec3(0.60, 0.57, 0.52), vec3(0.66, 0.58, 0.42), near);
+	vec3 water = mix(vec3(0.53, 0.60, 0.65), vec3(0.34, 0.62, 0.88), near);
+	water = mix(water * 1.12, water, smoothstep(0.55, 0.95, wv));   // flach am Rand heller
+	float rip = vnoise(p / 26.0 + vec2(TIME * 0.35, TIME * 0.22)) * vnoise(p / 11.0 - vec2(TIME * 0.25, -TIME * 0.3));
+	water += smoothstep(0.35, 0.6, rip) * 0.14 * (0.35 + 0.65 * near);
+	col = mix(col, shore, bank * (1.0 - we) * (1.0 - pe));   // kein Uferstreifen auf dem Weg
+	col = mix(col, water, we);
+	col = mix(col, vec3(0.30, 0.36, 0.44), we * (1.0 - we) * 4.0 * 0.45);
+	return col;
+}
+
 void fragment() {
 	vec2 p = local_pos;
 	float m = texture(mask, p / map_size).r;
@@ -218,5 +261,9 @@ void fragment() {
 	// Heller gelbgrüner Saum an der Wachstumsgrenze
 	float rim = smoothstep(0.30, 0.50, v) - smoothstep(0.50, 0.72, v);
 	col = mix(col, vec3(0.82, 0.92, 0.48), rim * 0.55);
+	vec2 tr = texture(terrain_tex, p / map_size).rg;
+	if (tr.x > 0.02 || tr.y > 0.02) {
+		col = paths_and_water(p, col, tr, big, small);
+	}
 	COLOR = vec4(col, 1.0);
 }

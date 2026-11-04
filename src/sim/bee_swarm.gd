@@ -66,8 +66,8 @@ func update(delta: float, grid: GroundGrid, rng: RandomNumberGenerator, speed_fa
 		if to.length() <= step:
 			b.pos = b.target
 			b.flying = false
-			# Über grauem Boden schweben und blühen lassen; über Grün gleich weiterfliegen
-			if not grid.is_green(Vector2i(b.pos / cell_px)):
+			# Über grauem Land schweben und blühen lassen; über Grün, Weg oder Wasser gleich weiterfliegen
+			if grid.is_open(Vector2i(b.pos / cell_px)):
 				b.hover = hover_sec
 			else:
 				b.target = pick_target(b.pos, grid, rng)
@@ -83,7 +83,7 @@ func pick_target(from: Vector2, grid: GroundGrid, rng: RandomNumberGenerator) ->
 	for t in tries:
 		var p := from + Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(hop_min, hop_max) * cell_px
 		var c := Vector2i(p / cell_px)
-		if grid.in_bounds(c) and not grid.is_green(c):
+		if grid.is_open(c):
 			return (Vector2(c) + Vector2(0.5, 0.5)) * cell_px
 	if not grid.frontier.is_empty():
 		var i := grid.frontier[rng.randi_range(0, grid.frontier.size() - 1)]

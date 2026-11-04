@@ -10,6 +10,7 @@
 		"green_radius_cells": 3.0,
 		"radius_px": 30,
 		"edge_margin_px": 46,
+		"water_radius_px": 24,
 		"start_cell": [320, 240]
 	},
 	"bees": {

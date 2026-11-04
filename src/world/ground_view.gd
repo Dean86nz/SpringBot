@@ -34,6 +34,10 @@ func bind(grid: GroundGrid, cell_px: float, cfg: Dictionary = {}) -> void:
 	mat.shader = SHADER
 	mat.set_shader_parameter("mask", _tex)
 	mat.set_shader_parameter("since_tex", _since_tex)
+	# Wege und Wasser ändern sich nie: einmal hochladen
+	var terrain_img := Image.create_from_data(grid.width, grid.height, false, Image.FORMAT_RG8, grid.terrain_vis)
+	mat.set_shader_parameter("terrain_tex", ImageTexture.create_from_image(terrain_img))
+	mat.set_shader_parameter("cell_px", cell_px)
 	mat.set_shader_parameter("map_size", _size_px)
 	for k: String in cfg:
 		if k == "since_upload_sec":

@@ -8,9 +8,15 @@ extends RefCounted
 ## Daneben eine Anzeige-Maske (vis): wie cells, aber der Roboter-Kreis setzt am Rand Teilwerte,
 ## damit der sichtbare Rand genau auf dem Kreis liegt statt am Zellraster einzurasten.
 ## Außerdem je Zelle der Zeitpunkt, seit dem sie grün ist (since, für „länger grün = üppiger“).
+## Gelände (terrain, von WorldMap gesetzt): Nur Land wird grün und zählt zur Fläche; Wege und
+## Wasser bleiben, wie sie sind. Über Wasser fährt der Roboter nur auf Brücken.
 
 const GREY := 0
 const GREEN := 255
+const LAND := 0
+const PATH := 1
+const WATER := 2
+const BRIDGE := 3
 
 var width := 0
 var height := 0
@@ -18,6 +24,9 @@ var cells := PackedByteArray()
 var vis := PackedByteArray()         # nur Darstellung: 0..255, ab 128 sichtbar grün
 var since := PackedByteArray()       # je Zelle 2 Byte: Spielsekunde + 1, ab der sie grün ist (0 = grau)
 var time_sec := 0.0                  # aktuelle Spielzeit, setzt main.gd jedes Bild
+var terrain := PackedByteArray()     # LAND, PATH, WATER oder BRIDGE je Zelle
+var terrain_vis := PackedByteArray() # nur Darstellung: 2 Byte je Zelle, Weg- und Wassermaske mit weichem Rand
+var land_count := 0                  # Zellen, die grün werden können (= 100 %)
 var green_count := 0
 var frontier := PackedInt32Array()   # Zellindizes der Grenze
 var _slot := PackedInt32Array()      # Zellindex → Position in frontier, -1 = nicht in der Grenze
@@ -33,6 +42,38 @@ func _init(w: int = 0, h: int = 0) -> void:
 func setup(w: int, h: int) -> void:
 	width = w
 	height = h
+	terrain = PackedByteArray()
+	terrain.resize(w * h)
+	terrain_vis = PackedByteArray()
+	terrain_vis.resize(w * h * 2)
+	land_count = w * h
+	_reset_state()
+
+
+## Gelände übernehmen (vor dem ersten Begrünen). soft: weiche Masken für die Darstellung.
+func set_terrain(t: PackedByteArray, soft: PackedByteArray) -> void:
+	terrain = t
+	terrain_vis = soft
+	land_count = t.count(LAND)
+	_reset_state()
+
+
+func is_walkable(c: Vector2i) -> bool:
+	return in_bounds(c) and terrain[c.y * width + c.x] != WATER
+
+
+## Land, das noch grau ist (Ziel für Bienen).
+func is_open(c: Vector2i) -> bool:
+	if not in_bounds(c):
+		return false
+	var i := c.y * width + c.x
+	return terrain[i] == LAND and cells[i] == GREY
+
+
+## Alles außer dem Gelände zurücksetzen: grau, keine Grenze, keine Zeiten.
+func _reset_state() -> void:
+	var w := width
+	var h := height
 	cells = PackedByteArray()
 	cells.resize(w * h)
 	vis = PackedByteArray()
@@ -48,8 +89,9 @@ func setup(w: int, h: int) -> void:
 	_has_dirty = true
 
 
+## Zellen, die grün werden können (Wege und Wasser zählen nicht).
 func total() -> int:
-	return width * height
+	return land_count
 
 
 func in_bounds(c: Vector2i) -> bool:
@@ -135,9 +177,9 @@ func spread(events: int, reach: float, seed_chance: float, rng: RandomNumberGene
 	return added
 
 
-## Alles auf grau zurücksetzen.
+## Alles auf grau zurücksetzen (das Gelände bleibt).
 func clear() -> void:
-	setup(width, height)
+	_reset_state()
 
 
 ## Begrünt alles außer einem Kreis (center, radius in Zellen). Nur fürs Cheat-Menü.
@@ -183,14 +225,14 @@ func load_bytes(packed: PackedByteArray) -> bool:
 	var raw := packed.decompress(width * height, FileAccess.COMPRESSION_DEFLATE)
 	if raw.size() != width * height:
 		return false
-	setup(width, height)
+	_reset_state()
 	for i in raw.size():
-		if raw[i] != GREY:
+		if raw[i] != GREY and terrain[i] == LAND:
 			cells[i] = GREEN
 	green_count = cells.count(GREEN)
 	vis = cells.duplicate()
 	for i in cells.size():
-		if cells[i] == GREY and _has_green_neighbor(i):
+		if cells[i] == GREY and terrain[i] == LAND and _has_green_neighbor(i):
 			_slot[i] = frontier.size()
 			frontier.append(i)
 	return true
@@ -206,7 +248,7 @@ func take_dirty() -> Rect2i:
 
 ## Begrünt Zelle i und pflegt die Grenze. true, wenn sie vorher grau war.
 func _green_index(i: int) -> bool:
-	if cells[i] == GREEN:
+	if cells[i] == GREEN or terrain[i] != LAND:
 		return false
 	cells[i] = GREEN
 	vis[i] = GREEN
@@ -235,7 +277,7 @@ func _has_green_neighbor(i: int) -> bool:
 
 
 func _frontier_add(i: int) -> void:
-	if cells[i] == GREY and _slot[i] < 0:
+	if cells[i] == GREY and terrain[i] == LAND and _slot[i] < 0:
 		_slot[i] = frontier.size()
 		frontier.append(i)
 
