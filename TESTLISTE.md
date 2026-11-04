@@ -1,24 +1,17 @@
-# Testliste Meilenstein 7 (v0.7.0)
+# Testliste Phase 2, Meilenstein 1 (v0.8.0)
 
-EXEs: `export/windows/SpringBot_v0.7.0.exe` (Release) und `SpringBot_v0.7.0_DEBUG.exe` (Debug mit Cheat-Menü).
-Release und Debug haben getrennte Spielstände. Die Musik aus Meilenstein 6 steht noch aus (Punkte 5, 6 und 10 der alten Liste).
+EXEs: `export/windows/SpringBot_v0.8.0.exe` (Release) und `SpringBot_v0.8.0_DEBUG.exe` (Debug mit Cheat-Menü).
+Dein Spielstand aus 0.7.0 wird übernommen.
 
-## Titelbildschirm
-1. Erster Start: Titel „Frühlings-Roboter“, leichter Blätterregen, Knöpfe „Spielen“ und „Beenden“. Bedienung mit D-Pad und A.
-2. „Spielen“: Die Ansicht gleitet zum Roboter, das Spiel läuft.
+## Kamera am Kartenrand
+1. An alle vier Kartenränder und in die Ecken fahren: Die Ansicht bleibt auf der Karte, nirgends ist leere blaugraue Fläche zu sehen.
+2. Der Roboter bleibt am Rand ganz im Bild, das Grün reicht trotzdem bis an den Rand.
+3. Am oberen Rand Pause → „Zum Titelbildschirm“: Auch hinter dem Titel ist keine leere Fläche zu sehen.
+   Schnell an den Rand: Debug-EXE, Cheat-Menü (L3 + R3 eine Sekunde halten, PC F12) → „Zeit ×10“.
 
-## Speichern
-3. Ein paar Minuten spielen, etwas kaufen, dann Pause → „Spiel beenden“. Neu starten: Hinter dem Titel ist dein Garten zu sehen, darüber Fläche und Spielzeit. „Weiterspielen“: Boden, Pollen, Skilltree und Position stimmen.
-4. Gleiches, aber das Spiel einfach mit dem Fenster-X (oder Alt+F4) schließen: Höchstens die letzten 30 Sekunden fehlen.
-5. Pause → „Zum Titelbildschirm“ → „Weiterspielen“ geht nahtlos weiter.
-6. Titel → „Neues Spiel“: Es kommt eine Nachfrage. „Zurück“ (oder B) ändert nichts, „Ja, neu beginnen“ startet mit grauer Welt.
-7. Ruckelt es auf dem Ally alle 30 Sekunden kurz (automatisches Speichern)? Es sollte nicht.
+## Musik
+4. Von Anfang an läuft „Another August“ (das Stück, das dir gefallen hat), etwas leiser als bisher.
+5. Später weiterhin Wechsel bei 30 % und 60 % Fläche.
 
-## Ende (Debug-EXE, Cheat-Menü: L3 + R3 eine Sekunde halten, PC F12)
-8. Cheat „Welt fast fertig (Ende testen)“, dann nach rechts über den letzten grauen Fleck fahren: Glocke, großer Blätterregen, nach 2,5 Sekunden der Endbildschirm mit Spielzeit, Pollen, Knoten und Bienen.
-9. „Weiterfahren“ (oder B): Man kann weiter herumfahren und kaufen, der Endbildschirm kommt nicht noch einmal.
-10. Danach im Titel steht „Die Welt blüht!“ statt der Prozentzahl.
-11. Endbildschirm → „Zum Titelbildschirm“ funktioniert.
-
-## Allgemein
-12. Text und Knöpfe auf dem Ally gut lesbar?
+## Stil-Vorschlag für Meilenstein 2 bis 4
+6. Bild `docs/stil_vorschlag_phase2.png` ansehen: Passt die Richtung?

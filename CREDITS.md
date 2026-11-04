@@ -8,8 +8,7 @@ Alle Stücke: Lizenz **CC0 1.0** (Public Domain), geprüft am 2026-11-03 auf der
 
 | Ab Fläche | Stück | Urheber | Quelle | Datei |
 |---|---|---|---|---|
-| 0 % | A Simple Trifle | jestar | https://opengameart.org/content/a-simple-trifle | `music_1_trifle.ogg` |
-| 5 % | Another August | cynicmusic | https://opengameart.org/content/another-august | `music_2_august.ogg` |
+| 0 % | Another August | cynicmusic | https://opengameart.org/content/another-august | `music_2_august.ogg` |
 | 30 % | Up in the Sky | Memoraphile (You're Perfect Studio), CC0 aus mehreren angebotenen Lizenzen | https://opengameart.org/content/up-in-the-sky | `music_3_sky.ogg` |
 | 60 % | Champ de tournesol | Komiku (Loyalty Freak Music) | https://opengameart.org/content/champ-de-tournesol | `music_4_tournesol.ogg` |
 

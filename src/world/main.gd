@@ -75,19 +75,22 @@ func _ready() -> void:
 	add_child(_petals)   # vor dem Roboter: Blätter liegen unter ihm
 	_robot.process_mode = Node.PROCESS_MODE_PAUSABLE
 	_robot.accel = Game.num("robot/accel", 10.0)
-	_robot.bounds = Rect2(Vector2.ZERO, size_px).grow(-cell_px * 0.5)
-	_robot.position = _start_px
 	_robot.radius_px = Game.num("robot/radius_px", 30.0)
+	# Abstand zum Kartenrand: Der Roboter bleibt samt Ketten und Schatten ganz im Bild
+	_robot.bounds = Rect2(Vector2.ZERO, size_px).grow(-Game.num("robot/edge_margin_px", 46.0))
+	_robot.position = _start_px
 	_robot.obstacles = [{"pos": hive_px, "radius": Game.num("bees/hive_radius_px", 32.0)}]
 	add_child(_robot)
 	_camera.process_mode = Node.PROCESS_MODE_ALWAYS   # Versatz für den Titel greift auch in der Pause
 	_camera.zoom = Vector2.ONE * Game.num("camera/zoom", 1.0)
 	_camera.position_smoothing_enabled = true
 	_camera.position_smoothing_speed = Game.num("camera/smoothing", 6.0)
-	_camera.limit_left = int(-cell_px * 4)
-	_camera.limit_top = int(-cell_px * 4)
-	_camera.limit_right = int(size_px.x + cell_px * 4)
-	_camera.limit_bottom = int(size_px.y + cell_px * 4)
+	# Kamera bleibt auf der Karte (Rand jenseits der Karte wäre nur leere Fläche)
+	var edge := int(Game.num("camera/edge_margin_px", 0.0))
+	_camera.limit_left = -edge
+	_camera.limit_top = -edge
+	_camera.limit_right = int(size_px.x) + edge
+	_camera.limit_bottom = int(size_px.y) + edge
 	_robot.add_child(_camera)
 	add_child(_hud)
 	_tree.setup(skills)
@@ -260,8 +263,19 @@ func show_title() -> void:
 	Engine.time_scale = 1.0
 	_hud.visible = false
 	_robot.input_enabled = false
-	_camera.offset = Vector2(0, -Game.num("camera/title_offset_px", 330.0))   # Roboter unter dem Menü
+	_camera.offset = _title_offset()
 	_title.open(_save_info())
+
+
+## Versatz, der den Roboter unter das Titelmenü schiebt. Der Versatz umgeht die Kartengrenze
+## der Kamera, deshalb wird er hier so gekürzt, dass die Ansicht auf der Karte bleibt.
+func _title_offset() -> Vector2:
+	var half := get_viewport_rect().size.y * 0.5 / _camera.zoom.y
+	var lo := _camera.limit_top + half
+	var hi := _camera.limit_bottom - half
+	var center := clampf(_robot.position.y, lo, hi)
+	var want := clampf(center - Game.num("camera/title_offset_px", 330.0), lo, hi)
+	return Vector2(0, want - center)
 
 
 func _start_playing() -> void:

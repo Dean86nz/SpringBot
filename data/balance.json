@@ -9,6 +9,7 @@
 		"accel": 10.0,
 		"green_radius_cells": 3.0,
 		"radius_px": 30,
+		"edge_margin_px": 46,
 		"start_cell": [320, 240]
 	},
 	"bees": {
@@ -24,6 +25,7 @@
 	"camera": {
 		"zoom": 1.0,
 		"smoothing": 6.0,
+		"edge_margin_px": 0,
 		"title_offset_px": 330
 	},
 	"save": {

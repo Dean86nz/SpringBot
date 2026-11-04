@@ -1,11 +1,10 @@
 {
-	"music_db": -8.0,
+	"music_db": -11.0,
 	"sfx_db": -4.0,
 	"fade_sec": 5.0,
 	"off_db": -60.0,
 	"tracks": [
-		{"file": "res://assets/audio/music/music_1_trifle.ogg", "from_coverage": 0.0, "db": -2.0},
-		{"file": "res://assets/audio/music/music_2_august.ogg", "from_coverage": 0.05, "db": 0.0},
+		{"file": "res://assets/audio/music/music_2_august.ogg", "from_coverage": 0.0, "db": 0.0},
 		{"file": "res://assets/audio/music/music_3_sky.ogg", "from_coverage": 0.30, "db": 0.0},
 		{"file": "res://assets/audio/music/music_4_tournesol.ogg", "from_coverage": 0.60, "db": 0.0}
 	],

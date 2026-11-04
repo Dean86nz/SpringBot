@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.0 – Phase 2, Meilenstein 1: Kamera am Kartenrand
+
+- Die Kamera bleibt auf der Karte, man sieht am Rand keine leere Fläche mehr (`camera/edge_margin_px`, 0).
+  Auch der Titelbildschirm verschiebt die Ansicht nicht mehr über den Rand.
+- Der Roboter bleibt am Kartenrand samt Ketten ganz im Bild (`robot/edge_margin_px`, 46). Sein Grün reicht trotzdem bis an den Rand.
+- Musik (Rückmeldung zu 0.7.0): „A Simple Trifle“ entfernt, „Another August“ läuft von Anfang an. Musik insgesamt 3 dB leiser (`music_db` −11).
+- Stil-Vorschlag für Grün, Objekte und Tiere: `docs/stil_vorschlag_phase2.png` (erzeugt mit `tools/style_preview.gd`).
+
 ## 0.7.0 – Meilenstein 7: Rahmen (Titel, Speichern, Ende)
 
 - Titelbildschirm mit Blätterregen; dahinter sieht man den eigenen gespeicherten Garten. „Weiterspielen“ (mit Fläche und Spielzeit), „Neues Spiel“ (fragt nach, wenn schon ein Garten existiert), „Beenden“.

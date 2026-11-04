@@ -2,7 +2,7 @@
 
 Kleines 2D-Incremental-Spiel: Ein Roboter bringt einer grauen Welt den Frühling zurück. Wo er fährt, wird der Boden grün. Godot 4.7.2, GDScript, Gamepad zuerst (ROG Ally X).
 
-Stand: **Meilenstein 7 (Titel, Speichern, Ende)**, Version 0.7.0. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`, fremde Inhalte in `CREDITS.md`.
+Stand: **Phase 2, Meilenstein 1 (Kamera am Kartenrand)**, Version 0.8.0. Plan der Phase 2 in `PHASE2.md`. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`, fremde Inhalte in `CREDITS.md`.
 
 ## Steuerung
 
@@ -47,6 +47,8 @@ Die Engine liegt in `Godot_v4.7.2-stable_win64.exe/` im Projektordner oder wird 
 ..\ScrapEmpire\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe --audio-driver Dummy --path . -s tests/screenshot.gd -- shot.png 240 "ui_accept:10:11,move_right:20:200"
 # Release- und Debug-EXE nach export/windows/
 .\build.ps1
+# Stil-Vorschaubild (Phase 2) nach docs/
+..\ScrapEmpire\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe --audio-driver Dummy --path . -s tools/style_preview.gd -- docs/stil_vorschlag_phase2.png
 # Grobe Spieldauer-Rechnung nach Preisänderungen im Skilltree
 python tools/balance_sim.py data/skilltree.json 0.4 640 480 1 0.005
 ```
