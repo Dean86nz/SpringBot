@@ -62,7 +62,8 @@ func _ready() -> void:
 	_start_px = (Vector2(start[0], start[1]) + Vector2(0.5, 0.5)) * cell_px if start is Array else size_px * 0.5
 
 	_ground.process_mode = Node.PROCESS_MODE_ALWAYS   # zeigt den geladenen Garten auch hinter dem Titel
-	_ground.bind(grid, cell_px)
+	var ground_cfg: Variant = Game.dig(Game.balance, "ground")
+	_ground.bind(grid, cell_px, ground_cfg if ground_cfg is Dictionary else {})
 	add_child(_ground)
 	var hive: Variant = Game.dig(Game.balance, "bees/hive_cell")
 	var hive_px := (Vector2(hive[0], hive[1]) + Vector2(0.5, 0.5)) * cell_px if hive is Array else _start_px

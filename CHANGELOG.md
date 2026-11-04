@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.1 – Blumen in Gruppen (Rückmeldung zu 0.9.0)
+
+- Blumen wachsen nicht mehr überall gleich dicht, sondern in großen Blumenwiesen (ca. 26 % des Grüns) und kleinen Blumeninseln (ca. 7 %).
+  Dazwischen, etwa zwei Drittel der Fläche, ruhiges Gras mit Grüntönen, Büscheln und nur vereinzelten Blumen.
+- Werte in `data/balance.json` (`ground`): `meadow_threshold` (höher = weniger Wiesen), `meadow_scale` (Größe der Wiesen),
+  `island_threshold`, `island_scale`, `island_strength`, `calm_flowers` (Blumen im ruhigen Gras), `flower_old` (Dichte in voller Wiese).
+  Unterschiedliche Dichte je Gebiet folgt mit dem Meilenstein „Gebiete“.
+- Plan der Phase 2 um Wege, Flüsse, Brücken und Wegrand-Details erweitert (`PHASE2.md`).
+
 ## 0.9.0 – Phase 2, Meilenstein 2: Abwechslungsreiches Grün
 
 - Grün in mehreren Tönen: große dunklere und gelblichere Flecken statt einer einheitlichen Fläche.

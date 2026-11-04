@@ -3,6 +3,7 @@
 // since_tex: je Zelle die Spielsekunde + 1, ab der sie grün ist (RG = 16 Bit, nie filtern).
 // Deko liegt in Kacheln: Jede Kachel entscheidet per Zufallswert, ob dort etwas steht.
 // Grün: Grüntöne, Grasbüschel, Blumen; je länger grün (lush 0..1), desto dichter und bunter.
+// Blumen nur in Gruppen: große Blumenwiesen und kleine Inseln (Rauschen), dazwischen ruhiges Gras.
 // Grau: Risse, Steinchen, trockene Halme. Werte setzt ground_view.gd aus data/balance.json.
 shader_type canvas_item;
 
@@ -18,6 +19,13 @@ uniform float flower_tile = 34.0;
 uniform float flower_young = 0.04;
 uniform float flower_old = 0.5;
 uniform float color_from = 0.25;   // ab diesem lush kommen bunte Blumen dazu
+uniform float meadow_scale = 700.0;
+uniform float meadow_detail_scale = 260.0;
+uniform float meadow_threshold = 0.6;   // höher = weniger Blumenwiesen
+uniform float island_scale = 120.0;
+uniform float island_threshold = 0.8;   // höher = weniger Blumeninseln
+uniform float island_strength = 0.7;
+uniform float calm_flowers = 0.05;      // Anteil der Blumen im ruhigen Gras
 uniform float crack_tile = 96.0;
 uniform float crack_density = 0.4;
 uniform float pebble_tile = 44.0;
@@ -87,6 +95,14 @@ vec4 tuft(vec2 p) {
 	return vec4(c, 1.0 - smoothstep(1.2, 2.4, d));
 }
 
+// 0..1: wie stark hier Blumen wachsen (Wiese 1, Insel island_strength, ruhiges Gras calm_flowers)
+float bloom_zone(vec2 p) {
+	float m = vnoise(p / meadow_scale + 5.3) * 0.65 + vnoise(p / meadow_detail_scale + 91.7) * 0.35;
+	float meadow = smoothstep(meadow_threshold - 0.04, meadow_threshold + 0.04, m);
+	float island = smoothstep(island_threshold - 0.03, island_threshold + 0.03, vnoise(p / island_scale + 33.1)) * island_strength;
+	return max(max(meadow, island), calm_flowers);
+}
+
 // Blume mit 5 Blütenblättern und gelber Mitte, kleiner Schatten. Junges Grün: nur weiß/gelb,
 // bunte Blumen erscheinen erst später (keine Blume wechselt ihre Farbe).
 vec4 flower(vec2 p) {
@@ -94,7 +110,7 @@ vec4 flower(vec2 p) {
 	float h = hash(id + 23.0);
 	float lush = lush_at((id + 0.5) * flower_tile);
 	int ci = int(floor(hash(id + 6.6) * 6.999));
-	float dens = mix(flower_young, flower_old, lush);
+	float dens = mix(flower_young, flower_old, lush) * bloom_zone((id + 0.5) * flower_tile);
 	if (ci >= 2) {
 		dens *= smoothstep(color_from, 1.0, lush);
 	}

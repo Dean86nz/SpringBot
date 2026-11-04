@@ -22,7 +22,8 @@ var _since_dirty := false
 var _since_upload := 0.25
 
 
-func bind(grid: GroundGrid, cell_px: float) -> void:
+## cfg: Abschnitt "ground" aus balance.json (Shader-Werte), leer = Standardwerte des Shaders.
+func bind(grid: GroundGrid, cell_px: float, cfg: Dictionary = {}) -> void:
 	_grid = grid
 	_size_px = Vector2(grid.width, grid.height) * cell_px
 	_img = Image.create_from_data(grid.width, grid.height, false, Image.FORMAT_R8, grid.vis)
@@ -34,13 +35,11 @@ func bind(grid: GroundGrid, cell_px: float) -> void:
 	mat.set_shader_parameter("mask", _tex)
 	mat.set_shader_parameter("since_tex", _since_tex)
 	mat.set_shader_parameter("map_size", _size_px)
-	var cfg: Variant = Game.dig(Game.balance, "ground")
-	if cfg is Dictionary:
-		for k: String in cfg:
-			if k == "since_upload_sec":
-				_since_upload = float(cfg[k])
-			else:
-				mat.set_shader_parameter(k, float(cfg[k]))
+	for k: String in cfg:
+		if k == "since_upload_sec":
+			_since_upload = float(cfg[k])
+		else:
+			mat.set_shader_parameter(k, float(cfg[k]))
 	material = mat
 	grid.take_dirty()
 	queue_redraw()
