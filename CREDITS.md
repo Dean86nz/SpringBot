@@ -23,5 +23,6 @@ Von **Kenney** (www.kenney.nl), Lizenz **CC0 1.0**, übernommen aus dem Projekt 
 | milestone_1 | jingles_STEEL13 | Music Jingles |
 | open_1, close_1, select_1 | open_001, close_001, switch_002 | Interface Sounds 1.0 |
 | deny_1 | impactSoft_heavy_000 | Impact Sounds 1.0 |
+| awake_1 (Objekt erwacht) | jingles_STEEL02 | Music Jingles |
 
 Quellen: https://kenney.nl/assets/music-jingles, https://kenney.nl/assets/interface-sounds, https://kenney.nl/assets/impact-sounds

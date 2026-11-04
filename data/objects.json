@@ -1,0 +1,23 @@
+{
+	"_info": "Objekte der Welt. Größen in Pixeln, Abstände in Zellen. block_px = Hindernis für den Roboter (0 = keins). Platzierung zufällig mit festem seed, nie auf Wegen oder Wasser.",
+	"seed": 2026,
+	"min_gap_px": 24,
+	"keep_free": {"radius_cells": 10},
+	"tries": 60,
+	"types": {
+		"tree": {"count": 90, "radius_px": 72, "block_px": 36},
+		"rock": {"count": 55, "radius_px": 62, "block_px": 44},
+		"pond": {"count": 20, "radius_px": 110, "block_px": 0},
+		"bush": {"count": 110, "radius_px": 48, "block_px": 0}
+	},
+	"wayside": {
+		"every_cells": [10, 18],
+		"offset_cells": 1.4,
+		"kinds": ["log", "fence", "stones"],
+		"radius_px": 40
+	},
+	"awake_check_sec": 0.2,
+	"awake_petals": 24,
+	"max_bursts_per_check": 6,
+	"wayside_petals": 8
+}

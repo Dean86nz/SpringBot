@@ -269,7 +269,7 @@ func load_bytes(packed: PackedByteArray) -> bool:
 			cells[i] = GREEN
 			vis[i] = GREEN
 			green_count += 1
-			_cover_edges(i)
+			_cover_edges(i)   # einmalig beim Laden
 		elif terrain[i] == PATH:
 			cells[i] = GREEN
 			clean_vis[i] = GREEN
@@ -302,14 +302,38 @@ func _green_index(i: int, full_vis: bool = true) -> bool:
 	since[i * 2 + 1] = s >> 8
 	green_count += 1
 	_frontier_remove(i)
-	_cover_edges(i)
-	for d in DIRS:
-		var n := _land_neighbor(i, d)
-		if n >= 0:
-			_frontier_add(n)
-			_settle(n)
-	_settle(i)
+	var x := i % width
+	if x < width - 1:
+		_touch(i, i + 1, DIRS[0])
+	if x > 0:
+		_touch(i, i - 1, DIRS[1])
+	if i < cells.size() - width:
+		_touch(i, i + width, DIRS[2])
+	if i >= width:
+		_touch(i, i - width, DIRS[3])
+	if vis[i] != GREEN:
+		_settle(i)
 	return true
+
+
+## Direkter Nachbar n der frisch grünen Zelle i: Land kommt in die Grenze; Weg oder Wasser wird
+## in der Anzeige grün, und die nächste Landzelle dahinter kommt in die Grenze (Sprung).
+func _touch(i: int, n: int, d: Vector2i) -> void:
+	if terrain[n] == LAND:
+		# Bedingungen vorab prüfen: spart bei jeder Ausbreitung zwei Funktionsaufrufe
+		if cells[n] == GREY:
+			if _slot[n] < 0:
+				_frontier_add(n)
+		elif vis[n] != GREEN:
+			_settle(n)
+		return
+	if vis[n] != GREEN:
+		vis[n] = GREEN
+		_mark(Rect2i(n % width, n / width, 1, 1))
+	var m := _land_neighbor(i, d)
+	if m >= 0:
+		_frontier_add(m)
+		_settle(m)
 
 
 ## Direkte Nachbarn von i, die kein Land sind, werden in der Anzeige grün.
@@ -352,7 +376,7 @@ func _has_green_neighbor(i: int) -> bool:
 ## Grüne Zelle mit Teilwert in der Anzeige wird voll grün, sobald sie nicht mehr am Rand liegt
 ## (alle direkten Nachbarn grün, kein Land oder außerhalb der Karte).
 func _settle(i: int) -> void:
-	if vis[i] == GREEN or cells[i] != GREEN:
+	if cells[i] != GREEN or vis[i] == GREEN:
 		return
 	var x := i % width
 	var y := i / width

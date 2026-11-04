@@ -4,11 +4,14 @@ extends Node2D
 ## Mit den Wachstums-Knoten wächst die Grenze des Grüns von allein weiter,
 ## Bienen tragen das Grün zu neuen Stellen. Alle Werte kommen aus dem Skilltree.
 ## Wege, Flüsse und Brücken kommen aus data/world.json (WorldMap); sie werden nie grün.
+## Objekte (Bäume, Teiche, Büsche, Felsen, Wegrand) aus data/objects.json erwachen, sobald unter
+## ihnen Grün ist; um Bäume und Felsen fährt der Roboter herum.
 ## Läuft auch während der Pause (Menü-Eingaben), Roboter und Boden pausieren.
 ## Rahmen: Start mit Titelbildschirm (dahinter der gespeicherte Garten), Speichern alle
 ## paar Sekunden und bei jedem Menü, Endbildschirm, sobald die ganze Welt blüht.
 
 const WORLD_PATH := "res://data/world.json"
+const OBJECTS_PATH := "res://data/objects.json"
 
 var grid: GroundGrid
 var skills: SkillTree
@@ -30,6 +33,9 @@ var _bee_view := BeeView.new()
 var _start_px := Vector2.ZERO
 var _ground := GroundView.new()
 var _bridge_view := BridgeView.new()
+var _objects: Array[WorldObject] = []
+var _obj_cfg: Dictionary = {}
+var _awake_timer := 0.0
 var _petals := PetalFx.new()
 var _petal_carry := 0.0
 var _dust := PetalFx.new()   # Staubwölkchen, wenn der Roboter einen Weg sauber fährt
@@ -61,7 +67,8 @@ func _ready() -> void:
 	grid = GroundGrid.new(w, h)
 	grid.hop_cells = int(Game.num("map/spread_hop_cells", 12))
 	var t0 := Time.get_ticks_msec()
-	var bridges := WorldMap.build(grid, Game.load_json(WORLD_PATH))
+	var world_data := Game.load_json(WORLD_PATH)
+	var bridges := WorldMap.build(grid, world_data)
 	print("Wege und Wasser: %d Brücken, %d ms" % [bridges.size(), Time.get_ticks_msec() - t0])
 	var tree_data := Game.load_json(Game.SKILLTREE_PATH)
 	skills = SkillTree.new(tree_data)
@@ -82,6 +89,16 @@ func _ready() -> void:
 	_bees.configure(Game.dig(Game.balance, "bees") if Game.dig(Game.balance, "bees") is Dictionary else {}, hive_px, cell_px)
 	_base_bloom = _bees.bloom_radius
 	_base_hover = _bees.hover_sec
+	_obj_cfg = Game.load_json(OBJECTS_PATH)
+	var blockers: Array[Dictionary] = []
+	for d in WorldObjects.place(grid, cell_px, _obj_cfg, world_data, [_start_px, hive_px]):
+		var o := WorldObject.new()
+		o.setup(d)
+		add_child(o)
+		_objects.append(o)
+		if float(d["block"]) > 0.0:
+			blockers.append({"pos": d["pos"], "radius": float(d["block"])})
+	print("Objekte: %d, davon %d Hindernisse, %d ms" % [_objects.size(), blockers.size(), Time.get_ticks_msec() - t0])
 	_bee_view.process_mode = Node.PROCESS_MODE_PAUSABLE
 	_bee_view.bind(_bees)
 	add_child(_bee_view)
@@ -98,6 +115,7 @@ func _ready() -> void:
 	_robot.bounds = Rect2(Vector2.ZERO, size_px).grow(-Game.num("robot/edge_margin_px", 46.0))
 	_robot.position = _start_px
 	_robot.obstacles = [{"pos": hive_px, "radius": Game.num("bees/hive_radius_px", 32.0)}]
+	_robot.obstacles.append_array(blockers)
 	_robot.water_radius_px = Game.num("robot/water_radius_px", 24.0)
 	_robot.walkable = func(p: Vector2) -> bool: return grid.is_walkable(Vector2i(p / cell_px))
 	add_child(_robot)
@@ -157,6 +175,10 @@ func _process(delta: float) -> void:
 	grid.time_sec = _world_sec
 	_ground.set_time(_world_sec)
 	_check_end(delta)
+	_awake_timer -= delta
+	if _awake_timer <= 0.0:
+		_awake_timer = float(_obj_cfg.get("awake_check_sec", 0.2))
+		_wake_objects(true)
 	_autosave += real
 	if _autosave >= Game.num("save/autosave_sec", 30.0):
 		save()
@@ -190,6 +212,23 @@ func _check_end(delta: float) -> void:
 		_finished = true
 		_end_wait = Game.num("end/delay_sec", 2.5)
 		_petals.burst(_robot.position, 200, Vector2(200, 700), Vector2(1.5, 2.5), Vector2(8, 14))
+
+
+## Objekte, unter denen es grün geworden ist, erwachen (mit Klang und Blättern, wenn animate).
+## Ohne Grün (Neues Spiel) schlafen sie wieder ein.
+func _wake_objects(animate: bool) -> void:
+	var bursts := int(_obj_cfg.get("max_bursts_per_check", 6))   # erwachen viele auf einmal: nicht jedes mit Blättern
+	for o in _objects:
+		var green := grid.is_green(Vector2i(o.position / cell_px))
+		if green == o.awake:
+			continue
+		o.set_awake(green, animate)
+		if green and animate and bursts > 0:
+			bursts -= 1
+			var big := not (o.kind in ["log", "fence", "stones"])
+			_petals.burst(o.position, int(_obj_cfg.get("awake_petals" if big else "wayside_petals", 10)), Vector2(60, 220), Vector2(0.6, 1.2), Vector2(6, 10))
+			if big:
+				Sfx.play_throttled("awake", 0.15, randf_range(0.9, 1.15))
 
 
 ## Frisch begrünte Zellen unter dem Roboter werfen ein paar Blätter nach hinten.
@@ -295,6 +334,7 @@ func reset_game() -> void:
 	_robot.velocity = Vector2.ZERO
 	_camera.reset_smoothing()
 	_paint()
+	_wake_objects(false)
 
 
 # --- Rahmen: Titel, Speichern, Beenden ---
@@ -392,6 +432,7 @@ func load_game(data: Dictionary) -> void:
 	_camera.reset_smoothing()
 	_milestone = floori(grid.coverage() * 10.0)
 	_paint()
+	_wake_objects(false)
 
 
 func quit() -> void:

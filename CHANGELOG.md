@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.11.0 – Phase 2, Meilenstein 4: Dinge, die zum Leben erwachen
+
+- 275 Objekte in der Landschaft: 90 Bäume, 55 Felsen, 20 Teiche, 110 Büsche. In der grauen Welt kahl, ausgetrocknet, verwelkt.
+  Wird es unter ihnen grün, erwachen sie mit kleiner Animation, Blätterwolke und Klang: Bäume blühen (rosa oder weiß), Teiche füllen sich mit Wasser und Seerosen, Büsche tragen rote Beeren, Felsen bekommen Moos und eine Blume.
+- Am Wegrand: rund 80 Baumstämme, Zäune und Steinhaufen. Sie erwachen ebenfalls (Moos und Pilze, Blumen am Zaun, Moos auf den Steinen), leiser und mit kleinerer Blätterwolke.
+- Um Bäume und Felsen fährt der Roboter herum; alles andere ist Dekoration. Für das Grün sind Objekte kein Hindernis.
+- Verteilung zufällig, aber mit festem Startwert immer gleich; nie auf Wegen oder Wasser, nie am Start; zwischen zwei Hindernissen passt der Roboter immer durch.
+  Alles in `data/objects.json` (Anzahl, Größe, Hindernis-Radius, Abstände, Wegrand-Abstand, Blätter).
+- Ob ein Objekt erwacht ist, ergibt sich aus dem Grün und muss nicht gespeichert werden.
+- Klang: Kenney „jingles_STEEL02“ (CC0), leise und mit wechselnder Tonhöhe (`awake` in `data/audio.json`).
+- Leistung: Ausbreitung wieder fast so schnell wie vor 0.10.1 (1,9 statt 3,8 µs je Ereignis). Die Erwach-Animation läuft über die Skalierung, neu gezeichnet wird nur einmal.
+  Jedes Objekt ist ein eigener Knoten, gezeichnet werden nur sichtbare.
+
 ## 0.10.1 – Rückmeldung zu 0.10.0
 
 - Keine grauen Reste mehr bei 100 %. Ursache war die Spurkorrektur aus 0.8.1: Zellen am Rand der Roboterspur behielten in der Anzeige einen Teilwert, auch wenn sie längst grün waren, und schimmerten mit dem Rauschen grau durch.
