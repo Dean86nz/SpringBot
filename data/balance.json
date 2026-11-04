@@ -2,7 +2,8 @@
 	"map": {
 		"width_cells": 640,
 		"height_cells": 480,
-		"cell_px": 24
+		"cell_px": 24,
+		"spread_hop_cells": 12
 	},
 	"robot": {
 		"speed_px": 380.0,
@@ -33,8 +34,9 @@
 		"lush_sec": 300,
 		"since_upload_sec": 0.25,
 		"tuft_tile": 30,
-		"tuft_young": 0.12,
-		"tuft_old": 0.55,
+		"tuft_young": 0.07,
+		"tuft_old": 0.32,
+		"tuft_alpha": 0.6,
 		"flower_tile": 40,
 		"flower_young": 0.05,
 		"flower_old": 0.7,
@@ -52,6 +54,9 @@
 		"pebble_density": 0.22,
 		"stalk_tile": 38,
 		"stalk_density": 0.25
+	},
+	"paths": {
+		"dust_per_cell": 0.25
 	},
 	"save": {
 		"autosave_sec": 30

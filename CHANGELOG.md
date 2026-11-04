@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.10.1 – Rückmeldung zu 0.10.0
+
+- Keine grauen Reste mehr bei 100 %. Ursache war die Spurkorrektur aus 0.8.1: Zellen am Rand der Roboterspur behielten in der Anzeige einen Teilwert, auch wenn sie längst grün waren, und schimmerten mit dem Rauschen grau durch.
+  Jetzt werden sie voll grün, sobald sie nicht mehr am Rand liegen. Ein Test prüft, dass bei 100 % jede Landzelle in der Anzeige voll grün ist.
+- Kein eingeschlossenes Land mehr: Die Ausbreitung springt über Wege und Wasser (bis 12 Zellen, `map/spread_hop_cells`). Ein Test lässt die Ausbreitung allein die ganze echte Karte füllen.
+- Saubere Wegränder: Weg- und Wasserzellen neben grünem Land gelten in der Anzeige als grün, dadurch scheint am Rand kein Grau mehr durch.
+- Wege sauber fahren: Wege sind anfangs schmutzig (dunkle Flecken, Zweige) und werden dort sauber, wo der Roboter darüberfährt, mit kleinen Staubwölkchen.
+  Dezente Anzeige „Wege: x %“ unter der Prozentanzeige. Zählt nicht für das Ende. Wird mitgespeichert. Bienen und Ausbreitung säubern keine Wege.
+- Grasbüschel weniger und dezenter (`ground/tuft_young` 0.07, `tuft_old` 0.32, neu `tuft_alpha` 0.6).
+
 ## 0.10.0 – Phase 2, Meilenstein 3: Wege und Wasser
 
 - Ein Fluss von Nord nach Süd und ein Bach, der nach Osten abzweigt; vier Erdwege schlängeln sich durch die Landschaft.

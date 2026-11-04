@@ -10,6 +10,7 @@ const COLORS := [
 const RIM := 6
 
 var capacity := 400
+var colors: Array = COLORS   # Farbauswahl je Blatt (Staub nutzt Brauntöne)
 var fall := 0.0   # Zug nach unten (Pixel/s²), für langsam fallenden Blätterregen
 var _rim := PackedVector2Array()     # Einheitskreis, RIM Punkte
 var _pos := PackedVector2Array()
@@ -54,7 +55,7 @@ func burst(p: Vector2, count: int, speed := Vector2(40, 160), life := Vector2(0.
 		_size[i] = randf_range(size.x, size.y)
 		_rot[i] = randf() * TAU
 		_spin[i] = randf_range(-6.0, 6.0)
-		_col[i] = COLORS[randi() % COLORS.size()]
+		_col[i] = colors[randi() % colors.size()]
 	queue_redraw()
 
 

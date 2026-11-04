@@ -7,11 +7,14 @@
 // Grau: Risse, Steinchen, trockene Halme. Werte setzt ground_view.gd aus data/balance.json.
 // terrain_tex: weiche Masken für Wege (R) und Wasser (G), 0,5 genau auf dem Rand. Wege und Wasser
 // liegen über dem Boden; sie werden lebendiger (warmes Braun, klares Blau), wenn daneben Grün ist.
+// clean_tex: wo der Roboter den Weg sauber gefahren hat (sonst schmutzig: dunkle Flecken, Zweige).
+// Weg- und Wasserzellen neben grünem Land sind in der Maske grün (GroundGrid), daher kein Grau am Rand.
 shader_type canvas_item;
 
 uniform sampler2D mask : filter_linear, repeat_disable;
 uniform sampler2D since_tex : filter_nearest, repeat_disable;
 uniform sampler2D terrain_tex : filter_linear, repeat_disable;
+uniform sampler2D clean_tex : filter_linear, repeat_disable;
 uniform float cell_px = 24.0;
 uniform vec2 map_size;
 uniform float now = 0.0;
@@ -19,6 +22,7 @@ uniform float lush_sec = 300.0;
 uniform float tuft_tile = 26.0;
 uniform float tuft_young = 0.12;
 uniform float tuft_old = 0.6;
+uniform float tuft_alpha = 0.6;
 uniform float flower_tile = 34.0;
 uniform float flower_young = 0.04;
 uniform float flower_old = 0.5;
@@ -96,7 +100,7 @@ vec4 tuft(vec2 p) {
 		d = min(d, seg(q, vec2(0.0), vec2(cos(a), sin(a)) * len * (0.75 + 0.25 * float(k % 2))));
 	}
 	vec3 c = mix(vec3(0.24, 0.52, 0.20), vec3(0.50, 0.76, 0.28), hash(id + 9.9));
-	return vec4(c, 1.0 - smoothstep(1.2, 2.4, d));
+	return vec4(c, (1.0 - smoothstep(0.9, 2.0, d)) * tuft_alpha);
 }
 
 // 0..1: wie stark hier Blumen wachsen (Wiese 1, Insel island_strength, ruhiges Gras calm_flowers)
@@ -202,14 +206,23 @@ float green_near(vec2 p) {
 	return smoothstep(0.08, 0.45, sum / 8.0);
 }
 
-vec3 paths_and_water(vec2 p, vec3 col, vec2 tr, float big, float small) {
-	float near = green_near(p);
-	// Erdweg: staubig im Grau, warmes Braun neben Grün, kleine Steinchen; Grassaum am Rand
+vec3 paths_and_water(vec2 p, vec3 col, vec2 tr, float near, float big, float small) {
+	// Erdweg: staubig im Grau, warmes Braun neben Grün, kleine Steinchen; Grassaum am Rand.
+	// Ungesäubert: dunkle Schmutzflecken und Zweige darüber.
 	float pv = tr.x + (small - 0.5) * 0.22;
 	float pe = smoothstep(0.45, 0.55, pv);
 	vec3 dirt = mix(vec3(0.60, 0.56, 0.49), vec3(0.76, 0.61, 0.43), near) + (big - 0.5) * 0.06 + (small - 0.5) * 0.05;
 	vec4 pb = pebble(p * 1.6 + 17.0);
 	dirt = mix(dirt, pb.rgb * vec3(1.04, 0.98, 0.9), pb.a * 0.7);
+	float clean = smoothstep(0.4, 0.6, texture(clean_tex, p / map_size).r + (small - 0.5) * 0.2);
+	if (clean < 0.999) {
+		float blot = smoothstep(0.45, 0.75, vnoise(p / 30.0 + 71.0) * 0.7 + vnoise(p / 9.0 + 13.0) * 0.3);
+		vec3 grime = mix(dirt * 0.78, vec3(0.42, 0.38, 0.33), blot * 0.7);
+		grime = mix(grime, grime * 0.7, crack(p * 0.7 + 5.0) * 0.8);
+		vec4 tw = stalk(p * 0.9 + 3.0);
+		grime = mix(grime, vec3(0.45, 0.36, 0.26), tw.a * 0.9);
+		dirt = mix(grime, dirt, clean);
+	}
 	float fringe = smoothstep(0.40, 0.5, pv) * (1.0 - smoothstep(0.52, 0.64, pv));
 	col = mix(col, dirt, pe);
 	col = mix(col, vec3(0.34, 0.63, 0.27), fringe * near * 0.8);
@@ -231,6 +244,11 @@ vec3 paths_and_water(vec2 p, vec3 col, vec2 tr, float big, float small) {
 void fragment() {
 	vec2 p = local_pos;
 	float m = texture(mask, p / map_size).r;
+	vec2 tr = texture(terrain_tex, p / map_size).rg;
+	float near = 0.0;
+	if (tr.x > 0.02 || tr.y > 0.02) {
+		near = green_near(p);
+	}
 	float big = vnoise(p / 46.0);
 	float small = vnoise(p / 9.0);
 	float v = m + (big * 0.6 + small * 0.4 - 0.5) * 0.55;
@@ -261,9 +279,8 @@ void fragment() {
 	// Heller gelbgrüner Saum an der Wachstumsgrenze
 	float rim = smoothstep(0.30, 0.50, v) - smoothstep(0.50, 0.72, v);
 	col = mix(col, vec3(0.82, 0.92, 0.48), rim * 0.55);
-	vec2 tr = texture(terrain_tex, p / map_size).rg;
 	if (tr.x > 0.02 || tr.y > 0.02) {
-		col = paths_and_water(p, col, tr, big, small);
+		col = paths_and_water(p, col, tr, near, big, small);
 	}
 	COLOR = vec4(col, 1.0);
 }

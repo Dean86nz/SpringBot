@@ -1,9 +1,10 @@
 class_name Hud
 extends CanvasLayer
-## Prozentanzeige der begrünten Fläche (oben Mitte), Pollen (oben links),
+## Prozentanzeige der begrünten Fläche (oben Mitte), darunter dezent die sauberen Wege, Pollen (oben links),
 ## Tastenhinweis (unten links) und Versionsnummer (unten rechts).
 
 var _percent := Label.new()
+var _paths := Label.new()
 var _pollen := Label.new()
 var _hint := Label.new()
 var _version := Label.new()
@@ -20,6 +21,16 @@ func _ready() -> void:
 	_percent.add_theme_color_override("font_outline_color", Color(0.25, 0.45, 0.25))
 	_percent.add_theme_constant_override("outline_size", 12)
 	add_child(_percent)
+	# Wege: dezent unter der Prozentanzeige, zählt nicht fürs Ende
+	_paths.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	_paths.offset_top = 92
+	_paths.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_paths.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_paths.add_theme_font_size_override("font_size", 24)
+	_paths.add_theme_color_override("font_color", Color(1.0, 0.95, 0.85, 0.85))
+	_paths.add_theme_color_override("font_outline_color", Color(0.45, 0.35, 0.25))
+	_paths.add_theme_constant_override("outline_size", 7)
+	add_child(_paths)
 	_pollen.position = Vector2(32, 24)
 	_pollen.add_theme_font_size_override("font_size", 40)
 	_pollen.add_theme_color_override("font_color", Color(1.0, 0.92, 0.45))
@@ -51,6 +62,10 @@ func _ready() -> void:
 
 func set_coverage(fraction: float) -> void:
 	_percent.text = "Frühling: %s %%" % format_percent(fraction)
+
+
+func set_paths(fraction: float) -> void:
+	_paths.text = "Wege: %s %%" % format_percent(fraction)
 
 
 ## Prozentanzeige springt kurz auf (bei jedem vollen Zehntel).
