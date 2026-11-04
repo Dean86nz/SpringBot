@@ -14,8 +14,11 @@ Arbeitsweise wie bisher: ein Meilenstein, dann anhalten, Release- und Debug-EXE,
 4. **Dinge, die zum Leben erwachen:** kahle Bäume, ausgetrocknete Teiche, verwelkte Büsche, kahle Felsen. Erreicht sie das Grün, verwandeln sie sich mit kleinem Effekt und Klang (Blüten, Wasser und Seerosen, Beeren, Moos).
    Reine Dekoration und Orientierungspunkte, keine Hindernisse für das Grün. Der Roboter fährt um Bäume und Felsen herum.
    Dazu Baumstämme, Zäune und Steine als Details am Wegrand.
-   (erledigt in 0.11.0; Rückmeldung zu 0.10.0 in 0.10.1: keine Grau-Reste, Wege sauber fahren, dezentere Grasbüschel)
+   (erledigt in 0.11.0; Rückmeldung zu 0.10.0 in 0.10.1: keine Grau-Reste, dezentere Grasbüschel)
+   Korrektur in 0.11.1: kein Wege-Fortschritt, Wege werden rein optisch schöner neben Grün (Kiesel, Zweige, Laub).
+   Verschiedene Baumarten mit eigener Form und Größe: Laubbaum, Tanne, Birke, Obstbaum, Weide am Wasser, junge Bäume.
 5. **Tiere:** Schmetterlinge, Vögel, Hasen, Frösche an den Teichen, nach und nach auf grünen Flächen. Reine Dekoration, nicht zu viele, flüssig auf dem Ally.
+   (erledigt in 0.12.0)
 6. **Gebiete mit eigenem Charakter:** 4 bis 6 Gebiete (z. B. Wiese, Hügel, Seenlandschaft, Wald) mit eigener Mischung aus Pflanzen, Objekten und Farben, auch eigener Blumendichte. Name dezent einblenden beim Betreten.
 
 Reihenfolge: Wege und Wasser kommen vor den Objekten, weil Objekte (Wegrand-Details, Teiche, Brücken) sich an ihnen ausrichten.

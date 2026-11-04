@@ -6,12 +6,14 @@ extends Node2D
 ## Wege, Flüsse und Brücken kommen aus data/world.json (WorldMap); sie werden nie grün.
 ## Objekte (Bäume, Teiche, Büsche, Felsen, Wegrand) aus data/objects.json erwachen, sobald unter
 ## ihnen Grün ist; um Bäume und Felsen fährt der Roboter herum.
+## Tiere (data/animals.json) leben als Deko nahe der Kamera über dem Grün (Animals, AnimalView).
 ## Läuft auch während der Pause (Menü-Eingaben), Roboter und Boden pausieren.
 ## Rahmen: Start mit Titelbildschirm (dahinter der gespeicherte Garten), Speichern alle
 ## paar Sekunden und bei jedem Menü, Endbildschirm, sobald die ganze Welt blüht.
 
 const WORLD_PATH := "res://data/world.json"
 const OBJECTS_PATH := "res://data/objects.json"
+const ANIMALS_PATH := "res://data/animals.json"
 
 var grid: GroundGrid
 var skills: SkillTree
@@ -36,6 +38,9 @@ var _bridge_view := BridgeView.new()
 var _objects: Array[WorldObject] = []
 var _obj_cfg: Dictionary = {}
 var _awake_timer := 0.0
+var _animals: Animals
+var _animal_view := AnimalView.new()
+var _ponds: Array[WorldObject] = []   # gleiche Reihenfolge wie _animals.ponds
 var _petals := PetalFx.new()
 var _petal_carry := 0.0
 var _milestone := 0          # erreichte Zehntel der Fläche (für Klang und Blätterregen)
@@ -89,6 +94,7 @@ func _ready() -> void:
 	_base_hover = _bees.hover_sec
 	_obj_cfg = Game.load_json(OBJECTS_PATH)
 	var blockers: Array[Dictionary] = []
+	var avoid: Array[Dictionary] = []   # wo keine Hasen hoppeln
 	for d in WorldObjects.place(grid, cell_px, _obj_cfg, world_data, [_start_px, hive_px]):
 		var o := WorldObject.new()
 		o.setup(d)
@@ -96,7 +102,18 @@ func _ready() -> void:
 		_objects.append(o)
 		if float(d["block"]) > 0.0:
 			blockers.append({"pos": d["pos"], "radius": float(d["block"])})
+		if d["kind"] == "pond":
+			_ponds.append(o)
+		if not d["quiet"]:
+			avoid.append({"pos": d["pos"], "radius": float(d["radius"]) * 0.8})
 	print("Objekte: %d, davon %d Hindernisse, %d ms" % [_objects.size(), blockers.size(), Time.get_ticks_msec() - t0])
+	_animals = Animals.new(grid, cell_px, Game.load_json(ANIMALS_PATH))
+	for o in _ponds:
+		_animals.ponds.append({"pos": o.position, "angle": o.angle, "size": o.scale.x, "awake": false})
+	_animals.avoid = avoid
+	_animal_view.process_mode = Node.PROCESS_MODE_PAUSABLE
+	_animal_view.bind(_animals)
+	add_child(_animal_view)
 	_bee_view.process_mode = Node.PROCESS_MODE_PAUSABLE
 	_bee_view.bind(_bees)
 	add_child(_bee_view)
@@ -173,6 +190,7 @@ func _process(delta: float) -> void:
 	if _awake_timer <= 0.0:
 		_awake_timer = float(_obj_cfg.get("awake_check_sec", 0.2))
 		_wake_objects(true)
+	_animals.update(delta, _view_rect(), _robot.position)
 	_autosave += real
 	if _autosave >= Game.num("save/autosave_sec", 30.0):
 		save()
@@ -221,6 +239,14 @@ func _wake_objects(animate: bool) -> void:
 			_petals.burst(o.position, int(_obj_cfg.get("awake_petals" if big else "wayside_petals", 10)), Vector2(60, 220), Vector2(0.6, 1.2), Vector2(6, 10))
 			if big:
 				Sfx.play_throttled("awake", 0.15, randf_range(0.9, 1.15))
+	for k in _ponds.size():
+		_animals.ponds[k]["awake"] = _ponds[k].awake
+
+
+## Sichtbarer Ausschnitt der Welt in Pixeln.
+func _view_rect() -> Rect2:
+	var size := get_viewport_rect().size / _camera.zoom
+	return Rect2(_camera.get_screen_center_position() - size * 0.5, size)
 
 
 ## Frisch begrünte Zellen unter dem Roboter werfen ein paar Blätter nach hinten.
@@ -309,6 +335,7 @@ func reset_game() -> void:
 	_finished = false
 	_end_wait = -1.0
 	_bees.set_count(0)
+	_animals.clear()
 	_robot.position = _start_px
 	_robot.velocity = Vector2.ZERO
 	_camera.reset_smoothing()

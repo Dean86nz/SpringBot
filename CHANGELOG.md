@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.12.0 – Phase 2, Meilenstein 5: Tiere
+
+- Schmetterlinge flattern über dem Grün (fünf Farben) und kehren um, wo es grau wird.
+- Hasen hoppeln von Grün zu Grün, meiden Wasser, Bäume, Felsen und Teiche und kommen von außerhalb des Bildes herein.
+- Vögel ziehen ab und zu in kleinen Gruppen (1 bis 4) über das Bild, mit Schatten tief unter ihnen.
+- Frösche sitzen am Rand erwachter Teiche, hüpfen ein Stück weiter oder springen mit Platschen ins Wasser und tauchen anderswo wieder auf.
+- Kommt der Roboter nah, fliehen Hasen und Schmetterlinge, Frösche springen ins Wasser.
+- Nach und nach: In der grauen Welt gibt es keine Tiere. Ihre Höchstzahl wächst mit dem Grün (z. B. Schmetterlinge ab 2 %, alle 9 ab 50 %; Hasen ab 8 %, Vögel ab 12 %).
+- Nicht zu viele: Tiere gibt es nur nahe der Kamera (höchstens 9 Schmetterlinge, 3 Hasen, 2 Frösche je sichtbarem Teich). Weiter weg verschwinden sie, beim Zurückkommen entstehen neue.
+  Reine Deko, nicht gespeichert, ohne Klang. Alle Werte in `data/animals.json`.
+- Leistung: `draw_circle`, Polygone und Bögen kosten in Godot 4.7 je Aufruf rund 15 bis 20 µs, ein Textur-Rechteck 0,2 µs (gemessen).
+  Tiere, Bienen, Bienenstock und Roboter zeichnen Kreise deshalb jetzt als Textur (`src/world/disc.gd`), das Aussehen bleibt gleich.
+  Mit allen Ausbauten (28 Bienen) und Zeit ×10 am PC ungedrosselt jetzt etwa 400 statt 300 FPS, obwohl die Tiere dazugekommen sind.
+
 ## 0.11.1 – Wege rein optisch, verschiedene Baumarten
 
 - Wege: kein eigener Fortschritt mehr. „Wege: x %“, das Säubern durch den Roboter und die Staubwölkchen aus 0.10.1 sind entfernt.

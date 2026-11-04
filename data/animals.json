@@ -1,0 +1,11 @@
+{
+	"_info": "Tiere (reine Deko, nicht gespeichert). Nur nahe der Kamera, nur über grünem Land. Höchstzahl wächst mit dem Grün: ab min_coverage einzelne, ab full_coverage alle (max). Abstände in Pixeln, Zeiten in Sekunden.",
+	"spawn_check_sec": 0.5,
+	"view_margin_px": 200,
+	"despawn_margin_px": 700,
+	"fade_sec": 0.6,
+	"butterfly": {"max": 9, "min_coverage": 0.02, "full_coverage": 0.5, "speed": 55, "turn": 2.5, "flee_px": 90},
+	"hare": {"max": 3, "min_coverage": 0.08, "full_coverage": 0.6, "hop_px": [36, 70], "hop_sec": 0.32, "rest_sec": [0.5, 2.8], "flee_px": 190},
+	"bird": {"min_coverage": 0.12, "every_sec": [14, 32], "flock": [1, 4], "speed": 230},
+	"frog": {"per_pond": 2, "hop_sec": 0.4, "rest_sec": [2.5, 7.0], "dive_px": 130, "hidden_sec": [3.0, 7.0]}
+}

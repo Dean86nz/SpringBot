@@ -1,22 +1,23 @@
-# Testliste Phase 2, Meilenstein 4 (v0.11.0) und Rückmeldung zu 0.10.0
+# Testliste Phase 2, Meilenstein 5 (v0.12.0) und Korrekturen 0.11.1
 
-EXEs: `export/windows/SpringBot_v0.11.0.exe` (Release) und `SpringBot_v0.11.0_DEBUG.exe` (Debug mit Cheat-Menü).
-Dein Spielstand wird übernommen. Objekte unter vorhandenem Grün sind beim Laden schon erwacht.
-Cheat-Menü (nur Debug): L3 + R3 eine Sekunde halten, PC F12.
+EXEs: `export/windows/SpringBot_v0.12.0.exe` (Release) und `SpringBot_v0.12.0_DEBUG.exe` (Debug mit Cheat-Menü).
+Dein Spielstand wird übernommen. Cheat-Menü (nur Debug): L3 + R3 eine Sekunde halten, PC F12.
 
-## Rückmeldung zu 0.10.0
-1. Bei 100 % ist kein Grau mehr zu sehen, auch nicht entlang früherer Roboterspuren (Cheat „Welt fast fertig“, dann über den letzten Fleck fahren).
-2. Wegränder im Grünen sind sauber: Grün geht direkt in den Weg über, kein grauer Saum.
-3. Wege sind anfangs schmutzig (dunkle Flecken, Zweige). Wo der Roboter darüberfährt, werden sie sauber, mit kleinen Staubwölkchen. Unter „Frühling“ steht dezent „Wege: x %“. Das Ende kommt auch ohne saubere Wege.
-4. Weniger und dezentere Grasbüschel.
+## Wege (0.11.1)
+1. Keine Anzeige „Wege: x %“ mehr, der Roboter säubert keine Wege und macht keinen Staub mehr.
+2. Wege im Grau sind staubig mit Flecken und Rissen. Wird es daneben grün, werden sie warm braun, und nach und nach liegen Kiesel, Zweige und Laub darauf.
 
-## Objekte (Meilenstein 4)
-5. In der grauen Welt stehen kahle Bäume, ausgetrocknete Teiche, verwelkte Büsche und kahle Felsen.
-6. Erreicht das Grün ein Objekt, erwacht es mit kleinem Ploppen, Blätterwolke und Klang:
-   Baum blüht, Teich füllt sich mit Wasser und Seerosen, Busch trägt Beeren, Fels bekommt Moos.
-7. Am Wegrand liegen Baumstämme, Zäune und Steine. Sie erwachen leiser (Moos und Pilze, Blumen am Zaun, Moos auf Steinen).
-8. Um Bäume und Felsen fährt der Roboter herum. Über Büsche, Teiche und Wegrand-Details fährt er hinweg.
-9. Ist der Klang zu oft, zu laut oder zu leise? Passt die Menge der Objekte?
+## Bäume (0.11.1)
+3. Sechs Baumarten mit eigener Form und Größe: Laubbaum (große Krone), Tanne (gezackt, Zapfen), Birke (weißer Stamm, helle lichte Krone), Obstbaum (Blüten), Trauerweide (hängende Zweige, nur am Wasser), junge Bäume (klein, erwachen leise).
+4. Auch tot sehen die Arten verschieden aus (kahle Äste, braune Tanne, weißer Birkenstamm, kahle Weidenzweige, Stecken).
+5. Um junge Bäume fährt der Roboter nicht herum, um alle anderen Bäume schon.
+
+## Tiere (Meilenstein 5)
+6. Am Anfang (graue Welt) keine Tiere. Mit wachsendem Grün kommen nach und nach Schmetterlinge, dann Hasen und Vögel.
+7. Schmetterlinge flattern über dem Grün, Hasen hoppeln, Vögel ziehen in kleinen Gruppen mit Schatten vorbei.
+8. An erwachten Teichen sitzen Frösche, hüpfen am Ufer oder springen mit Platschen ins Wasser.
+9. Fährt der Roboter auf Hasen, Schmetterlinge oder Frösche zu, fliehen sie.
+10. Sind es zu viele, zu wenige, zu klein oder zu groß?
 
 ## Allgemein
-10. Läuft es auf dem Ally weiterhin flüssig? Beim Cheat „Welt fast fertig“ erwachen alle Objekte auf einmal, dort ist ein kurzes Stocken (am PC knapp 0,8 s) zu erwarten.
+11. Läuft es auf dem Ally weiterhin flüssig? Roboter, Bienen und Bienenstock werden jetzt schneller gezeichnet und sollten genau gleich aussehen wie vorher.

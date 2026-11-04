@@ -89,7 +89,7 @@ func _draw() -> void:
 	var outline := Color(0.30, 0.36, 0.44)
 	# Schatten
 	draw_set_transform(Vector2(4, 6), 0.0, Vector2(1.0, 0.85))
-	draw_circle(Vector2.ZERO, 40.0, Color(0.0, 0.0, 0.0, 0.18))
+	Disc.dot(self, Vector2.ZERO, 40.0, Color(0.0, 0.0, 0.0, 0.18))
 	draw_set_transform(Vector2.ZERO)
 	# Ketten links und rechts, mit wanderndem Profil
 	for side in [-1.0, 1.0]:
@@ -104,13 +104,13 @@ func _draw() -> void:
 	draw_style_box(_body_box, Rect2(Vector2(-28, -26), Vector2(56, 52)))
 	# Kopf vorne mit Augen
 	draw_style_box(_head_box, Rect2(Vector2(4, -18), Vector2(26, 36)))
-	draw_circle(Vector2(22, -8), 4.5, outline)
-	draw_circle(Vector2(22, 8), 4.5, outline)
-	draw_circle(Vector2(23.5, -9.5), 1.6, Color.WHITE)
-	draw_circle(Vector2(23.5, 6.5), 1.6, Color.WHITE)
+	Disc.dot(self, Vector2(22, -8), 4.5, outline)
+	Disc.dot(self, Vector2(22, 8), 4.5, outline)
+	Disc.dot(self, Vector2(23.5, -9.5), 1.6, Color.WHITE)
+	Disc.dot(self, Vector2(23.5, 6.5), 1.6, Color.WHITE)
 	# Antenne mit Blume
 	draw_line(Vector2(-10, 0), Vector2(-16, 0), outline, 3.0)
 	var bloom := Vector2(-16, 0)
 	for k in 5:
-		draw_circle(bloom + Vector2.from_angle(k * TAU / 5.0 + _wobble * 0.2) * 7.0, 5.5, Color(1.0, 0.56, 0.69))
-	draw_circle(bloom, 4.5, Color(1.0, 0.85, 0.30))
+		Disc.dot(self, bloom + Vector2.from_angle(k * TAU / 5.0 + _wobble * 0.2) * 7.0, 5.5, Color(1.0, 0.56, 0.69))
+	Disc.dot(self, bloom, 4.5, Color(1.0, 0.85, 0.30))
