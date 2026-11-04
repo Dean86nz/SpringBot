@@ -38,6 +38,7 @@ var _title := TitleScreen.new()
 var _end := EndScreen.new()
 var _store := SaveStore.new()
 var _play_sec := 0.0         # Spielzeit in echten Sekunden (ohne Pause und Menüs)
+var _world_sec := 0.0        # Spielzeit der Welt (läuft mit Zeit ×10 schneller), für „seit wann grün“
 var _finished := false       # Ende schon erreicht (Endbildschirm kommt nur einmal)
 var _end_wait := -1.0        # Sekunden bis zum Endbildschirm, < 0 = keiner geplant
 var _autosave := 0.0
@@ -133,6 +134,9 @@ func _process(delta: float) -> void:
 	_hud.set_pollen(skills.pollen, skills.rate(grid.green_count))
 	var real := delta / maxf(Engine.time_scale, 0.001)
 	_play_sec += real
+	_world_sec += delta
+	grid.time_sec = _world_sec
+	_ground.set_time(_world_sec)
 	_check_end(delta)
 	_autosave += real
 	if _autosave >= Game.num("save/autosave_sec", 30.0):
@@ -247,6 +251,9 @@ func reset_game() -> void:
 	_spread_carry = 0.0
 	_milestone = 0
 	_play_sec = 0.0
+	_world_sec = 0.0
+	grid.time_sec = 0.0
+	_ground.set_time(0.0)
 	_finished = false
 	_end_wait = -1.0
 	_bees.set_count(0)
@@ -305,14 +312,17 @@ func save() -> void:
 	var data := {
 		"game_version": Game.version(),
 		"play_sec": _play_sec,
+		"world_sec": _world_sec,
 		"finished": _finished or _end_wait >= 0.0,
 		"robot": [_robot.position.x, _robot.position.y],
 		"grid": {"w": grid.width, "h": grid.height},
 		"skills": skills.to_dict(),
 	}
 	var cells := grid.cells.duplicate()
+	var since := grid.since.duplicate()
 	_save_task = WorkerThreadPool.add_task(func() -> void:
 		data["grid"]["cells"] = Marshalls.raw_to_base64(cells.compress(FileAccess.COMPRESSION_DEFLATE))
+		data["grid"]["since"] = Marshalls.raw_to_base64(since.compress(FileAccess.COMPRESSION_DEFLATE))
 		_store.write(data))
 
 
@@ -333,8 +343,12 @@ func load_game(data: Dictionary) -> void:
 			push_warning("Spielstand passt nicht zur Karte, neues Spiel")
 		_paint()
 		return
+	grid.load_since(Marshalls.base64_to_raw(str(g.get("since", ""))))
 	skills.from_dict(data.get("skills", {}))
 	_play_sec = float(data.get("play_sec", 0.0))
+	_world_sec = float(data.get("world_sec", _play_sec))
+	grid.time_sec = _world_sec
+	_ground.set_time(_world_sec)
 	_finished = bool(data.get("finished", false))
 	var r: Array = data.get("robot", [])
 	if r.size() == 2:

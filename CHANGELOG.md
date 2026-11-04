@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.9.0 – Phase 2, Meilenstein 2: Abwechslungsreiches Grün
+
+- Grün in mehreren Tönen: große dunklere und gelblichere Flecken statt einer einheitlichen Fläche.
+- Grasbüschel und Blumen in sieben Farben (weiß, gelb, rosa, lila, rot, blau, orange). Frisches Grün hat nur wenige Büschel und vereinzelt weiße und gelbe Blumen.
+  Je länger eine Stelle grün ist, desto dichter wachsen Büschel und Blumen, nach und nach kommen die bunten dazu. Voll üppig nach 5 Minuten Spielzeit (`ground/lush_sec`).
+  Neue Pflanzen wachsen klein heran, keine Blume wechselt ihre Farbe.
+- Die graue Welt bekommt Risse, Steinchen und trockene Halme, bleibt aber trist.
+- Alles wird im Boden-Shader (`src/world/ground.gdshader`) direkt auf der Grafikkarte gezeichnet, ohne Einzelobjekte. Grafikkarten-Zeit am PC (Radeon 860M, ähnlich wie im Ally X) 0,74 ms je Bild statt 0,15 ms.
+- Jede Zelle merkt sich, seit wann sie grün ist; das wird mitgespeichert. Alte Spielstände: alles vorhandene Grün gilt als alt (sofort üppig).
+- Alle Dichten und Kachelgrößen in `data/balance.json` (`ground`).
+
 ## 0.8.1 – Spur mittig (Rückmeldung zu 0.8.0)
 
 - Die grüne Spur lag bis zu einer halben Zelle (12 px) neben dem Roboter, weil sie am Zellraster einrastete.

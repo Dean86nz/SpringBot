@@ -7,6 +7,7 @@ extends RefCounted
 ## Positionsindex, damit Hinzufügen, Entfernen und zufälliges Ziehen O(1) sind.
 ## Daneben eine Anzeige-Maske (vis): wie cells, aber der Roboter-Kreis setzt am Rand Teilwerte,
 ## damit der sichtbare Rand genau auf dem Kreis liegt statt am Zellraster einzurasten.
+## Außerdem je Zelle der Zeitpunkt, seit dem sie grün ist (since, für „länger grün = üppiger“).
 
 const GREY := 0
 const GREEN := 255
@@ -15,6 +16,8 @@ var width := 0
 var height := 0
 var cells := PackedByteArray()
 var vis := PackedByteArray()         # nur Darstellung: 0..255, ab 128 sichtbar grün
+var since := PackedByteArray()       # je Zelle 2 Byte: Spielsekunde + 1, ab der sie grün ist (0 = grau)
+var time_sec := 0.0                  # aktuelle Spielzeit, setzt main.gd jedes Bild
 var green_count := 0
 var frontier := PackedInt32Array()   # Zellindizes der Grenze
 var _slot := PackedInt32Array()      # Zellindex → Position in frontier, -1 = nicht in der Grenze
@@ -34,6 +37,8 @@ func setup(w: int, h: int) -> void:
 	cells.resize(w * h)
 	vis = PackedByteArray()
 	vis.resize(w * h)
+	since = PackedByteArray()
+	since.resize(w * h * 2)
 	frontier = PackedInt32Array()
 	_slot = PackedInt32Array()
 	_slot.resize(w * h)
@@ -148,6 +153,30 @@ func to_bytes() -> PackedByteArray:
 	return cells.compress(FileAccess.COMPRESSION_DEFLATE)
 
 
+## Spielsekunde, ab der Zelle i grün ist (-1 = grau).
+func green_since(i: int) -> float:
+	var s := since[i * 2] | (since[i * 2 + 1] << 8)
+	return s - 1.0 if s > 0 else -1.0
+
+
+## „Seit wann grün“ gepackt (für den Spielstand).
+func since_to_bytes() -> PackedByteArray:
+	return since.compress(FileAccess.COMPRESSION_DEFLATE)
+
+
+## Gegenstück zu since_to_bytes. Ohne passende Daten (alter Spielstand) gilt alles Grün
+## als seit Spielbeginn grün. Nach load_bytes aufrufen.
+func load_since(packed: PackedByteArray) -> void:
+	var raw := packed.decompress(width * height * 2, FileAccess.COMPRESSION_DEFLATE) if packed.size() > 0 else PackedByteArray()
+	if raw.size() == width * height * 2:
+		since = raw
+		return
+	for i in cells.size():
+		if cells[i] == GREEN:
+			since[i * 2] = 1
+	_mark(Rect2i(0, 0, width, height))
+
+
 ## Gegenstück zu to_bytes: übernimmt die Zellen und baut Zähler und Grenze neu auf.
 ## false (und nichts geändert), wenn die Daten nicht zu dieser Kartengröße passen.
 func load_bytes(packed: PackedByteArray) -> bool:
@@ -181,6 +210,9 @@ func _green_index(i: int) -> bool:
 		return false
 	cells[i] = GREEN
 	vis[i] = GREEN
+	var s := mini(int(time_sec) + 1, 65535)
+	since[i * 2] = s & 255
+	since[i * 2 + 1] = s >> 8
 	green_count += 1
 	_frontier_remove(i)
 	var x := i % width

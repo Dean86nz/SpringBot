@@ -51,3 +51,20 @@ func test_store_rotates_and_survives_broken_file() -> void:
 	f.close()
 	assert_eq(int(st.read().get("n", 0)), 1, "kaputter neuester Stand: der ältere wird genommen")
 	st.wipe()
+
+
+func test_green_since_survives_save_and_old_saves_count_as_old() -> void:
+	var a := GroundGrid.new(30, 20)
+	a.time_sec = 125.0
+	a.paint_circle(Vector2(10, 10), 3.0)
+	var i := 10 * 30 + 10
+	assert_eq(a.green_since(i), 125.0, "Zeitpunkt des Begrünens")
+	assert_eq(a.green_since(0), -1.0, "grau")
+	var b := GroundGrid.new(30, 20)
+	b.load_bytes(a.to_bytes())
+	b.load_since(a.since_to_bytes())
+	assert_eq(b.green_since(i), 125.0)
+	var c := GroundGrid.new(30, 20)
+	c.load_bytes(a.to_bytes())
+	c.load_since(PackedByteArray())
+	assert_eq(c.green_since(i), 0.0, "alter Spielstand: Grün gilt als seit Spielbeginn grün")

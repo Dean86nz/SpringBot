@@ -7,7 +7,7 @@ extends SceneTree
 ##   CHEATS=1 öffnet bei Bild 5 das Cheat-Menü, POLLEN=n gibt bei Bild 5 Pollen,
 ##   MAXALL=1 setzt bei Bild 20 alle Upgrades auf Maximum, TIMEX=n beschleunigt ab Bild 20 die Zeit,
 ##   ALMOST=1 begrünt bei Bild 15 die Welt bis auf einen Fleck rechts vom Roboter (Ende testen).
-## Gibt am Ende die FPS aus (NOVSYNC=1 misst ungedrosselt).
+## Gibt am Ende die FPS aus (NOVSYNC=1 misst ungedrosselt) und die Grafikkarten-Zeit je Bild.
 
 var _frames := 0
 var _target := 120
@@ -15,6 +15,8 @@ var _out := "user://screenshot.png"
 var _plan: Array = []
 var _last_us := 0
 var _worst_ms := 0.0
+var _gpu_ms := 0.0
+var _gpu_n := 0
 
 
 func _initialize() -> void:
@@ -29,6 +31,7 @@ func _initialize() -> void:
 			_plan.append({"action": p[0], "from": int(p[1]), "to": int(p[2])})
 	if OS.get_environment("NOVSYNC") == "1":
 		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
+	RenderingServer.viewport_set_measure_render_time(root.get_viewport_rid(), true)
 	change_scene_to_file("res://src/world/main.tscn")
 
 
@@ -56,7 +59,11 @@ func _process(_delta: float) -> bool:
 			print("langsames Bild %d: %.1f ms, Grün %.1f %%" % [_frames, ms, current_scene.grid.coverage() * 100.0])
 		_worst_ms = maxf(_worst_ms, ms)
 	_last_us = now
+	if _frames > 30:
+		_gpu_ms += RenderingServer.viewport_get_measured_render_time_gpu(root.get_viewport_rid())
+		_gpu_n += 1
 	if _frames == _target:
+		print("Grafikkarte im Schnitt %.2f ms je Bild" % (_gpu_ms / maxi(_gpu_n, 1)))
 		var img := root.get_viewport().get_texture().get_image()
 		var err := img.save_png(_out)
 		print("screenshot %s -> %d, FPS %d, langsamstes Bild %.1f ms, Grün %.1f %%" % [_out, err, Engine.get_frames_per_second(), _worst_ms, current_scene.grid.coverage() * 100.0])

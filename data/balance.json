@@ -28,6 +28,23 @@
 		"edge_margin_px": 0,
 		"title_offset_px": 330
 	},
+	"ground": {
+		"lush_sec": 300,
+		"since_upload_sec": 0.25,
+		"tuft_tile": 30,
+		"tuft_young": 0.12,
+		"tuft_old": 0.55,
+		"flower_tile": 40,
+		"flower_young": 0.05,
+		"flower_old": 0.6,
+		"color_from": 0.25,
+		"crack_tile": 96,
+		"crack_density": 0.4,
+		"pebble_tile": 44,
+		"pebble_density": 0.22,
+		"stalk_tile": 38,
+		"stalk_density": 0.25
+	},
 	"save": {
 		"autosave_sec": 30
 	},

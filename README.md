@@ -2,7 +2,7 @@
 
 Kleines 2D-Incremental-Spiel: Ein Roboter bringt einer grauen Welt den Frühling zurück. Wo er fährt, wird der Boden grün. Godot 4.7.2, GDScript, Gamepad zuerst (ROG Ally X).
 
-Stand: **Phase 2, Meilenstein 1 (Kamera am Kartenrand)**, Version 0.8.1. Plan der Phase 2 in `PHASE2.md`. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`, fremde Inhalte in `CREDITS.md`.
+Stand: **Phase 2, Meilenstein 2 (Abwechslungsreiches Grün)**, Version 0.9.0. Plan der Phase 2 in `PHASE2.md`. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`, fremde Inhalte in `CREDITS.md`.
 
 ## Steuerung
 
@@ -26,7 +26,8 @@ Stand: **Phase 2, Meilenstein 1 (Kamera am Kartenrand)**, Version 0.8.1. Plan de
 - `src/sim/bee_swarm.gd`: Bienen-Logik (Zielwahl, Schweben, Begrünen), `src/world/bee_view.gd` zeichnet Stock und Bienen.
 - `src/sim/ground_grid.gd`: Boden-Raster (1 Byte je Zelle), Begrünen im Kreis, Zähler, Schmutz-Rechteck,
   laufend gepflegte Grenze (graue Zellen mit grünem Nachbarn) und Selbstausbreitung mit Samenflug.
-- `src/world/ground_view.gd`: Boden als ein Rechteck mit Shader; eine Maske (1 Pixel je Zelle, linear gefiltert) plus Rauschen ergibt weiche, organische Grenzen.
+- `src/world/ground_view.gd` + `ground.gdshader`: Boden als ein Rechteck mit Shader; eine Maske (1 Pixel je Zelle, linear gefiltert) plus Rauschen ergibt weiche, organische Grenzen.
+  Grüntöne, Grasbüschel, Blumen, Risse, Steinchen und Halme entstehen im Shader aus Zufallswerten je Kachel; „seit wann grün“ je Zelle (zweite Textur) macht alte Stellen üppiger. Werte in `data/balance.json` (`ground`).
 - `src/world/robot.gd`, `src/world/main.gd` (öffnet/schließt die Menüs), `src/ui/hud.gd`.
 - `src/autoload/sfx.gd` (Autoload „Sfx“): Klänge mit Varianten, Musikstücke je Fortschritt mit Überblenden.
   Dateien in `assets/audio/`, Lautstärken und Schwellen in `data/audio.json`.
