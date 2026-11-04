@@ -7,14 +7,14 @@
 // Grau: Risse, Steinchen, trockene Halme. Werte setzt ground_view.gd aus data/balance.json.
 // terrain_tex: weiche Masken für Wege (R) und Wasser (G), 0,5 genau auf dem Rand. Wege und Wasser
 // liegen über dem Boden; sie werden lebendiger (warmes Braun, klares Blau), wenn daneben Grün ist.
-// clean_tex: wo der Roboter den Weg sauber gefahren hat (sonst schmutzig: dunkle Flecken, Zweige).
+// Wege rein optisch: im Grau staubig mit Flecken und Rissen; je grüner daneben, desto mehr
+// Kiesel, Zweige und Laub liegen darauf (erscheinen Stück für Stück, nicht überblendet).
 // Weg- und Wasserzellen neben grünem Land sind in der Maske grün (GroundGrid), daher kein Grau am Rand.
 shader_type canvas_item;
 
 uniform sampler2D mask : filter_linear, repeat_disable;
 uniform sampler2D since_tex : filter_nearest, repeat_disable;
 uniform sampler2D terrain_tex : filter_linear, repeat_disable;
-uniform sampler2D clean_tex : filter_linear, repeat_disable;
 uniform float cell_px = 24.0;
 uniform vec2 map_size;
 uniform float now = 0.0;
@@ -40,6 +40,9 @@ uniform float pebble_tile = 44.0;
 uniform float pebble_density = 0.22;
 uniform float stalk_tile = 38.0;
 uniform float stalk_density = 0.25;
+uniform float path_pebbles = 0.45;   // Anteil der Kachel-Plätze mit Kiesel, wenn ganz grün daneben
+uniform float path_twigs = 0.22;
+uniform float path_leaves = 0.35;
 
 const vec3 PAL[7] = vec3[7](
 	vec3(1.0, 1.0, 0.96), vec3(1.0, 0.85, 0.30), vec3(1.0, 0.56, 0.69), vec3(0.72, 0.55, 0.95),
@@ -206,25 +209,89 @@ float green_near(vec2 p) {
 	return smoothstep(0.08, 0.45, sum / 8.0);
 }
 
+// Kieselsteinchen auf dem Weg: erscheint, wenn hash < amount (amount wächst mit dem Grün daneben)
+vec4 path_pebble(vec2 p, float amount) {
+	float tile = 16.0;
+	vec2 id = floor(p / tile);
+	float h = hash(id + 61.0);
+	if (h > amount) {
+		return vec4(0.0);
+	}
+	vec2 c = (id + 0.25 + 0.5 * vec2(hash(id + 1.7), hash(id + 4.9))) * tile;
+	float r = 1.6 + 2.2 * hash(id + 2.9);
+	vec2 q = p - c;
+	float body = 1.0 - smoothstep(r - 0.6, r + 0.5, length(q * vec2(1.0, 1.3)));
+	float sh = (1.0 - smoothstep(r - 0.6, r + 0.5, length((q - vec2(1.0, 1.4)) * vec2(1.0, 1.3)))) * 0.22;
+	float k = hash(id + 7.3);
+	vec3 c1 = k < 0.4 ? vec3(0.86, 0.83, 0.76) : (k < 0.7 ? vec3(0.70, 0.66, 0.60) : vec3(0.80, 0.68, 0.55));
+	c1 = mix(c1, c1 + 0.08, 1.0 - smoothstep(0.0, r * 0.7, length(q + vec2(r * 0.35))));
+	return body > sh ? vec4(c1, body) : vec4(vec3(0.0), sh);
+}
+
+// Zweig: Ast mit einer Gabel, quer über den Weg gefallen
+vec4 path_twig(vec2 p, float amount) {
+	float tile = 46.0;
+	vec2 id = floor(p / tile);
+	if (hash(id + 71.0) > amount) {
+		return vec4(0.0);
+	}
+	vec2 c = (id + 0.3 + 0.4 * vec2(hash(id + 3.3), hash(id + 5.1))) * tile;
+	float a = hash(id + 8.8) * 6.2832;
+	vec2 dir = vec2(cos(a), sin(a));
+	float len = tile * (0.22 + 0.12 * hash(id + 9.4));
+	vec2 a0 = c - dir * len;
+	vec2 a1 = c + dir * len;
+	vec2 fork = mix(a0, a1, 0.6);
+	float b = a + (hash(id + 2.1) < 0.5 ? 0.6 : -0.6);
+	float d = min(seg(p, a0, a1), seg(p, fork, fork + vec2(cos(b), sin(b)) * len * 0.55));
+	vec3 col = mix(vec3(0.42, 0.30, 0.20), vec3(0.55, 0.42, 0.28), hash(id + 6.2));
+	return vec4(col, 1.0 - smoothstep(0.6, 1.5, d));
+}
+
+// Blatt: spitzes Oval mit Mittelrippe, frisch grün bis gelblich
+vec4 path_leaf(vec2 p, float amount) {
+	float tile = 24.0;
+	vec2 id = floor(p / tile);
+	if (hash(id + 81.0) > amount) {
+		return vec4(0.0);
+	}
+	vec2 c = (id + 0.25 + 0.5 * vec2(hash(id + 4.1), hash(id + 7.9))) * tile;
+	float a = hash(id + 3.7) * 6.2832;
+	vec2 q = p - c;
+	q = vec2(q.x * cos(a) + q.y * sin(a), -q.x * sin(a) + q.y * cos(a));
+	float L = 3.5 + 2.5 * hash(id + 5.3);
+	float w = L * 0.45 * (1.0 - (q.x / L) * (q.x / L));
+	float body = (1.0 - smoothstep(-0.4, 0.6, abs(q.y) - w)) * step(abs(q.x), L);
+	float k = hash(id + 9.7);
+	vec3 col = k < 0.5 ? vec3(0.42, 0.66, 0.26) : (k < 0.8 ? vec3(0.62, 0.72, 0.28) : vec3(0.78, 0.62, 0.30));
+	col = mix(col * 0.8, col, smoothstep(0.0, 0.9, abs(q.y)));   // Mittelrippe
+	return vec4(col, body * 0.95);
+}
+
 vec3 paths_and_water(vec2 p, vec3 col, vec2 tr, float near, float big, float small) {
-	// Erdweg: staubig im Grau, warmes Braun neben Grün, kleine Steinchen; Grassaum am Rand.
-	// Ungesäubert: dunkle Schmutzflecken und Zweige darüber.
+	// Erdweg: im Grau staubig mit Flecken und Rissen; neben Grün warmes Braun mit Kieseln,
+	// Zweigen und Laub, Grassaum am Rand.
 	float pv = tr.x + (small - 0.5) * 0.22;
 	float pe = smoothstep(0.45, 0.55, pv);
-	vec3 dirt = mix(vec3(0.60, 0.56, 0.49), vec3(0.76, 0.61, 0.43), near) + (big - 0.5) * 0.06 + (small - 0.5) * 0.05;
-	vec4 pb = pebble(p * 1.6 + 17.0);
-	dirt = mix(dirt, pb.rgb * vec3(1.04, 0.98, 0.9), pb.a * 0.7);
-	float clean = smoothstep(0.4, 0.6, texture(clean_tex, p / map_size).r + (small - 0.5) * 0.2);
-	if (clean < 0.999) {
-		float blot = smoothstep(0.45, 0.75, vnoise(p / 30.0 + 71.0) * 0.7 + vnoise(p / 9.0 + 13.0) * 0.3);
-		vec3 grime = mix(dirt * 0.78, vec3(0.42, 0.38, 0.33), blot * 0.7);
-		grime = mix(grime, grime * 0.7, crack(p * 0.7 + 5.0) * 0.8);
-		vec4 tw = stalk(p * 0.9 + 3.0);
-		grime = mix(grime, vec3(0.45, 0.36, 0.26), tw.a * 0.9);
-		dirt = mix(grime, dirt, clean);
+	if (pe > 0.001) {
+		vec3 dirt = mix(vec3(0.60, 0.56, 0.49), vec3(0.76, 0.61, 0.43), near) + (big - 0.5) * 0.06 + (small - 0.5) * 0.05;
+		float dull = 1.0 - near;
+		if (dull > 0.001) {
+			float blot = smoothstep(0.45, 0.75, vnoise(p / 30.0 + 71.0) * 0.7 + vnoise(p / 9.0 + 13.0) * 0.3);
+			dirt = mix(dirt, vec3(0.50, 0.47, 0.42), blot * 0.5 * dull);
+			dirt = mix(dirt, dirt * 0.75, crack(p * 0.7 + 5.0) * 0.7 * dull);
+		}
+		if (near > 0.001) {
+			vec4 pb = path_pebble(p, near * path_pebbles);
+			dirt = mix(dirt, pb.rgb, pb.a);
+			vec4 tw = path_twig(p, near * path_twigs);
+			dirt = mix(dirt, tw.rgb, tw.a);
+			vec4 lf = path_leaf(p, near * path_leaves);
+			dirt = mix(dirt, lf.rgb, lf.a);
+		}
+		col = mix(col, dirt, pe);
 	}
 	float fringe = smoothstep(0.40, 0.5, pv) * (1.0 - smoothstep(0.52, 0.64, pv));
-	col = mix(col, dirt, pe);
 	col = mix(col, vec3(0.34, 0.63, 0.27), fringe * near * 0.8);
 	// Wasser: Uferstreifen, Wasser mit leichtem Glitzern, dunkle Uferlinie
 	float wv = tr.y + (small - 0.5) * 0.12;

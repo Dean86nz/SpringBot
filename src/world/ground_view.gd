@@ -20,8 +20,6 @@ var _timer := 0.0
 var _since_timer := 0.0
 var _since_dirty := false
 var _since_upload := 0.25
-var _clean_img: Image
-var _clean_tex: ImageTexture
 
 
 ## cfg: Abschnitt "ground" aus balance.json (Shader-Werte), leer = Standardwerte des Shaders.
@@ -40,9 +38,6 @@ func bind(grid: GroundGrid, cell_px: float, cfg: Dictionary = {}) -> void:
 	var terrain_img := Image.create_from_data(grid.width, grid.height, false, Image.FORMAT_RG8, grid.terrain_vis)
 	mat.set_shader_parameter("terrain_tex", ImageTexture.create_from_image(terrain_img))
 	mat.set_shader_parameter("cell_px", cell_px)
-	_clean_img = Image.create_from_data(grid.width, grid.height, false, Image.FORMAT_R8, grid.clean_vis)
-	_clean_tex = ImageTexture.create_from_image(_clean_img)
-	mat.set_shader_parameter("clean_tex", _clean_tex)
 	mat.set_shader_parameter("map_size", _size_px)
 	for k: String in cfg:
 		if k == "since_upload_sec":
@@ -78,11 +73,6 @@ func _process(delta: float) -> void:
 		_since_tex.update(_since_img)
 	if _timer > 0.0:
 		return
-	if _grid.clean_changed:
-		_grid.clean_changed = false
-		_timer = UPLOAD_SECONDS
-		_clean_img.set_data(_grid.width, _grid.height, false, Image.FORMAT_R8, _grid.clean_vis)
-		_clean_tex.update(_clean_img)
 	if _grid.take_dirty().has_area():
 		_timer = UPLOAD_SECONDS
 		_since_dirty = true

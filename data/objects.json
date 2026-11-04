@@ -1,14 +1,19 @@
 {
-	"_info": "Objekte der Welt. Größen in Pixeln, Abstände in Zellen. block_px = Hindernis für den Roboter (0 = keins). Platzierung zufällig mit festem seed, nie auf Wegen oder Wasser.",
+	"_info": "Objekte der Welt. Größen in Pixeln, Abstände in Zellen. block_px = Hindernis für den Roboter (0 = keins). size = Größe je Objekt zufällig zwischen [min, max]. near_water_cells: steht höchstens so weit vom Wasser. quiet: erwacht ohne Klang. Platzierung zufällig mit festem seed, nie auf Wegen oder Wasser.",
 	"seed": 2026,
 	"min_gap_px": 24,
 	"keep_free": {"radius_cells": 10},
 	"tries": 60,
 	"types": {
-		"tree": {"count": 90, "radius_px": 72, "block_px": 36},
-		"rock": {"count": 55, "radius_px": 62, "block_px": 44},
 		"pond": {"count": 20, "radius_px": 110, "block_px": 0},
-		"bush": {"count": 110, "radius_px": 48, "block_px": 0}
+		"willow": {"count": 12, "radius_px": 80, "block_px": 32, "size": [0.9, 1.15], "near_water_cells": 6, "tries": 600},
+		"oak": {"count": 30, "radius_px": 76, "block_px": 36, "size": [0.85, 1.2]},
+		"fir": {"count": 24, "radius_px": 56, "block_px": 28, "size": [0.8, 1.25]},
+		"rock": {"count": 55, "radius_px": 62, "block_px": 44, "size": [0.75, 1.15]},
+		"fruit": {"count": 16, "radius_px": 58, "block_px": 28, "size": [0.85, 1.1]},
+		"birch": {"count": 18, "radius_px": 50, "block_px": 22, "size": [0.85, 1.15]},
+		"bush": {"count": 110, "radius_px": 48, "block_px": 0, "size": [0.8, 1.15]},
+		"sapling": {"count": 30, "radius_px": 26, "block_px": 0, "size": [0.8, 1.2], "quiet": true}
 	},
 	"wayside": {
 		"every_cells": [10, 18],

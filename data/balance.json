@@ -53,10 +53,10 @@
 		"pebble_tile": 44,
 		"pebble_density": 0.22,
 		"stalk_tile": 38,
-		"stalk_density": 0.25
-	},
-	"paths": {
-		"dust_per_cell": 0.25
+		"stalk_density": 0.25,
+		"path_pebbles": 0.45,
+		"path_twigs": 0.22,
+		"path_leaves": 0.35
 	},
 	"save": {
 		"autosave_sec": 30

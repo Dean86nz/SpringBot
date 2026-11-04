@@ -16,7 +16,6 @@ extends RefCounted
 ## liegen; sobald alle Nachbarn grün (oder kein Land) sind, werden sie voll grün (_settle).
 ## Weg- und Wasserzellen neben grünem Land gelten in der Anzeige als grün, sonst fiele die
 ## weich gefilterte Maske am Wegrand ab und dort schiene Grau durch.
-## Wege: cells = GREEN heißt „sauber gefahren“ (nur der Roboter), eigene Zähler und Maske.
 
 const GREY := 0
 const GREEN := 255
@@ -35,11 +34,6 @@ var time_sec := 0.0                  # aktuelle Spielzeit, setzt main.gd jedes B
 var terrain := PackedByteArray()     # LAND, PATH, WATER oder BRIDGE je Zelle
 var terrain_vis := PackedByteArray() # nur Darstellung: 2 Byte je Zelle, Weg- und Wassermaske mit weichem Rand
 var land_count := 0                  # Zellen, die grün werden können (= 100 %)
-var path_count := 0
-var clean_count := 0                 # sauber gefahrene Wegzellen
-var clean_vis := PackedByteArray()   # nur Darstellung: Wege sauber 0..255, weicher Rand wie vis
-var clean_changed := false           # clean_vis seit dem letzten Hochladen geändert
-var last_cleaned := 0                # Wegzellen, die das letzte paint_circle gesäubert hat
 var hop_cells := 12                  # so weit springt die Ausbreitung über Wege und Wasser
 var green_count := 0
 var frontier := PackedInt32Array()   # Zellindizes der Grenze
@@ -61,7 +55,6 @@ func setup(w: int, h: int) -> void:
 	terrain_vis = PackedByteArray()
 	terrain_vis.resize(w * h * 2)
 	land_count = w * h
-	path_count = 0
 	_reset_state()
 
 
@@ -70,7 +63,6 @@ func set_terrain(t: PackedByteArray, soft: PackedByteArray) -> void:
 	terrain = t
 	terrain_vis = soft
 	land_count = t.count(LAND)
-	path_count = t.count(PATH)
 	_reset_state()
 
 
@@ -96,10 +88,6 @@ func _reset_state() -> void:
 	vis.resize(w * h)
 	since = PackedByteArray()
 	since.resize(w * h * 2)
-	clean_vis = PackedByteArray()
-	clean_vis.resize(w * h)
-	clean_count = 0
-	clean_changed = true
 	frontier = PackedInt32Array()
 	_slot = PackedInt32Array()
 	_slot.resize(w * h)
@@ -122,11 +110,6 @@ func is_green(c: Vector2i) -> bool:
 	return in_bounds(c) and terrain[c.y * width + c.x] == LAND and cells[c.y * width + c.x] == GREEN
 
 
-## Anteil der sauber gefahrenen Wege, 0..1 (zählt nicht fürs Ende).
-func path_clean() -> float:
-	return 0.0 if path_count == 0 else float(clean_count) / float(path_count)
-
-
 ## Anteil der begrünten Fläche, 0..1.
 func coverage() -> float:
 	return 0.0 if total() == 0 else float(green_count) / float(total())
@@ -146,8 +129,7 @@ func set_green(c: Vector2i) -> bool:
 ## (Zelle (x, y) hat ihren Mittelpunkt bei x + 0,5 / y + 0,5). Gibt die Zahl neuer grüner Zellen zurück.
 ## Anzeige: Zellen nahe dem Rand bekommen 0,5 + (radius − Abstand), so liegt die 0,5-Linie der
 ## weich gefilterten Maske genau auf dem Kreis (zählt nicht als grün).
-## clean_paths: Wegzellen im Kreis werden sauber (nur der Roboter), Anzahl in last_cleaned.
-func paint_circle(center: Vector2, radius: float, clean_paths: bool = false) -> int:
+func paint_circle(center: Vector2, radius: float) -> int:
 	var reach := radius + 0.5
 	var x0 := maxi(int(floor(center.x - reach)), 0)
 	var x1 := mini(int(ceil(center.x + reach)), width - 1)
@@ -160,7 +142,6 @@ func paint_circle(center: Vector2, radius: float, clean_paths: bool = false) -> 
 	var reach2 := reach * reach
 	var added := 0
 	var touched := false
-	last_cleaned = 0
 	for y in range(y0, y1 + 1):
 		var dy := y + 0.5 - center.y
 		var row := y * width
@@ -171,22 +152,13 @@ func paint_circle(center: Vector2, radius: float, clean_paths: bool = false) -> 
 				continue
 			var i := row + x
 			var v := 255 if d2 <= inner2 else mini(int((0.5 + radius - sqrt(d2)) * 255.0), 255)
-			var t := terrain[i]
-			if t == LAND:
+			if terrain[i] == LAND:
 				var old := vis[i]
 				vis[i] = maxi(old, v)
 				if d2 <= r2 and _green_index(i, false):
 					added += 1
 				if vis[i] != old:
 					touched = true
-			elif t == PATH and clean_paths:
-				if clean_vis[i] < v:
-					clean_vis[i] = v
-					clean_changed = true
-				if d2 <= r2 and cells[i] == GREY:
-					cells[i] = GREEN
-					clean_count += 1
-					last_cleaned += 1
 	if added > 0 or touched:
 		_mark(Rect2i(x0, y0, x1 - x0 + 1, y1 - y0 + 1))
 	return added
@@ -263,17 +235,12 @@ func load_bytes(packed: PackedByteArray) -> bool:
 		return false
 	_reset_state()
 	for i in raw.size():
-		if raw[i] == GREY:
+		if raw[i] == GREY or terrain[i] != LAND:   # Wege aus 0.10.1 waren „sauber“: zählt nicht mehr
 			continue
-		if terrain[i] == LAND:
-			cells[i] = GREEN
-			vis[i] = GREEN
-			green_count += 1
-			_cover_edges(i)   # einmalig beim Laden
-		elif terrain[i] == PATH:
-			cells[i] = GREEN
-			clean_vis[i] = GREEN
-			clean_count += 1
+		cells[i] = GREEN
+		vis[i] = GREEN
+		green_count += 1
+		_cover_edges(i)   # einmalig beim Laden
 	for i in cells.size():
 		if cells[i] == GREY and terrain[i] == LAND and _has_green_neighbor(i):
 			_slot[i] = frontier.size()

@@ -76,8 +76,8 @@ func test_robot_stops_at_water() -> void:
 ## Wasser), und bei 100 % ist die Anzeige-Maske überall voll grün (kein Grau mehr sichtbar).
 func test_spread_alone_fills_real_map_and_leaves_no_grey() -> void:
 	var g := _real_grid()
-	g.paint_circle(Vector2(320.3, 240.7), 3.0, true)
-	g.paint_circle(Vector2(330.6, 240.2), 3.0, true)   # zweite Spur: Randzellen mit Teilwert
+	g.paint_circle(Vector2(320.3, 240.7), 3.0)
+	g.paint_circle(Vector2(330.6, 240.2), 3.0)   # zweite Spur: Randzellen mit Teilwert
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 3
 	while not g.frontier.is_empty():
@@ -90,7 +90,7 @@ func test_spread_alone_fills_real_map_and_leaves_no_grey() -> void:
 	assert_eq(partial, 0, "Landzellen, die in der Anzeige nicht voll grün sind")
 
 
-func test_only_robot_cleans_paths() -> void:
+func test_robot_never_greens_or_counts_paths() -> void:
 	var g := GroundGrid.new(20, 10)
 	var t := PackedByteArray()
 	t.resize(200)
@@ -99,13 +99,6 @@ func test_only_robot_cleans_paths() -> void:
 	var soft := PackedByteArray()
 	soft.resize(400)
 	g.set_terrain(t, soft)
-	g.paint_circle(Vector2(10.5, 5.5), 2.0)
-	assert_eq(g.clean_count, 0, "Bienen säubern keine Wege")
-	g.paint_circle(Vector2(10.5, 5.5), 2.0, true)
-	assert_eq(g.last_cleaned, 5, "Roboter säubert die Wegzellen im Kreis")
-	assert_eq(g.path_clean(), 0.5)
-	assert_eq(g.coverage() < 1.0, true)
-	var b := GroundGrid.new(20, 10)
-	b.set_terrain(t, soft)
-	b.load_bytes(g.to_bytes())
-	assert_eq(b.clean_count, 5, "saubere Wege überstehen Speichern und Laden")
+	assert_eq(g.paint_circle(Vector2(10.5, 5.5), 2.0), 8, "nur die Landzellen im Kreis")
+	assert_eq(g.cells[5 * 20 + 10], GroundGrid.GREY, "Weg bleibt, wie er ist")
+	assert_eq(g.total(), 190)

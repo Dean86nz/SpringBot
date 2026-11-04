@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.11.1 – Wege rein optisch, verschiedene Baumarten
+
+- Wege: kein eigener Fortschritt mehr. „Wege: x %“, das Säubern durch den Roboter und die Staubwölkchen aus 0.10.1 sind entfernt.
+  Wege werden jetzt von selbst schöner, wenn es daneben grün wird: aus staubigem Grau mit Flecken und Rissen wird warmes Braun, auf dem nach und nach Kiesel, Zweige und Laub liegen.
+  Werte in `data/balance.json` (`ground/path_pebbles`, `path_twigs`, `path_leaves`). Alte Spielstände mit „sauberen“ Wegen laden normal.
+- Sechs Baumarten mit eigener Form und Größe statt eines Baums: Laubbaum (große buckelige Krone), Tanne (gezackte Schichten, Zapfen), Birke (weißer Stamm, lichte hellgrüne Krone),
+  Obstbaum (kleinere Krone voller rosa oder weißer Blüten), Trauerweide (hängende Zweige, steht nur am Wasser) und junge Bäume (Stecken mit ein paar Blättern, erwachen leise, kein Hindernis).
+  Jeder Baum, Fels und Busch hat eine eigene Größe. Alles in `data/objects.json` (Anzahl, Größe von bis, Hindernis, Abstand zum Wasser).
+- Werkzeug `tools/object_gallery.gd`: alle Objekte tot und erwacht auf einem Bild.
+
 ## 0.11.0 – Phase 2, Meilenstein 4: Dinge, die zum Leben erwachen
 
 - 275 Objekte in der Landschaft: 90 Bäume, 55 Felsen, 20 Teiche, 110 Büsche. In der grauen Welt kahl, ausgetrocknet, verwelkt.

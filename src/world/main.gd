@@ -38,8 +38,6 @@ var _obj_cfg: Dictionary = {}
 var _awake_timer := 0.0
 var _petals := PetalFx.new()
 var _petal_carry := 0.0
-var _dust := PetalFx.new()   # Staubwölkchen, wenn der Roboter einen Weg sauber fährt
-var _dust_carry := 0.0
 var _milestone := 0          # erreichte Zehntel der Fläche (für Klang und Blätterregen)
 var _robot := Robot.new()
 var _camera := Camera2D.new()
@@ -104,10 +102,6 @@ func _ready() -> void:
 	add_child(_bee_view)
 	_petals.process_mode = Node.PROCESS_MODE_PAUSABLE
 	add_child(_petals)   # vor dem Roboter: Blätter liegen unter ihm
-	_dust.process_mode = Node.PROCESS_MODE_PAUSABLE
-	_dust.capacity = 160
-	_dust.colors = [Color(0.78, 0.68, 0.52, 0.8), Color(0.66, 0.56, 0.42, 0.8), Color(0.86, 0.80, 0.68, 0.7)]
-	add_child(_dust)
 	_robot.process_mode = Node.PROCESS_MODE_PAUSABLE
 	_robot.accel = Game.num("robot/accel", 10.0)
 	_robot.radius_px = Game.num("robot/radius_px", 30.0)
@@ -185,12 +179,10 @@ func _process(delta: float) -> void:
 
 
 func _paint() -> void:
-	var fresh := grid.paint_circle(_robot.position / cell_px, _green_radius, true)
+	var fresh := grid.paint_circle(_robot.position / cell_px, _green_radius)
 	_robot_petals(fresh)
-	_robot_dust(grid.last_cleaned)
 	var cov := grid.coverage()
 	_hud.set_coverage(cov)
-	_hud.set_paths(grid.path_clean())
 	Sfx.set_progress(cov)
 	var m := floori(cov * 10.0)
 	if m > _milestone:
@@ -225,7 +217,7 @@ func _wake_objects(animate: bool) -> void:
 		o.set_awake(green, animate)
 		if green and animate and bursts > 0:
 			bursts -= 1
-			var big := not (o.kind in ["log", "fence", "stones"])
+			var big := not o.quiet
 			_petals.burst(o.position, int(_obj_cfg.get("awake_petals" if big else "wayside_petals", 10)), Vector2(60, 220), Vector2(0.6, 1.2), Vector2(6, 10))
 			if big:
 				Sfx.play_throttled("awake", 0.15, randf_range(0.9, 1.15))
@@ -242,19 +234,6 @@ func _robot_petals(fresh: int) -> void:
 	for i in n:
 		var p := _robot.position + back * _robot.radius_px * 0.8 + Vector2(randf_range(-1, 1), randf_range(-1, 1)) * _robot.radius_px * 0.6
 		_petals.burst(p, 1, Vector2(40, 140), Vector2(0.7, 1.2), Vector2(6, 10), back, 1.1)
-
-
-## Frisch gesäuberte Wegzellen wirbeln etwas Staub auf (Werte in balance.json, "paths").
-func _robot_dust(cleaned: int) -> void:
-	if cleaned <= 0 or _robot.velocity.length() < 20.0:
-		return
-	_dust_carry += cleaned * Game.num("paths/dust_per_cell", 0.25)
-	var n := mini(int(_dust_carry), 3)
-	_dust_carry -= n
-	var back := -_robot.velocity.normalized()
-	for i in n:
-		var p := _robot.position + back * _robot.radius_px * 0.7 + Vector2(randf_range(-1, 1), randf_range(-1, 1)) * _robot.radius_px * 0.7
-		_dust.burst(p, 1, Vector2(20, 70), Vector2(0.5, 0.9), Vector2(7, 12), back, 1.4)
 
 
 ## Wo eine Biene etwas erblühen ließ, fliegen ein paar Blätter.

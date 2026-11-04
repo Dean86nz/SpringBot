@@ -1,12 +1,16 @@
 class_name WorldObjects
 extends RefCounted
-## Verteilt die Objekte der Welt (data/objects.json): Bäume, Felsen, Teiche, Büsche frei in der
-## Landschaft, dazu Baumstämme, Zäune und Steine am Wegrand. Zufällig, aber mit festem seed, also
-## jedes Mal gleich. Nie auf Wegen oder Wasser, nie zu nah am Start, nie überlappend.
-## Reine Logik. Ergebnis: Liste von {kind, pos (Pixel), angle, seed, block (Pixel), wayside}.
+## Verteilt die Objekte der Welt (data/objects.json): Bäume (Laubbaum, Tanne, Birke, Obstbaum,
+## Weide, junger Baum), Felsen, Teiche, Büsche frei in der Landschaft, dazu Baumstämme, Zäune und
+## Steine am Wegrand. Zufällig, aber mit festem seed, also jedes Mal gleich. Nie auf Wegen oder
+## Wasser, nie zu nah am Start, nie überlappend. Weiden stehen nur nahe am Wasser (near_water_cells).
+## Jedes Objekt bekommt eine eigene Größe aus "size" [min, max]; Radius und Hindernis wachsen mit.
+## Reine Logik. Ergebnis: Liste von {kind, pos (Pixel), angle, seed, block (Pixel), radius, size, quiet}.
+## quiet: erwacht leise (ohne Klang, wenige Blätter), z. B. Wegrand und junge Bäume.
 ## Ob ein Objekt erwacht ist, steht nicht hier: das ergibt sich aus dem Grün unter ihm.
 
-const KINDS := ["tree", "rock", "pond", "bush"]
+## Reihenfolge = Platzierung: Große und wählerische zuerst, damit sie noch Platz finden.
+const KINDS := ["pond", "willow", "oak", "fir", "rock", "fruit", "birch", "bush", "sapling"]
 
 
 static func place(grid: GroundGrid, cell_px: float, data: Dictionary, world: Dictionary, keep_free: Array[Vector2]) -> Array[Dictionary]:
@@ -41,18 +45,35 @@ static func place(grid: GroundGrid, cell_px: float, data: Dictionary, world: Dic
 			var pos := (line[i] + tan.orthogonal() * side * hw) * cell_px
 			if _fits(grid, cell_px, pos, ws_r, out, gap, keep_free, free_px):
 				out.append({"kind": kinds[rng.randi() % kinds.size()], "pos": pos, "angle": tan.angle(),
-					"seed": rng.randi(), "block": 0.0, "radius": ws_r, "wayside": true})
+					"seed": rng.randi(), "block": 0.0, "radius": ws_r, "size": 1.0, "quiet": true})
 	for kind in KINDS:
 		var t: Dictionary = types.get(kind, {})
-		var r := float(t.get("radius_px", 50.0))
+		var sz: Array = t.get("size", [1.0, 1.0])
+		var water := float(t.get("near_water_cells", 0.0))
 		for n in int(t.get("count", 0)):
-			for k in tries:
+			var f := rng.randf_range(float(sz[0]), float(sz[1]))
+			var r := float(t.get("radius_px", 50.0)) * f
+			for k in int(t.get("tries", tries)):
 				var pos := Vector2(rng.randf_range(r, size.x - r), rng.randf_range(r, size.y - r))
+				if water > 0.0 and not _near_water(grid, cell_px, pos, r + water * cell_px):
+					continue
 				if _fits(grid, cell_px, pos, r, out, gap, keep_free, free_px):
 					out.append({"kind": kind, "pos": pos, "angle": rng.randf() * TAU, "seed": rng.randi(),
-						"block": float(t.get("block_px", 0.0)), "radius": r, "wayside": false})
+						"block": float(t.get("block_px", 0.0)) * f, "radius": r, "size": f,
+						"quiet": bool(t.get("quiet", false))})
 					break
 	return out
+
+
+## Liegt im Umkreis reach (Pixel) um pos Wasser? Stichproben auf 16 Strahlen.
+static func _near_water(grid: GroundGrid, cell_px: float, pos: Vector2, reach: float) -> bool:
+	for k in 16:
+		var dir := Vector2.from_angle(k * TAU / 16.0)
+		for s in range(1, 6):
+			var c := Vector2i((pos + dir * reach * s / 5.0) / cell_px)
+			if grid.in_bounds(c) and grid.terrain[c.y * grid.width + c.x] == GroundGrid.WATER:
+				return true
+	return false
 
 
 ## Nur Land unter dem ganzen Kreis, Abstand zu anderen Objekten und zum Start.
