@@ -2,11 +2,15 @@ class_name Hud
 extends CanvasLayer
 ## Prozentanzeige der begrünten Fläche (oben Mitte), Pollen (oben links),
 ## Tastenhinweis (unten links) und Versionsnummer (unten rechts).
+## Unter der Prozentanzeige erscheint beim Betreten eines Gebiets kurz und dezent sein Name.
 
 var _percent := Label.new()
 var _pollen := Label.new()
 var _hint := Label.new()
 var _version := Label.new()
+var _region := Label.new()
+var _region_tw: Tween
+var banner_cfg: Dictionary = {}   # Zeiten der Namenseinblendung (regions.json "banner")
 
 
 func _ready() -> void:
@@ -20,6 +24,16 @@ func _ready() -> void:
 	_percent.add_theme_color_override("font_outline_color", Color(0.25, 0.45, 0.25))
 	_percent.add_theme_constant_override("outline_size", 12)
 	add_child(_percent)
+	_region.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	_region.offset_top = 92
+	_region.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_region.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_region.add_theme_font_size_override("font_size", 30)
+	_region.add_theme_color_override("font_color", Color(1, 1, 0.94, 0.9))
+	_region.add_theme_color_override("font_outline_color", Color(0.22, 0.36, 0.24, 0.6))
+	_region.add_theme_constant_override("outline_size", 8)
+	_region.modulate.a = 0.0
+	add_child(_region)
 	_pollen.position = Vector2(32, 24)
 	_pollen.add_theme_font_size_override("font_size", 40)
 	_pollen.add_theme_color_override("font_color", Color(1.0, 0.92, 0.45))
@@ -61,6 +75,19 @@ func pulse() -> void:
 	_percent.modulate = Color(1.0, 0.95, 0.6)
 	tw.tween_property(_percent, "scale", Vector2.ONE, 0.7).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
 	tw.parallel().tween_property(_percent, "modulate", Color.WHITE, 0.9)
+
+
+## Name des Gebiets langsam ein- und wieder ausblenden.
+func show_region(region_name: String) -> void:
+	if region_name.is_empty():
+		return
+	if _region_tw:
+		_region_tw.kill()
+	_region.text = "~  %s  ~" % region_name
+	_region_tw = create_tween()
+	_region_tw.tween_property(_region, "modulate:a", 1.0, float(banner_cfg.get("fade_in_sec", 0.8)))
+	_region_tw.tween_interval(float(banner_cfg.get("hold_sec", 2.5)))
+	_region_tw.tween_property(_region, "modulate:a", 0.0, float(banner_cfg.get("fade_out_sec", 1.4)))
 
 
 func set_pollen(amount: float, per_sec: float) -> void:

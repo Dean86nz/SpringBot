@@ -9,6 +9,9 @@
 // liegen über dem Boden; sie werden lebendiger (warmes Braun, klares Blau), wenn daneben Grün ist.
 // Wege rein optisch: im Grau staubig mit Flecken und Rissen; je grüner daneben, desto mehr
 // Kiesel, Zweige und Laub liegen darauf (erscheinen Stück für Stück, nicht überblendet).
+// Gebiete (region_a/b/c, grob und weich gefiltert, damit Grenzen sanft verlaufen): Farbfaktor für
+// Grün (a.rgb × 2) und Grau (c.rgb × 2), Blumendichte (a.a × 2), Büscheldichte (c.a × 2),
+// Lieblingsfarbe der Blumen (b.rgb) mit Anteil (b.a). Einmal je Pixel gelesen, nicht je Kachel.
 // Weg- und Wasserzellen neben grünem Land sind in der Maske grün (GroundGrid), daher kein Grau am Rand.
 shader_type canvas_item;
 
@@ -43,6 +46,10 @@ uniform float stalk_density = 0.25;
 uniform float path_pebbles = 0.45;   // Anteil der Kachel-Plätze mit Kiesel, wenn ganz grün daneben
 uniform float path_twigs = 0.22;
 uniform float path_leaves = 0.35;
+uniform bool use_regions = false;
+uniform sampler2D region_a : filter_linear, repeat_disable;
+uniform sampler2D region_b : filter_linear, repeat_disable;
+uniform sampler2D region_c : filter_linear, repeat_disable;
 
 const vec3 PAL[7] = vec3[7](
 	vec3(1.0, 1.0, 0.96), vec3(1.0, 0.85, 0.30), vec3(1.0, 0.56, 0.69), vec3(0.72, 0.55, 0.95),
@@ -86,10 +93,10 @@ float lush_at(vec2 p) {
 }
 
 // Grasbüschel: 4 Halme aus einem Punkt, wachsen beim Erscheinen
-vec4 tuft(vec2 p) {
+vec4 tuft(vec2 p, float amount) {
 	vec2 id = floor(p / tuft_tile);
 	float h = hash(id + 11.0);
-	float dens = mix(tuft_young, tuft_old, lush_at((id + 0.5) * tuft_tile));
+	float dens = mix(tuft_young, tuft_old, lush_at((id + 0.5) * tuft_tile)) * amount;
 	if (h > dens) {
 		return vec4(0.0);
 	}
@@ -106,23 +113,27 @@ vec4 tuft(vec2 p) {
 	return vec4(c, (1.0 - smoothstep(0.9, 2.0, d)) * tuft_alpha);
 }
 
-// 0..1: wie stark hier Blumen wachsen (Wiese 1, Insel island_strength, ruhiges Gras calm_flowers)
-float bloom_zone(vec2 p) {
+// 0..1: wie stark hier Blumen wachsen (Wiese 1, Insel island_strength, ruhiges Gras calm_flowers).
+// amount (Gebiet): über 1 mehr und größere Blumenwiesen, unter 1 weniger.
+float bloom_zone(vec2 p, float amount) {
 	float m = vnoise(p / meadow_scale + 5.3) * 0.65 + vnoise(p / meadow_detail_scale + 91.7) * 0.35;
-	float meadow = smoothstep(meadow_threshold - 0.04, meadow_threshold + 0.04, m);
+	float th = meadow_threshold - (amount - 1.0) * 0.2;
+	float meadow = smoothstep(th - 0.04, th + 0.04, m);
 	float island = smoothstep(island_threshold - 0.03, island_threshold + 0.03, vnoise(p / island_scale + 33.1)) * island_strength;
-	return max(max(meadow, island), calm_flowers);
+	return max(max(meadow, island), calm_flowers * amount);
 }
 
 // Blume mit 5 Blütenblättern und gelber Mitte, kleiner Schatten. Junges Grün: nur weiß/gelb,
 // bunte Blumen erscheinen erst später (keine Blume wechselt ihre Farbe).
-vec4 flower(vec2 p) {
+// amount: Dichte des Gebiets; fav: Lieblingsfarbe des Gebiets (rgb) und ihr Anteil (a).
+vec4 flower(vec2 p, float amount, vec4 fav) {
 	vec2 id = floor(p / flower_tile);
 	float h = hash(id + 23.0);
 	float lush = lush_at((id + 0.5) * flower_tile);
 	int ci = int(floor(hash(id + 6.6) * 6.999));
-	float dens = mix(flower_young, flower_old, lush) * bloom_zone((id + 0.5) * flower_tile);
-	if (ci >= 2) {
+	float dens = mix(flower_young, flower_old, lush) * bloom_zone((id + 0.5) * flower_tile, amount) * min(amount, 1.0);
+	bool is_fav = hash(id + 12.3) < fav.a;
+	if (ci >= 2 || is_fav) {
 		dens *= smoothstep(color_from, 1.0, lush);
 	}
 	if (h > dens) {
@@ -139,7 +150,8 @@ vec4 flower(vec2 p) {
 	float petal = 1.0 - smoothstep(edge - 0.8, edge + 0.6, length(q));
 	float shadow = (1.0 - smoothstep(edge_s - 0.8, edge_s + 0.6, length(qs))) * 0.22;
 	float centre = 1.0 - smoothstep(R * 0.3 - 0.7, R * 0.3 + 0.6, length(q));
-	vec3 pc = mix(PAL[ci] * 0.82, PAL[ci], smoothstep(0.0, 2.0, edge - length(q)));   // Rand etwas dunkler
+	vec3 base = is_fav ? fav.rgb * (0.92 + 0.12 * hash(id + 14.1)) : PAL[ci];
+	vec3 pc = mix(base * 0.82, base, smoothstep(0.0, 2.0, edge - length(q)));   // Rand etwas dunkler
 	vec3 col = mix(pc, vec3(1.0, 0.80, 0.25), centre);
 	return petal > shadow ? vec4(col, petal) : vec4(vec3(0.0), shadow);
 }
@@ -323,6 +335,16 @@ void fragment() {
 	vec3 col;
 	vec3 dry = mix(vec3(0.66, 0.64, 0.60), vec3(0.77, 0.75, 0.70), big) + (small - 0.5) * 0.07;
 	vec3 lush = mix(vec3(0.40, 0.72, 0.30), vec3(0.56, 0.84, 0.36), big) + (small - 0.5) * 0.09;
+	vec4 ra = vec4(0.5);
+	vec4 rb = vec4(0.0);
+	vec4 rc = vec4(0.5);
+	if (use_regions) {
+		vec2 uv = p / map_size;
+		ra = texture(region_a, uv);
+		rb = texture(region_b, uv);
+		rc = texture(region_c, uv);
+	}
+	dry *= rc.rgb * 2.0;
 	if (g < 0.999) {
 		// Trocken: helles, warmes Grau mit Rissen, Steinchen und Halmen – trist, aber nie dunkel
 		dry = mix(dry, dry * 0.72, crack(p) * 0.8);
@@ -337,9 +359,10 @@ void fragment() {
 		float t2 = vnoise(p / 120.0 + 53.0);
 		lush = mix(lush, vec3(0.30, 0.60, 0.26), smoothstep(0.5, 0.85, t1) * 0.7);
 		lush = mix(lush, vec3(0.64, 0.84, 0.34), smoothstep(0.55, 0.9, t2) * 0.6);
-		vec4 t = tuft(p);
+		vec4 t = tuft(p, rc.a * 2.0);
 		lush = mix(lush, t.rgb, t.a);
-		vec4 f = flower(p);
+		lush *= ra.rgb * 2.0;   // Farbe des Gebiets (auch für die Büschel)
+		vec4 f = flower(p, ra.a * 2.0, rb);
 		lush = mix(lush, f.rgb, f.a);
 	}
 	col = mix(dry, lush, g);

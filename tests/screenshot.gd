@@ -7,6 +7,7 @@ extends SceneTree
 ##   CHEATS=1 öffnet bei Bild 5 das Cheat-Menü, POLLEN=n gibt bei Bild 5 Pollen,
 ##   MAXALL=1 setzt bei Bild 20 alle Upgrades auf Maximum, TIMEX=n beschleunigt ab Bild 20 die Zeit,
 ##   ROBOT=x,y setzt den Roboter bei Bild 15 auf diese Zelle.
+##   LUSH=1 spult bei Bild 15 die Weltzeit um 2000 s vor (alles Grün üppig, bunte Blumen).
 ##   ALMOST=1 begrünt bei Bild 15 die Welt bis auf einen Fleck rechts vom Roboter (Ende testen).
 ## Gibt am Ende die FPS aus (NOVSYNC=1 misst ungedrosselt) und die Grafikkarten-Zeit je Bild.
 
@@ -53,6 +54,8 @@ func _process(_delta: float) -> bool:
 		var rc := OS.get_environment("ROBOT").split(",")
 		var rob: Node2D = current_scene._robot
 		rob.position = (Vector2(float(rc[0]), float(rc[1])) + Vector2(0.5, 0.5)) * current_scene.cell_px
+	if _frames == 15 and OS.get_environment("LUSH") == "1":
+		current_scene._world_sec += 2000.0
 	if _frames == 15 and OS.get_environment("ALMOST") == "1":
 		current_scene.get_node("CheatMenu").almost_done_requested.emit()
 	if _frames == 5 and OS.get_environment("CHEATS") == "1":

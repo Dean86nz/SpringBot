@@ -20,5 +20,6 @@ Arbeitsweise wie bisher: ein Meilenstein, dann anhalten, Release- und Debug-EXE,
 5. **Tiere:** Schmetterlinge, Vögel, Hasen, Frösche an den Teichen, nach und nach auf grünen Flächen. Reine Dekoration, nicht zu viele, flüssig auf dem Ally.
    (erledigt in 0.12.0)
 6. **Gebiete mit eigenem Charakter:** 4 bis 6 Gebiete (z. B. Wiese, Hügel, Seenlandschaft, Wald) mit eigener Mischung aus Pflanzen, Objekten und Farben, auch eigener Blumendichte. Name dezent einblenden beim Betreten.
+   (erledigt in 0.13.0: Blumental, Stiller Wald, Seenland, Felsenhügel, Obstgarten)
 
 Reihenfolge: Wege und Wasser kommen vor den Objekten, weil Objekte (Wegrand-Details, Teiche, Brücken) sich an ihnen ausrichten.

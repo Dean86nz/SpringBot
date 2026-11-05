@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.13.0 – Phase 2, Meilenstein 6: Gebiete
+
+- Fünf Gebiete mit eigenem Charakter, Grenzen natürlich geschwungen und weich ineinander übergehend:
+  - **Blumental** (Start): helles Grün, sehr viele und große Blumenwiesen, kaum Bäume, viele Büsche.
+  - **Stiller Wald** (Norden): dunkleres, kühles Grün, dichter Wald aus Laubbäumen, Tannen, Birken und jungen Bäumen, wenig Blumen, meist weiße.
+  - **Seenland** (Westen, am Fluss): frisches, bläuliches Grün, viele Teiche (mit Fröschen), Birken, Vergissmeinnicht-Blau.
+  - **Felsenhügel** (Nordosten): gelbliches Grün, viele Felsen und Tannen, violette Blumen, etwas kühleres Grau.
+  - **Obstgarten** (Südosten): warmes Grün, viele blühende Obstbäume und Büsche, rosa Blumen.
+- Beim Betreten eines Gebiets erscheint sein Name dezent unter der Prozentanzeige („~ Blumental ~“) und blendet wieder aus.
+  Erst nach einer Sekunde im neuen Gebiet, damit es an der Grenze nicht flackert; nach dem Titelbildschirm wird das aktuelle Gebiet gezeigt.
+- Alles in `data/regions.json`: Lage, Farben, Blumen- und Büscheldichte, Lieblingsfarbe der Blumen, Objekt-Gewichte und zusätzliche Objekte je Gebiet, Zeiten der Einblendung.
+- Dadurch mehr Objekte in der Welt (646 statt 396, davon 330 statt 155 Hindernisse), vor allem im Wald und auf dem Felsenhügel.
+- Leistung: Godot zeichnet auch einmal aufgezeichnete Objekte jedes Bild neu, Kreise und Polygone kosten dabei viel.
+  Die Objekte zeichnen deshalb Kreise jetzt als Textur, Polygone als Dreiecke und Umrisse als Linien. Sie sehen gleich aus.
+  Mit allen Ausbauten und Zeit ×10 am PC ungedrosselt etwa 330–350 FPS wie in 0.12.0, obwohl es deutlich mehr Objekte gibt (ohne die Umstellung wären es etwa 190).
+
 ## 0.12.0 – Phase 2, Meilenstein 5: Tiere
 
 - Schmetterlinge flattern über dem Grün (fünf Farben) und kehren um, wo es grau wird.

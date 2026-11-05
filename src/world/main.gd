@@ -6,6 +6,8 @@ extends Node2D
 ## Wege, Flüsse und Brücken kommen aus data/world.json (WorldMap); sie werden nie grün.
 ## Objekte (Bäume, Teiche, Büsche, Felsen, Wegrand) aus data/objects.json erwachen, sobald unter
 ## ihnen Grün ist; um Bäume und Felsen fährt der Roboter herum.
+## Gebiete (data/regions.json) geben Boden und Objekten ihren Charakter; beim Betreten eines
+## Gebiets blendet das HUD dezent seinen Namen ein.
 ## Tiere (data/animals.json) leben als Deko nahe der Kamera über dem Grün (Animals, AnimalView).
 ## Läuft auch während der Pause (Menü-Eingaben), Roboter und Boden pausieren.
 ## Rahmen: Start mit Titelbildschirm (dahinter der gespeicherte Garten), Speichern alle
@@ -14,6 +16,7 @@ extends Node2D
 const WORLD_PATH := "res://data/world.json"
 const OBJECTS_PATH := "res://data/objects.json"
 const ANIMALS_PATH := "res://data/animals.json"
+const REGIONS_PATH := "res://data/regions.json"
 
 var grid: GroundGrid
 var skills: SkillTree
@@ -38,6 +41,8 @@ var _bridge_view := BridgeView.new()
 var _objects: Array[WorldObject] = []
 var _obj_cfg: Dictionary = {}
 var _awake_timer := 0.0
+var _regions: Regions
+var _region_watch := Regions.Watch.new()
 var _animals: Animals
 var _animal_view := AnimalView.new()
 var _ponds: Array[WorldObject] = []   # gleiche Reihenfolge wie _animals.ponds
@@ -73,6 +78,10 @@ func _ready() -> void:
 	var world_data := Game.load_json(WORLD_PATH)
 	var bridges := WorldMap.build(grid, world_data)
 	print("Wege und Wasser: %d Brücken, %d ms" % [bridges.size(), Time.get_ticks_msec() - t0])
+	var regions_data := Game.load_json(REGIONS_PATH)
+	_regions = Regions.new(w, h, regions_data)
+	var banner: Dictionary = regions_data.get("banner", {})
+	_region_watch.confirm_sec = float(banner.get("confirm_sec", 1.0))
 	var tree_data := Game.load_json(Game.SKILLTREE_PATH)
 	skills = SkillTree.new(tree_data)
 	_spread_cap = int(tree_data.get("spread_max_events_per_frame", 3000))
@@ -83,7 +92,7 @@ func _ready() -> void:
 
 	_ground.process_mode = Node.PROCESS_MODE_ALWAYS   # zeigt den geladenen Garten auch hinter dem Titel
 	var ground_cfg: Variant = Game.dig(Game.balance, "ground")
-	_ground.bind(grid, cell_px, ground_cfg if ground_cfg is Dictionary else {})
+	_ground.bind(grid, cell_px, ground_cfg if ground_cfg is Dictionary else {}, _regions)
 	add_child(_ground)
 	_bridge_view.bind(bridges, cell_px)
 	add_child(_bridge_view)
@@ -95,7 +104,7 @@ func _ready() -> void:
 	_obj_cfg = Game.load_json(OBJECTS_PATH)
 	var blockers: Array[Dictionary] = []
 	var avoid: Array[Dictionary] = []   # wo keine Hasen hoppeln
-	for d in WorldObjects.place(grid, cell_px, _obj_cfg, world_data, [_start_px, hive_px]):
+	for d in WorldObjects.place(grid, cell_px, _obj_cfg, world_data, [_start_px, hive_px], _regions):
 		var o := WorldObject.new()
 		o.setup(d)
 		add_child(o)
@@ -141,6 +150,7 @@ func _ready() -> void:
 	_camera.limit_right = int(size_px.x) + edge
 	_camera.limit_bottom = int(size_px.y) + edge
 	_robot.add_child(_camera)
+	_hud.banner_cfg = banner
 	add_child(_hud)
 	_tree.setup(skills)
 	add_child(_tree)
@@ -191,6 +201,8 @@ func _process(delta: float) -> void:
 		_awake_timer = float(_obj_cfg.get("awake_check_sec", 0.2))
 		_wake_objects(true)
 	_animals.update(delta, _view_rect(), _robot.position)
+	if _region_watch.update(_regions.at_px(_robot.position, cell_px), real):
+		_hud.show_region(_regions.name_of(_region_watch.current))
 	_autosave += real
 	if _autosave >= Game.num("save/autosave_sec", 30.0):
 		save()
@@ -370,6 +382,7 @@ func _start_playing() -> void:
 	_hud.visible = true
 	_robot.input_enabled = true
 	_autosave = 0.0
+	_region_watch.reset()   # Name des Gebiets nach dem Titel zeigen
 	get_tree().paused = false
 	create_tween().tween_property(_camera, "offset", Vector2.ZERO, 0.8).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 

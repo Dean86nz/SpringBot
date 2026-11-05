@@ -2,7 +2,7 @@
 
 Kleines 2D-Incremental-Spiel: Ein Roboter bringt einer grauen Welt den Frühling zurück. Wo er fährt, wird der Boden grün. Godot 4.7.2, GDScript, Gamepad zuerst (ROG Ally X).
 
-Stand: **Phase 2, Meilenstein 5 (Tiere)**, Version 0.12.0. Plan der Phase 2 in `PHASE2.md`. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`, fremde Inhalte in `CREDITS.md`.
+Stand: **Phase 2, Meilenstein 6 (Gebiete)**, Version 0.13.0. Phase 2 ist damit vollständig. Plan der Phase 2 in `PHASE2.md`. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`, fremde Inhalte in `CREDITS.md`.
 
 ## Steuerung
 
@@ -27,7 +27,8 @@ Stand: **Phase 2, Meilenstein 5 (Tiere)**, Version 0.12.0. Plan der Phase 2 in `
 - `data/objects.json` + `src/sim/world_objects.gd`: Verteilung der Objekte (fester Startwert). `src/world/world_object.gd` zeichnet ein Objekt tot oder erwacht;
   main.gd lässt Objekte erwachen, sobald unter ihnen Grün ist, und gibt Bäume und Felsen dem Roboter als Hindernisse.
 - `data/animals.json` + `src/sim/animals.gd`: Tiere als Deko (Schmetterlinge, Vögel, Hasen, Frösche), nur nahe der Kamera und über Grün; `src/world/animal_view.gd` zeichnet sie.
-- `src/world/disc.gd`: Kreise als Textur statt draw_circle (in Godot 4.7 rund 80-mal billiger); für alles, was jedes Bild neu gezeichnet wird.
+- `src/world/disc.gd`: Kreise als Textur statt draw_circle (in Godot 4.7 rund 80-mal billiger). Gilt auch für Objekte: Godot zeichnet sie jedes Bild neu, auch wenn sie nur einmal aufgezeichnet werden.
+- `data/regions.json` + `src/sim/regions.gd`: Gebiete mit eigenen Farben, Blumen, Objekten; ground_view.gd gibt sie als kleine Texturen an den Shader, das HUD blendet den Namen beim Betreten ein.
 - `src/sim/skill_tree.gd`: Pollen, Knoten-Stufen, Sichtbarkeit (gekauft / kaufbar / „?“ / verdeckt), Summen der Werte (reine Logik, getestet).
 - `src/sim/bee_swarm.gd`: Bienen-Logik (Zielwahl, Schweben, Begrünen), `src/world/bee_view.gd` zeichnet Stock und Bienen.
 - `src/sim/ground_grid.gd`: Boden-Raster (1 Byte je Zelle), Begrünen im Kreis, Zähler, Schmutz-Rechteck,

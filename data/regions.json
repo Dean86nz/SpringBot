@@ -1,0 +1,54 @@
+{
+	"_info": "Gebiete der Welt. points = Mittelpunkte in Zellen (Karte 640 × 480), jede Zelle gehört zum nächsten Punkt; warp verbiegt die Grenzen (Zellen), damit sie natürlich wirken. grass / dry = Farbfaktor für grünen / grauen Boden (1 = unverändert). flowers / tufts = Faktor für Blumen- und Grasbüscheldichte. flower_color + flower_share = Lieblingsfarbe der Blumen und ihr Anteil. objects = Gewicht je Objektart (fehlt = 1): die Zahl aus objects.json verteilt sich danach. extra = zusätzliche Objekte, die nur in diesem Gebiet stehen. banner = dezente Namenseinblendung beim Betreten (Sekunden).",
+	"seed": 7,
+	"warp_cells": 45,
+	"warp_scale_cells": 140,
+	"regions": [
+		{
+			"name": "Blumental",
+			"points": [[320, 250], [300, 380]],
+			"grass": [1.0, 1.05, 0.95], "dry": [1.0, 1.0, 1.0],
+			"flowers": 1.7, "tufts": 0.9,
+			"flower_color": [1.0, 0.85, 0.30], "flower_share": 0.2,
+			"objects": {"pond": 0.6, "willow": 1.0, "oak": 0.3, "fir": 0.1, "rock": 0.4, "fruit": 0.6, "birch": 0.5, "bush": 1.2, "sapling": 1.0},
+			"extra": {}
+		},
+		{
+			"name": "Stiller Wald",
+			"points": [[300, 90], [420, 60]],
+			"grass": [0.74, 0.86, 0.80], "dry": [0.92, 0.93, 0.92],
+			"flowers": 0.45, "tufts": 1.5,
+			"flower_color": [1.0, 1.0, 0.96], "flower_share": 0.65,
+			"objects": {"pond": 0.4, "oak": 3.0, "fir": 2.5, "rock": 0.6, "fruit": 0.2, "birch": 1.5, "bush": 1.2, "sapling": 2.5},
+			"extra": {"oak": 40, "fir": 35, "birch": 15, "sapling": 30, "bush": 20}
+		},
+		{
+			"name": "Seenland",
+			"points": [[70, 120], [70, 360]],
+			"grass": [0.84, 1.0, 1.10], "dry": [0.96, 0.99, 1.04],
+			"flowers": 0.9, "tufts": 1.1,
+			"flower_color": [0.55, 0.75, 1.0], "flower_share": 0.5,
+			"objects": {"pond": 4.0, "oak": 0.6, "fir": 0.3, "rock": 0.4, "fruit": 0.3, "birch": 1.5, "bush": 1.0},
+			"extra": {"pond": 10, "birch": 8}
+		},
+		{
+			"name": "Felsenhügel",
+			"points": [[565, 160], [600, 40]],
+			"grass": [1.16, 1.02, 0.70], "dry": [0.95, 0.97, 1.03],
+			"flowers": 0.8, "tufts": 0.7,
+			"flower_color": [0.72, 0.55, 0.95], "flower_share": 0.55,
+			"objects": {"pond": 0.3, "oak": 0.4, "fir": 2.0, "rock": 4.0, "fruit": 0.1, "birch": 1.0, "bush": 0.7, "sapling": 0.7},
+			"extra": {"rock": 35, "fir": 12}
+		},
+		{
+			"name": "Obstgarten",
+			"points": [[530, 400], [450, 440]],
+			"grass": [1.06, 1.05, 0.82], "dry": [1.04, 1.0, 0.94],
+			"flowers": 1.2, "tufts": 1.0,
+			"flower_color": [1.0, 0.56, 0.69], "flower_share": 0.4,
+			"objects": {"pond": 0.6, "oak": 0.5, "fir": 0.1, "rock": 0.3, "fruit": 6.0, "birch": 0.4, "bush": 1.4, "sapling": 1.5},
+			"extra": {"fruit": 30, "bush": 15}
+		}
+	],
+	"banner": {"confirm_sec": 1.0, "fade_in_sec": 0.8, "hold_sec": 2.5, "fade_out_sec": 1.4}
+}
