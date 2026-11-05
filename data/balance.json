@@ -20,6 +20,18 @@
 		"hop_max_cells": 18,
 		"target_tries": 8
 	},
+	"birds": {
+		"_info": "Samenvögel: Tempo (Pixel/s), Streifenlänge und Halbbreite in Zellen, Rast im Häuschen (s), Abstand zum nächsten Streifen (Zellen), nach so vielen Streifen heim, Versuche je Planung, Vögel je Schwarm (nur Bild), Hindernis-Radius des Häuschens.",
+		"speed_px": 320.0,
+		"strip_cells": 30,
+		"width_cells": 1.6,
+		"rest_sec": 4.0,
+		"range_cells": [20, 70],
+		"trips_home": 3,
+		"target_tries": 10,
+		"flock_size": 5,
+		"nest_radius_px": 26
+	},
 	"camera": {
 		"zoom": 1.0,
 		"smoothing": 6.0,

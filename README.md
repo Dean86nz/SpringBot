@@ -2,7 +2,7 @@
 
 Kleines 2D-Incremental-Spiel: Ein Roboter bringt einer grauen Welt den Frühling zurück. Wo er fährt, wird der Boden grün. Godot 4.7.2, GDScript, Gamepad zuerst (ROG Ally X).
 
-Stand: **Phase 3, Meilenstein 3 (Reisekarte und Reisen)**, Version 0.18.0. Plan und Stand in `PHASE3.md`. Plan der Phase 2 in `PHASE2.md`. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`, fremde Inhalte in `CREDITS.md`.
+Stand: **Phase 3, Meilenstein 4 (Felder und Vorort, Samenvögel)**, Version 0.19.0. Plan und Stand in `PHASE3.md`. Plan der Phase 2 in `PHASE2.md`. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`, fremde Inhalte in `CREDITS.md`.
 
 ## Steuerung
 
@@ -19,9 +19,11 @@ Stand: **Phase 3, Meilenstein 3 (Reisekarte und Reisen)**, Version 0.18.0. Plan 
 
 ## Aufbau
 
-- `data/balance.json`: Kartengröße, Zellgröße, Grundtempo, Begrünungsradius, Bienen (Stock, Flugtempo, Blütengröße, Schwebezeit, Sprungweite), Kamera.
-- `data/skilltree.json`: Pollen je grüner Zelle und Sekunde, Grundwerte, Texte der Werte und alle 45 Knoten
-  (Position, Voraussetzungen, Stufen, Kosten, Wirkung, besondere Knoten).
+- `data/balance.json`: Kartengröße, Zellgröße, Grundtempo, Begrünungsradius, Bienen (Stock, Flugtempo, Blütengröße, Schwebezeit, Sprungweite),
+  Samenvögel (Tempo, Streifenlänge und -breite, Rast, Reichweite), Kamera.
+- `data/skilltree.json`: Pollen je grüner Zelle und Sekunde, Grundwerte, Texte der Werte und alle 58 Knoten
+  (Position, Voraussetzungen, Stufen, Kosten, Wirkung, besondere Knoten). Knoten mit „region“ (der Ast der Samenvögel)
+  bleiben verdeckt, bis man die Region erreicht hat (`SkillTree.regions`, aus dem Spielstand).
 - `data/regions/heimatdorf/world.json` + `src/sim/world_map.gd`: Flüsse und Wege als Kurven, daraus je Zelle Land, Weg, Wasser oder Brücke (GroundGrid.terrain).
   Nur Land wird grün und zählt zur Fläche; Wasser ist ohne Brücke nicht befahrbar. `src/world/bridge_view.gd` zeichnet die Brücken.
 - `data/regions/heimatdorf/objects.json` + `src/sim/world_objects.gd`: Verteilung der Objekte (fester Startwert). `src/world/world_object.gd` zeichnet ein Objekt tot oder erwacht;
@@ -36,9 +38,12 @@ Stand: **Phase 3, Meilenstein 3 (Reisekarte und Reisen)**, Version 0.18.0. Plan 
 - Dorf: `region.json` → „village“ (Platz, Brunnen, Gebäude, Felder, Wäscheleine, Bewohner, Fest). Gebäude und Requisiten sind feste Objekte (`WorldObjects.place(..., fixed)`), der Platz ist in `world.json` („plazas“) befestigt.
   `src/sim/villagers.gd` + `src/world/villager_view.gd`: die Bewohner mit ihrer Arbeit und ihren Haustieren; sie kehren mit dem Fortschritt zurück
   und reparieren die Gebäude (Gerüst, Fortschritt im Spielstand unter „repaired“). Werkzeug: `tools/villager_gallery.gd` zeigt alle Bewohner, Hunde und Katzen groß.
+  Wer weit draußen wohnt (Höfe in Felder und Vorort, „hub_cells“), trifft sich auf dem eigenen Hof und hilft nur in der Nähe („local_cells“); „face“ dreht ein Gebäude zu seinem Hof.
 - `areas.json` + `src/sim/areas.gd` (Klasse `Areas`): Gebiete mit eigenen Farben, Blumen, Objekten; ground_view.gd gibt sie als kleine Texturen an den Shader, das HUD blendet den Namen beim Betreten ein.
 - `src/sim/skill_tree.gd`: Pollen, Knoten-Stufen, Sichtbarkeit (gekauft / kaufbar / „?“ / verdeckt), Summen der Werte (reine Logik, getestet).
 - `src/sim/bee_swarm.gd`: Bienen-Logik (Zielwahl, Schweben, Begrünen), `src/world/bee_view.gd` zeichnet Stock und Bienen.
+- `src/sim/seed_birds.gd`: Samenvögel (ab Felder und Vorort): Schwärme wählen den Streifen mit dem meisten Grau, säen ihn im Flug
+  und rasten nach ein paar Streifen im Vogelhäuschen (`region.json` „nest_cell“). `src/world/bird_view.gd` zeichnet Häuschen, Schwärme in V-Form und fallende Samen.
 - `src/sim/ground_grid.gd`: Boden-Raster (1 Byte je Zelle), Begrünen im Kreis, Zähler, Schmutz-Rechteck,
   laufend gepflegte Grenze (graue Zellen mit grünem Nachbarn) und Selbstausbreitung mit Samenflug.
 - `src/world/ground_view.gd` + `ground.gdshader`: Boden als ein Rechteck mit Shader; eine Maske (1 Pixel je Zelle, linear gefiltert) plus Rauschen ergibt weiche, organische Grenzen.
@@ -66,7 +71,9 @@ Die Engine liegt in `Godot_v4.7.2-stable_win64.exe/` im Projektordner oder wird 
 # Stil-Vorschaubild (Phase 2) nach docs/
 ..\ScrapEmpire\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe --audio-driver Dummy --path . -s tools/style_preview.gd -- docs/stil_vorschlag_phase2.png
 # Ganze Karte als Bild (Wege, Wasser, Brücken, Objekte; links grau, rechts grün), optional Zoom und Mitte in Zellen
+# (Umgebungsvariablen: REGION=felder für eine andere Region, GRID=1 für ein Koordinatengitter)
 ..\ScrapEmpire\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe --audio-driver Dummy --path . -s tools/map_preview.gd -- karte.png
-# Grobe Spieldauer-Rechnung nach Preisänderungen im Skilltree
+# Grobe Spieldauer-Rechnung nach Preisänderungen im Skilltree (eine Karte, oder mit --reise alle Regionen nacheinander)
 python tools/balance_sim.py data/skilltree.json 0.4 640 480 1 0.005
+python tools/balance_sim.py data/skilltree.json 0.5 0 0 1 0.005 --reise
 ```

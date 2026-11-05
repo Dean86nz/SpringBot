@@ -68,6 +68,10 @@ Die Helfer sind eigene Ideen (nichts aus Unharvest oder Moon Sweepers). Größen
    Einleitung je Region. (Die Übersichtskarte aus 0.15.0 ist dafür die Grundlage.)
    (erledigt in 0.18.0, mit einer ersten Karte von „Felder und Vorort“ als Reiseziel; Höfe, Häuser und Samenvögel folgen in Meilenstein 4)
 4. **Felder und Vorort** mit Samenvögeln (neuer Skilltree-Ast).
+   (erledigt in 0.19.0: Vorort mit Laden, Kita, Häusern, Gärten und Brunnen; Weizenhof mit Windmühle und Silo; Mohnhof;
+   21 Bewohner, Höfe mit eigenem Treffpunkt; Samenvögel mit 13 Knoten, verdeckt bis zur Ankunft in Felder und Vorort)
+   Balancing (Modell `tools/balance_sim.py --reise`): Heimatdorf rund 32 bis 37 Minuten, Felder und Vorort nur rund 18 bis 24 Minuten,
+   weil der Roboter alle Verbesserungen aus dem Heimatdorf mitbringt. Ziel 45 bis 75 Minuten offen, siehe Rückfrage im Bericht zu 0.19.0.
 5. **Großstadt** mit Gärtner-Drohnen.
 6. **Die ganze Welt** mit Regenwolken, großer Abschluss und Abspann.
 

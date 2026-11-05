@@ -14,10 +14,10 @@ func _init(cfg: Dictionary = {}) -> void:
 	hints = cfg.get("hints", {})
 
 
-## ctx: {can_buy: bool, bees: int, quiet: bool}. quiet = gerade nichts einblenden (Menü offen,
+## ctx: {can_buy: bool, bees: int, birds: int, birds_branch: bool, quiet: bool}. quiet = gerade nichts einblenden (Menü offen,
 ## anderer Hinweis sichtbar). Gibt die id des fälligen Hinweises zurück ("" = keiner) und merkt ihn.
 func due(ctx: Dictionary, delta: float) -> String:
-	for id: String in ["move", "tree", "bees"]:
+	for id: String in ["move", "tree", "bees", "birds_branch", "birds"]:
 		if seen.has(id) or not _condition(id, ctx):
 			_wait.erase(id)
 			continue
@@ -38,6 +38,10 @@ func _condition(id: String, ctx: Dictionary) -> bool:
 			return seen.has("move") and bool(ctx.get("can_buy", false))
 		"bees":
 			return int(ctx.get("bees", 0)) > 0
+		"birds_branch":
+			return bool(ctx.get("birds_branch", false))
+		"birds":
+			return int(ctx.get("birds", 0)) > 0
 	return false
 
 

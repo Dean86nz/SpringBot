@@ -1,10 +1,11 @@
 {
-	"_info": "Region Heimatdorf (die erste Region). Größe in Zellen, Start des Roboters und Bienenstock in Zellen. village: Dorfplatz (Mitte, in world.json als Platz), Brunnen, Gebäude (id, Art, Zelle; die Vorderseite zeigt zum Platz), Requisiten (Felder, Wäscheleine), Größen je Art (block = Hindernis, radius = Platzbedarf in Pixeln), Bewohner, Fest (Sekunden). finished_*: Text am Ende der Region.",
+	"_info": "Region Heimatdorf (die erste Region). Größe in Zellen, Start des Roboters, Bienenstock und Vogelhäuschen (nest_cell, steht erst mit den Samenvögeln) in Zellen. village: Dorfplatz (Mitte, in world.json als Platz), Brunnen, Gebäude (id, Art, Zelle; die Vorderseite zeigt zum Platz), Requisiten (Felder, Wäscheleine), Größen je Art (block = Hindernis, radius = Platzbedarf in Pixeln), Bewohner, Fest (Sekunden). finished_*: Text am Ende der Region.",
 	"name": "Heimatdorf",
 	"width_cells": 640,
 	"height_cells": 480,
 	"start_cell": [320, 240],
 	"hive_cell": [314, 235],
+	"nest_cell": [327, 249],
 	"village": {
 		"center": [322, 214],
 		"plaza_radius": 9.0,

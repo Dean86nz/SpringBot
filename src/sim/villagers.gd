@@ -1,8 +1,9 @@
 class_name Villagers
 extends RefCounted
 ## Die Bewohner des Dorfes (Phase 3). Jeder hat ein Zuhause und eine Arbeit (region.json „residents“):
-## Schmied am Amboss, Bauern auf dem Feld, Ladenbesitzer, Wäsche an der Leine, Imker zwischen Bienenstock
-## und Honigstand, Kinder, die auf dem Platz spielen, jemand liest auf der Bank, andere schlendern.
+## Schmied am Amboss, Müller an der Windmühle, Bauern auf dem Feld (Gärtner im Garten: auch "farmer"),
+## Ladenbesitzer, Wäsche an der Leine, Imker zwischen Bienenstock und Honigstand, Kinder, die auf dem
+## Platz spielen, jemand liest auf der Bank, andere schlendern.
 ## Manche haben einen Hund oder eine Katze.
 ## Sie kehren nach und nach zurück: sobald um ihr Haus Grün ist (ready) und der Frühling ihren Wert "from"
 ## erreicht hat. Sie kommen zu Fuß von außerhalb des Dorfes. Die Gebäude sind kaputt, bis die Bewohner sie
@@ -12,6 +13,9 @@ extends RefCounted
 ## Hindernisse (obstacles: Gebäude, Brunnen, Bienenstock) umgehen sie, statt hindurchzulaufen.
 ## Wanderer (job "hike") gehen ab und zu ein langes Stück die Wege (trails) entlang aus dem Dorf hinaus
 ## und wieder zurück.
+## Treffpunkt (hub): Wer nahe am Dorfplatz wohnt, trifft sich dort. Wer weit draußen wohnt (Bauernhöfe in
+## Felder und Vorort), hat seinen Hof als Treffpunkt: Pausen, Spaziergänge und Fest finden dort statt,
+## geholfen wird nur in der Nähe (local_cells), damit niemand quer über die Karte läuft.
 ## Reine Deko und Logik in Weltpixeln; gezeichnet von VillagerView.
 
 enum Kind { HUMAN, DOG, CAT }
@@ -44,6 +48,8 @@ class Person:
 	var tleft := 0
 	var tdone := 0
 	var check := 0.0       # Sekunden bis zur nächsten Suche nach Arbeit am Bau
+	var hub := Vector2.ZERO    # Treffpunkt: Dorfplatz oder der eigene Hof
+	var hub_r := 200.0         # Radius des Treffpunkts
 
 
 var people: Array[Person] = []
@@ -65,9 +71,14 @@ var repair_sec := 12.0
 var obstacles: Array[Dictionary] = []   # {pos, r}: Gebäude, Brunnen, Bienenstock
 var trails: Array[PackedVector2Array] = []   # Wege der Region in Pixeln (für Wanderer)
 var hike_points := Vector2i(14, 30)    # so viele Wegpunkte geht ein Wanderer hinaus
+var hub_dist := 60.0 * 24.0    # wer weiter weg vom Platz wohnt, hat den eigenen Hof als Treffpunkt
+var yard_r := 110.0            # Radius des Hofes als Treffpunkt
+var local_dist := 90.0 * 24.0  # so weit vom Treffpunkt entfernt hilft und spaziert man
 var _ball_target := Vector2.ZERO
 var _rng := RandomNumberGenerator.new()
 
+## Halbe Größe der Beete (wie in world_object.gd), in denen Bauern und Gärtner arbeiten.
+const PLOTS := {"field": Vector2(104, 64), "garden": Vector2(46, 32)}
 const LINE_SLOTS := 6
 const MAX_JARS := 6
 
@@ -85,6 +96,9 @@ func _init(cfg: Dictionary = {}, cell_px: float = 24.0, p_places: Dictionary = {
 	wait_sec = Vector2(ws[0], ws[1])
 	arrive_from = float(cfg.get("arrive_from_cells", 22.0)) * cell_px
 	repair_sec = float(cfg.get("repair_sec", 12.0))
+	hub_dist = float(cfg.get("hub_cells", 60.0)) * cell_px
+	local_dist = float(cfg.get("local_cells", 90.0)) * cell_px
+	yard_r = float(cfg.get("yard_radius_px", yard_r))
 	ball = center + Vector2(0, plaza_r * 0.6)
 	_ball_target = ball
 	for r: Dictionary in cfg.get("residents", []):
@@ -95,6 +109,7 @@ func _init(cfg: Dictionary = {}, cell_px: float = 24.0, p_places: Dictionary = {
 		p.from = float(r.get("from", 0.0))
 		p.look = _rng.randi() % 64
 		p.phase = _rng.randf() * TAU
+		_set_hub(p)
 		people.append(p)
 		var owner := people.size() - 1
 		for pet in ["dog", "cat"]:
@@ -106,11 +121,26 @@ func _init(cfg: Dictionary = {}, cell_px: float = 24.0, p_places: Dictionary = {
 				a.owner = owner
 				a.from = p.from
 				a.look = _rng.randi() % 64
+				a.hub = p.hub
+				a.hub_r = p.hub_r
 				people.append(a)
 	for id: String in places:
 		if places[id]["type"] == "laundry":
 			laundry[id] = 0
 		repair[id] = 0.0
+
+
+## Treffpunkt der Person: der Dorfplatz, oder der Hof vor dem eigenen Haus, wenn es weit draußen steht.
+func _set_hub(p: Person) -> void:
+	p.hub = center
+	p.hub_r = plaza_r
+	var pl: Dictionary = places.get(p.home, {})
+	if pl.is_empty() or Vector2(pl["pos"]).distance_to(center) <= hub_dist:
+		return
+	var door: Vector2 = pl["door"]
+	var out := (door - Vector2(pl["pos"])).normalized()
+	p.hub = door + out * yard_r
+	p.hub_r = yard_r
 
 
 func is_done(id: String) -> bool:
@@ -173,10 +203,11 @@ func update_return(coverage: float, green: Callable, instant: bool = false) -> i
 			p.pos = people[p.owner].pos + Vector2(-26, 18)
 			p.target = p.pos
 		else:
-			var d := (home - center).normalized().rotated(_rng.randf_range(-0.5, 0.5))
-			p.pos = center + d * (arrive_from + home.distance_to(center))
+			var away := home - p.hub
+			var d := (away.normalized() if away.length() > 1.0 else Vector2.from_angle(_rng.randf() * TAU)).rotated(_rng.randf_range(-0.5, 0.5))
+			p.pos = p.hub + d * (arrive_from + home.distance_to(p.hub))
 			p.arriving = true
-			p.target = center if festive else _job_spot(p)
+			p.target = _plaza_spot(p) if festive else _job_spot(p)
 			p.delay = _rng.randf() * 1.5
 	return n
 
@@ -208,7 +239,7 @@ func set_festive(on: bool) -> void:
 		p.sitting = false
 		p.carry = false
 		if p.kind == Kind.HUMAN:
-			p.target = _plaza_spot() if on else _job_spot(p)
+			p.target = _plaza_spot(p) if on else _job_spot(p)
 
 
 func update(delta: float) -> void:
@@ -233,6 +264,7 @@ func update(delta: float) -> void:
 		else:
 			match p.job:
 				"smith": _stay_and_work(p, delta, 22.0)
+				"miller": _stay_and_work(p, delta, 20.0)
 				"shop": _stay_and_work(p, delta, 16.0)
 				"read": _read(p, delta)
 				"farmer":
@@ -290,13 +322,18 @@ func _pick_repair(p: Person) -> String:
 	var best := ""
 	var best_d := INF
 	for id: String in repair:
-		if is_done(id) or not _can_fix(id) or _workers(id) >= 2:
+		if is_done(id) or not _can_fix(id) or _workers(id) >= 2 or not _near(p, id):
 			continue
 		var d := p.pos.distance_squared_to(places[id]["pos"])
 		if d < best_d:
 			best_d = d
 			best = id
 	return best
+
+
+## Liegt das Gebäude in der Nähe des Treffpunkts der Person?
+func _near(p: Person, id: String) -> bool:
+	return Vector2(places[id]["pos"]).distance_to(p.hub) <= local_dist
 
 
 func _can_fix(id: String) -> bool:
@@ -361,7 +398,7 @@ func _stay_and_work(p: Person, delta: float, break_every: float) -> void:
 			p.wait -= delta
 			if p.wait <= 0.0:
 				p.state = 2
-				p.target = _plaza_spot()
+				p.target = _plaza_spot(p)
 		2:   # Pause: kurz zum Platz
 			if _walk(p, delta, speed * 0.8):
 				p.state = 3
@@ -391,11 +428,12 @@ func _farm(p: Person, delta: float) -> void:
 		p.wait -= delta
 		return
 	if _walk(p, delta, speed * 0.45):
-		var rows := 8
+		var e := _plot(f)
+		var rows := maxi(int(e.y * 2.0 / (16.0 * float(f.get("size", 1.0)))), 2)
 		var row := p.slot % rows
-		var along := -90.0 if (p.slot / rows) % 2 == 0 else 90.0
+		var along := -(e.x - 14.0) if (p.slot / rows) % 2 == 0 else e.x - 14.0
 		p.slot += 1
-		p.target = f["pos"] + Vector2(along * (1.0 if row % 2 == 0 else -1.0), -56.0 + row * 16.0 - 4.0)
+		p.target = f["pos"] + Vector2(along * (1.0 if row % 2 == 0 else -1.0), -e.y + 4.0 + row * (e.y * 2.0 - 8.0) / rows)
 		p.wait = _rng.randf_range(0.8, 2.0)   # hacken
 
 
@@ -428,7 +466,7 @@ func _laundry(p: Person, delta: float) -> void:
 			p.state = 1 if p.slot < LINE_SLOTS else 3
 			if p.state == 3:
 				p.carry = false
-				p.target = _plaza_spot()
+				p.target = _plaza_spot(p)
 		3:   # während die Wäsche trocknet: auf dem Platz
 			if _walk(p, delta, speed * 0.7):
 				p.wait = _rng.randf_range(25.0, 40.0)
@@ -482,7 +520,7 @@ func _play(p: Person, delta: float) -> void:
 		return
 	if _walk(p, delta, speed * 1.6):
 		p.wait = _rng.randf_range(0.2, 1.2)
-		p.target = ball + Vector2.from_angle(_rng.randf() * TAU) * _rng.randf_range(20, 70) if _rng.randf() < 0.6 else _plaza_spot()
+		p.target = ball + Vector2.from_angle(_rng.randf() * TAU) * _rng.randf_range(20, 70) if _rng.randf() < 0.6 else _plaza_spot(p)
 
 
 func _update_ball(delta: float) -> void:
@@ -546,7 +584,7 @@ func _hike(p: Person, delta: float) -> void:
 			if _walk(p, delta, speed * 0.75):
 				if p.tleft <= 0:
 					p.state = 4
-					p.target = _plaza_spot()
+					p.target = _plaza_spot(p)
 				else:
 					p.ti += p.tdir
 					p.tleft -= 1
@@ -565,11 +603,9 @@ func _stroll(p: Person, delta: float) -> void:
 		p.wait = _rng.randf_range(wait_sec.x, wait_sec.y)
 		var r := _rng.randf()
 		if r < 0.45:
-			p.target = _plaza_spot()
+			p.target = _plaza_spot(p)
 		else:
-			var ids := places.keys()
-			var id: String = ids[_rng.randi() % ids.size()]
-			p.target = places[id]["door"]
+			p.target = places[_near_place(p)]["door"]
 
 
 func _celebrate(p: Person, delta: float) -> void:
@@ -578,7 +614,7 @@ func _celebrate(p: Person, delta: float) -> void:
 		return
 	if _walk(p, delta, speed):
 		p.wait = _rng.randf_range(1.0, 3.0)   # hüpft (VillagerView), dann zum nächsten Platz
-		p.target = _plaza_spot()
+		p.target = _plaza_spot(p)
 
 
 ## Hund folgt seinem Menschen (rennt mit Kindern), Katze sitzt lange vor einem Haus und wechselt selten.
@@ -599,22 +635,35 @@ func _pet(p: Person, delta: float) -> void:
 	p.sitting = false
 	if _walk(p, delta, speed * 0.5):
 		p.wait = _rng.randf_range(12.0, 30.0)
-		var ids := places.keys()
-		var id: String = ids[_rng.randi() % ids.size()]
-		p.target = places[id]["door"] + Vector2(_rng.randf_range(-30, 30), 8)
+		p.target = places[_near_place(p)]["door"] + Vector2(_rng.randf_range(-30, 30), 8)
 
 
 # --- Orte ---
 
+## Halbe Größe eines Feldes oder Gartens in Weltpixeln.
+func _plot(f: Dictionary) -> Vector2:
+	return PLOTS.get(f.get("type", "field"), PLOTS["field"]) * float(f.get("size", 1.0))
+
+
 func _place_pos(id: String) -> Vector2:
 	return places[id]["pos"] if places.has(id) else center
+
+
+## Ein zufälliges Gebäude in der Nähe des Treffpunkts (sonst irgendeins).
+func _near_place(p: Person) -> String:
+	var ids := places.keys()
+	for t in 8:
+		var id: String = ids[_rng.randi() % ids.size()]
+		if _near(p, id):
+			return id
+	return p.home if places.has(p.home) else ids[_rng.randi() % ids.size()]
 
 
 ## Wo die Person ihre Arbeit tut (im Weltmaß, aus der Lage des Gebäudes).
 func _job_spot(p: Person) -> Vector2:
 	var pl: Dictionary = places.get(p.home, {})
 	if pl.is_empty():
-		return _plaza_spot()
+		return _plaza_spot(p)
 	var rot := float(pl.get("angle", 0.0))
 	var local := Vector2.ZERO
 	match p.job:
@@ -624,11 +673,11 @@ func _job_spot(p: Person) -> Vector2:
 		"beekeeper": local = Vector2(0, 30)
 		"farmer":
 			var f: Dictionary = places.get(p.work, {})
-			return f["pos"] + Vector2(-90, -60) if not f.is_empty() else _plaza_spot()
+			return f["pos"] - _plot(f) + Vector2(14, 4) if not f.is_empty() else _plaza_spot(p)
 		"laundry":
 			var l: Dictionary = places.get(p.work, {})
-			return l["pos"] + Vector2(-80, 30) if not l.is_empty() else _plaza_spot()
-		"kid": return _plaza_spot()
+			return l["pos"] + Vector2(-80, 30) if not l.is_empty() else _plaza_spot(p)
+		"kid": return _plaza_spot(p)
 		_: return pl["door"]
 	return pl["pos"] + local.rotated(rot)
 
@@ -643,5 +692,8 @@ func _work_dir(p: Person) -> float:
 	return rot + PI / 2.0
 
 
-func _plaza_spot() -> Vector2:
-	return center + Vector2.from_angle(_rng.randf() * TAU) * _rng.randf_range(0.4, 0.85) * plaza_r
+## Ein Platz am Treffpunkt der Person (ohne Person: auf dem Dorfplatz).
+func _plaza_spot(p: Person = null) -> Vector2:
+	var c := center if p == null else p.hub
+	var r := plaza_r if p == null else p.hub_r
+	return c + Vector2.from_angle(_rng.randf() * TAU) * _rng.randf_range(0.4, 0.85) * r

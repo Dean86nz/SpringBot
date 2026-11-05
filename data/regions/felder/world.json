@@ -10,7 +10,13 @@
 		{"width": 4.0, "wiggle": 1.0, "points": [[560, 380], [565, 500], [555, 606]]},
 		{"width": 4.0, "wiggle": 1.2, "points": [[450, 372], [470, 280], [520, 200], [600, 120], [650, -6]]},
 		{"width": 3.5, "wiggle": 0.8, "points": [[600, 383], [680, 440], [700, 520], [620, 560], [562, 520]]},
-		{"width": 4.0, "wiggle": 1.2, "points": [[100, 606], [110, 480], [150, 372]]}
+		{"width": 4.0, "wiggle": 1.2, "points": [[100, 606], [110, 480], [150, 372]]},
+		{"name": "Vorortstraße", "width": 3.5, "wiggle": 0.3, "points": [[625, 380], [624, 420], [625, 458]]}
+	],
+	"plazas": [
+		{"name": "Vorplatz", "center": [625, 465], "radius": 8.0},
+		{"name": "Hof am Weizenfeld", "center": [263, 309], "radius": 4.5},
+		{"name": "Hof an der Mohnwiese", "center": [202, 479], "radius": 4.0}
 	],
 	"bridge_width": 6.0,
 	"bridge_overhang": 1.5

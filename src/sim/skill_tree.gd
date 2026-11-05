@@ -4,6 +4,8 @@ extends RefCounted
 ## Ein Knoten ist kaufbar, wenn einer seiner Vorgänger (requires) mindestens Stufe 1 hat.
 ## Sichtbarkeit: gekauft oder kaufbar = sichtbar, Nachbar eines kaufbaren Knotens = „?“,
 ## alles andere verdeckt. Werte (stat) sind die Summe aller Effekte × Stufe plus Grundwert.
+## Äste einer Region (Knoten mit "region", z. B. die Samenvögel) bleiben ganz verdeckt und unkäuflich,
+## bis man die Region erreicht hat (regions, setzt main.gd aus dem Spielstand).
 
 signal changed
 
@@ -16,6 +18,7 @@ var nodes: Dictionary = {}       # id → Definition
 var order: Array[String] = []
 var levels: Dictionary = {}      # id → Stufe
 var stats_info: Dictionary = {}  # stat → {label, format, scale}
+var regions: Array[String] = []  # schon erreichte Regionen (für Äste mit "region")
 var _base: Dictionary = {}
 var _neighbors: Dictionary = {}  # id → Array[String] (Vorgänger und Nachfolger)
 
@@ -75,6 +78,8 @@ func cost(id: String) -> int:
 func state(id: String) -> State:
 	if level(id) > 0:
 		return State.OWNED
+	if is_gated(id):
+		return State.HIDDEN
 	if _is_unlocked(id):
 		return State.AVAILABLE
 	for n: String in _neighbors[id]:
@@ -154,7 +159,15 @@ func reset() -> void:
 	changed.emit()
 
 
+## Gehört der Knoten zum Ast einer Region, die man noch nicht erreicht hat?
+func is_gated(id: String) -> bool:
+	var r := str(nodes[id].get("region", ""))
+	return r != "" and not regions.has(r)
+
+
 func _is_unlocked(id: String) -> bool:
+	if is_gated(id):
+		return false
 	var req: Array = nodes[id].get("requires", [])
 	if req.is_empty():
 		return true

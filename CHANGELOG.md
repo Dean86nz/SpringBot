@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.19.0 – Phase 3, Meilenstein 4: Felder und Vorort mit Samenvögeln
+
+- **Samenvögel**, der neue Helfer: Schwärme fliegen vom Vogelhäuschen weit hinaus und säen im Flug lange Streifen Grün,
+  quer über graues Land (sie suchen sich den Streifen mit dem meisten Grau). Nach ein paar Streifen rasten sie am Häuschen
+  und picken Körner. Ist alles grün, ziehen sie gemächliche Runden. Sie helfen in jeder Region, auch im Heimatdorf.
+- **Neuer Ast im Skilltree** (nach unten, 13 Knoten): Vogelhäuschen, längere und breitere Streifen, mehr Schwärme, schnellerer Flug,
+  kürzere Rast, mehr Pollen; dazu drei besondere Knoten (Großer Vogelzug, Saatsturm, Himmelsgarten).
+  Der Ast bleibt ganz verdeckt, bis man Felder und Vorort erreicht. Bei der Ankunft ein Hinweis, beim ersten Schwarm ein zweiter.
+- **Vorort** um einen Vorplatz mit Brunnen: Laden, Kita, zehn Häuser, vier Gemüsegärten, Wäscheleine, eine Straße zur Landstraße.
+- **Zwei Bauernhöfe** mit Hofplatz: Weizenhof (Bauernhaus, Scheune, Silo, drei Felder, Windmühle) und Mohnhof (Bauernhaus, Scheune, zwei Felder).
+- Neue Gebäude: **Windmühle** (die Flügel drehen sich, sobald sie repariert ist; kaputt hängen zwei zerrissene Flügel schief),
+  **Silo** (kaputt rostig mit Loch), **Gemüsegarten** (Salat, Möhren, Kürbisse; kaputt Unkraut und umgefallener Zaun).
+- **21 Bewohner**, die nach und nach zurückkehren und reparieren: Bauern auf den Feldern, Gärtner in den Gärten, ein Müller mit Mehlsack,
+  Ladenbesitzer, Wäsche, Kinder auf dem Vorplatz, Leser, Wanderer, dazu Hunde und Katzen.
+  Wer auf einem Hof wohnt, macht Pause und feiert auf seinem Hof und hilft nur in der Nähe, statt quer über die Karte zu laufen.
+- Werkzeuge: Übersichtskarte als Bild für jede Region mit Koordinatengitter, Screenshot-Werkzeug kann in eine Region reisen,
+  Spieldauer-Rechnung für die ganze Reise mit Samenvögeln.
+
 ## 0.18.0 – Phase 3, Meilenstein 3: Reisekarte und Reisen
 
 - **Reisekarte:** Alle Regionen als Stationen auf einer geschwungenen Route: fertige grün mit Häkchen, die aktuelle als Stern, freie mit Pfeil,

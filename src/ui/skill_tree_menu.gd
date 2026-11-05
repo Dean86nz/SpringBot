@@ -28,6 +28,7 @@ const BRANCH_COLORS := {
 	"robot": Color(0.47, 0.72, 0.98),
 	"growth": Color(0.52, 0.84, 0.40),
 	"bees": Color(1.0, 0.78, 0.30),
+	"birds": Color(0.62, 0.70, 1.0),
 }
 const GOLD := Color(1.0, 0.84, 0.35)
 const POOR := Color(1.0, 0.70, 0.66)
@@ -160,6 +161,11 @@ func show_help(text: String, sec: float) -> void:
 
 func open() -> void:
 	visible = true
+	_bounds = Rect2(_pos("root"), Vector2.ZERO)   # Äste noch nicht erreichter Regionen zählen nicht
+	for id in _tree.order:
+		if not _tree.is_gated(id):
+			_bounds = _bounds.expand(_pos(id))
+	_bounds = _bounds.grow(UNIT_PX)
 	if _tree.state(_selected) < SkillTree.State.AVAILABLE:
 		_selected = "root"
 	_view = _pos(_selected)
@@ -537,6 +543,20 @@ func _icon(id: String, p: Vector2, s: float, col: Color) -> void:
 			for a in 5:
 				_layer.draw_circle(p + Vector2.from_angle(a * TAU / 5.0) * s * 0.55, s * 0.4, Color(1.0, 0.7, 0.82, col.a))
 			_layer.draw_circle(p, s * 0.35, Color(1.0, 0.88, 0.35, col.a))
+		"birds":   # Vogel im Flug: zwei geschwungene Flügel
+			for sx in [-1.0, 1.0]:
+				_layer.draw_polyline(PackedVector2Array([p + Vector2(0, 0.15) * s, p + Vector2(sx * 0.45, -0.35) * s, p + Vector2(sx * 0.95, -0.05) * s]), col, 5.0, true)
+			_layer.draw_circle(p + Vector2(0, 0.2) * s, s * 0.2, col)
+		"strip", "strip_width":   # Saatstreifen: Reihe von Körnern
+			for k in 5:
+				_layer.draw_circle(p + Vector2(lerpf(-0.8, 0.8, k / 4.0), lerpf(0.5, -0.5, k / 4.0)) * s, s * (0.16 if kind == "strip" else 0.24), col)
+		"bird_speed":
+			for dx in [-0.45, 0.25]:
+				var o := p + Vector2(dx * s, 0)
+				_layer.draw_polyline(PackedVector2Array([o + Vector2(-0.3, -0.6) * s, o + Vector2(0.3, 0) * s, o + Vector2(-0.3, 0.6) * s]), col, 4.0, true)
+		"bird_rest":
+			_layer.draw_colored_polygon(PackedVector2Array([p + Vector2(-0.6, -0.8) * s, p + Vector2(0.6, -0.8) * s, p]), col)
+			_layer.draw_colored_polygon(PackedVector2Array([p + Vector2(-0.6, 0.8) * s, p + Vector2(0.6, 0.8) * s, p]), col)
 		"bee_rest":
 			_layer.draw_colored_polygon(PackedVector2Array([p + Vector2(-0.6, -0.8) * s, p + Vector2(0.6, -0.8) * s, p]), col)
 			_layer.draw_colored_polygon(PackedVector2Array([p + Vector2(-0.6, 0.8) * s, p + Vector2(0.6, 0.8) * s, p]), col)

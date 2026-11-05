@@ -2,7 +2,8 @@ extends Node2D
 ## Hauptszene: Raster, Boden, Roboter, Kamera, HUD, Menüs und (nur Debug) Cheat-Menü.
 ## Jedes Bild begrünt der Roboter die Zellen in seinem Radius; grüne Zellen bringen Pollen.
 ## Mit den Wachstums-Knoten wächst die Grenze des Grüns von allein weiter,
-## Bienen tragen das Grün zu neuen Stellen. Alle Werte kommen aus dem Skilltree.
+## Bienen tragen das Grün zu neuen Stellen, Samenvögel (ab Felder und Vorort) säen ganze Streifen.
+## Alle Werte kommen aus dem Skilltree.
 ## Regionen (Phase 3): data/campaign.json sagt, welche Regionen es gibt; die Daten der aktuellen Region
 ## liegen in ihrem Ordner (Campaign). Der Spielstand hat je Region einen Eintrag, Skills gelten für alle.
 ## Reisen (TravelScreen): speichern, Zielregion im Spielstand vermerken, Hauptszene neu laden (Game.arrival).
@@ -46,6 +47,11 @@ var _bee_speed := 1.0
 var _base_bloom := 2.3
 var _base_hover := 2.0
 var _bee_view := BeeView.new()
+var _birds := SeedBirds.new()
+var _bird_view := BirdView.new()
+var _bird_speed := 1.0
+var _bird_base: Dictionary = {}   # Grundwerte der Samenvögel (Streifen, Breite, Rast)
+var _nest_blocks := false         # Vogelhäuschen steht (Hindernis für den Roboter)
 var _start_px := Vector2.ZERO
 var _ground := GroundView.new()
 var _bridge_view := BridgeView.new()
@@ -138,12 +144,16 @@ func _ready() -> void:
 	_bees.configure(Game.dig(Game.balance, "bees") if Game.dig(Game.balance, "bees") is Dictionary else {}, hive_px, cell_px)
 	_base_bloom = _bees.bloom_radius
 	_base_hover = _bees.hover_sec
+	var nest_px := Campaign.cell_px(region, "nest_cell", cell_px, hive_px + Vector2(-90, 60))
+	var bird_cfg: Variant = Game.dig(Game.balance, "birds")
+	_birds.configure(bird_cfg if bird_cfg is Dictionary else {}, nest_px, cell_px)
+	_bird_base = {"strip": _birds.strip_cells, "width": _birds.width_cells, "rest": _birds.rest_sec}
 	_obj_cfg = rdata["objects"]
 	var blockers: Array[Dictionary] = []
 	var avoid: Array[Dictionary] = []   # wo keine Hasen hoppeln
 	var places := {}
 	var fixed := _village_objects(places)
-	for d in WorldObjects.place(grid, cell_px, _obj_cfg, world_data, [_start_px, hive_px], _areas, fixed):
+	for d in WorldObjects.place(grid, cell_px, _obj_cfg, world_data, [_start_px, hive_px, nest_px], _areas, fixed):
 		var o := WorldObject.new()
 		o.setup(d)
 		add_child(o)
@@ -183,6 +193,9 @@ func _ready() -> void:
 	_bee_view.process_mode = Node.PROCESS_MODE_PAUSABLE
 	_bee_view.bind(_bees)
 	add_child(_bee_view)
+	_bird_view.process_mode = Node.PROCESS_MODE_PAUSABLE
+	_bird_view.bind(_birds)
+	add_child(_bird_view)
 	_petals.process_mode = Node.PROCESS_MODE_PAUSABLE
 	add_child(_petals)   # vor dem Roboter: Blätter liegen unter ihm
 	_robot.process_mode = Node.PROCESS_MODE_PAUSABLE
@@ -291,6 +304,11 @@ func _process(delta: float) -> void:
 	_spread(delta)
 	_bees.update(delta, grid, _rng, _bee_speed)
 	_bee_blooms()
+	if not _birds.flocks.is_empty():
+		_birds.update(delta, grid, _rng, _bird_speed)
+		for p in _birds.blooms:   # wo die Saat aufgeht, ein paar Blätter
+			_petals.burst(p, 3, Vector2(30, 120), Vector2(0.6, 1.0), Vector2(5, 8))
+		_birds.blooms.clear()
 	var cells := grid.green_count + int(_bonus_cells)   # fertige andere Regionen bringen auch Pollen
 	skills.tick(delta, cells)
 	_hud.set_pollen(skills.pollen, skills.rate(cells))
@@ -355,7 +373,7 @@ func _check_end(delta: float) -> void:
 
 
 ## Gebäude, Requisiten und Brunnen des Dorfes als feste Objekte (Format wie WorldObjects.place).
-## Gebäude drehen ihre Vorderseite zum Platz; davor liegt die Tür. places bekommt je id Lage, Tür,
+## Gebäude drehen ihre Vorderseite zum Platz (oder zum Punkt "face"); davor liegt die Tür. places bekommt je id Lage, Tür,
 ## Art und Drehung (für die Bewohner).
 func _village_objects(places: Dictionary) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
@@ -373,11 +391,14 @@ func _village_objects(places: Dictionary) -> Array[Dictionary]:
 		var pos := (Vector2(b["pos"][0], b["pos"][1]) + Vector2(0.5, 0.5)) * cell_px
 		var sz: Array = t.get("size", [1.0, 1.0])
 		var f := rng.randf_range(float(sz[0]), float(sz[1]))
-		var to_plaza := (center - pos).normalized()
-		var rot := 0.0 if kind in ["field", "laundry"] else to_plaza.angle() - PI / 2.0
+		var face := center
+		if b.get("face") is Array:   # eigene Blickrichtung (z. B. zum Hof statt zum fernen Dorfplatz)
+			face = (Vector2(b["face"][0], b["face"][1]) + Vector2(0.5, 0.5)) * cell_px
+		var to_plaza := (face - pos).normalized()
+		var rot := 0.0 if kind in ["field", "laundry", "garden", "windmill", "silo"] else to_plaza.angle() - PI / 2.0
 		var block := float(t.get("block", 50.0)) * f
 		out.append({"id": str(b["id"]), "kind": kind, "pos": pos, "angle": rot, "seed": rng.randi(),
-			"block": block, "radius": float(t.get("radius", 76.0)) * f, "size": f, "quiet": kind in ["field", "laundry", "stand"]})
+			"block": block, "radius": float(t.get("radius", 76.0)) * f, "size": f, "quiet": kind in ["field", "laundry", "stand", "garden"]})
 		places[str(b["id"])] = {"pos": pos, "type": kind, "angle": rot, "block": block, "radius": float(t.get("radius", 76.0)) * f, "size": f,
 			"door": pos + Vector2(0, block + 16.0).rotated(rot) if block > 0.0 else pos + Vector2(0, 30)}
 	var fo: Variant = _village.get("fountain")
@@ -521,7 +542,10 @@ func _update_tips(delta: float) -> void:
 		_hud.hide_tip()
 	if not _hud.tip_visible():
 		_tip_id = ""
+	var branch := str(_tutorial.hints.get("birds_branch", {}).get("node", ""))
 	var ctx := {"can_buy": not _tutorial.seen.has("tree") and _first_buy_possible(), "bees": _bees.bees.size(),
+		"birds": _birds.flocks.size(),
+		"birds_branch": skills.nodes.has(branch) and not skills.is_gated(branch) and skills.level(branch) == 0,
 		"quiet": _tip_id != "" or not _hud.visible or MenuKit.any_open(get_tree()) or _end_wait >= 0.0}
 	var id := _tutorial.due(ctx, delta)
 	if id != "":
@@ -586,6 +610,19 @@ func _apply_upgrades() -> void:
 	_bee_speed = 1.0 + skills.stat("bee_speed") / 100.0
 	_bees.bloom_radius = _base_bloom + skills.stat("bloom")
 	_bees.hover_sec = _base_hover * clampf(1.0 - skills.stat("bee_rest") / 100.0, 0.1, 1.0)
+	_birds.set_count(int(skills.stat("birds")))
+	_bird_speed = 1.0 + skills.stat("bird_speed") / 100.0
+	_birds.strip_cells = float(_bird_base["strip"]) + skills.stat("strip")
+	_birds.width_cells = float(_bird_base["width"]) + skills.stat("strip_width")
+	_birds.rest_sec = float(_bird_base["rest"]) * clampf(1.0 - skills.stat("bird_rest") / 100.0, 0.1, 1.0)
+	var nest_on := not _birds.flocks.is_empty()
+	if nest_on != _nest_blocks:   # das Häuschen steht erst mit dem ersten Schwarm
+		_nest_blocks = nest_on
+		var ob := {"pos": _birds.nest, "radius": Game.num("birds/nest_radius_px", 26.0)}
+		if nest_on:
+			_robot.obstacles.append(ob)
+		else:
+			_robot.obstacles.erase(ob)
 
 
 ## Menüs öffnen und schließen. Das Cheat-Menü verwaltet sich selbst.
@@ -617,7 +654,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		_tree.open()
 		Sfx.play("open")
 		_tutorial.first("tree")   # schon gefunden: der Hinweis zum Öffnen kommt nicht mehr
-		if _tip_id == "tree":
+		var branch := str(_tutorial.hints.get("birds_branch", {}).get("node", ""))
+		if skills.nodes.has(branch) and not skills.is_gated(branch):
+			_tutorial.first("birds_branch")   # neuer Ast schon gesehen
+		if _tip_id in ["tree", "birds_branch"]:
 			_hud.hide_tip()
 		if _tutorial.first("tree_help"):
 			_tree.show_help(_tutorial.text("tree_help"), _tutorial.show_sec("tree_help"))
@@ -645,10 +685,14 @@ func reset_game() -> void:
 	_finished = false
 	_end_wait = -1.0
 	_bees.set_count(0)
+	_birds.set_count(0)
+	_birds.seeds.clear()
+	_birds.blooms.clear()
 	_animals.clear()
 	_villagers.clear()
 	_villager_view.queue_redraw()   # auch in der Pause (Titel, Einleitung): altes Bild der Bewohner löschen
 	_region_saves.clear()   # Neues Spiel: alle Regionen von vorn
+	skills.regions.assign([region_id])
 	_tutorial.reset()
 	_tip_id = ""
 	_hud.hide_tip()
@@ -748,6 +792,11 @@ func load_game(data: Dictionary) -> void:
 	reset_game()
 	_region_saves = (data.get("regions", {}) as Dictionary).duplicate()
 	var entry: Dictionary = _region_saves.get(region_id, {})
+	var reached: Array[String] = [region_id]   # erreichte Regionen schalten ihre Äste im Skilltree frei
+	for id: String in _region_saves:
+		if not reached.has(id):
+			reached.append(id)
+	skills.regions = reached
 	if not data.is_empty():
 		skills.from_dict(data.get("skills", {}))
 		_tutorial.from_list(data.get("tutorial", []))   # alte Spielstände: Hinweise kommen noch einmal

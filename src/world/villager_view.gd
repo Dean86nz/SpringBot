@@ -17,7 +17,8 @@ const SCALE := 2.2
 ## Halbe Größe des Daches je Gebäudeart (wie in world_object.gd), für Gerüst und Bauabschnitte.
 const EXTENTS := {"house": Vector2(58, 42), "church": Vector2(38, 62), "school": Vector2(66, 38), "library": Vector2(48, 38),
 	"shop": Vector2(48, 36), "smithy": Vector2(44, 36), "farmhouse": Vector2(54, 40), "barn": Vector2(72, 42),
-	"stand": Vector2(30, 16), "field": Vector2(104, 64), "laundry": Vector2(64, 8), "cemetery": Vector2(70, 52)}
+	"stand": Vector2(30, 16), "field": Vector2(104, 64), "laundry": Vector2(64, 8), "cemetery": Vector2(70, 52),
+	"windmill": Vector2(40, 40), "silo": Vector2(30, 30), "garden": Vector2(46, 32)}
 
 var _v: Villagers
 
@@ -101,13 +102,14 @@ func _human(p: Villagers.Person) -> void:
 		"smith": cloth = Color(0.38, 0.30, 0.26)
 		"beekeeper": cloth = Color(0.97, 0.97, 0.94)
 		"farmer": cloth = Color(0.40, 0.52, 0.72)
+		"miller": cloth = Color(0.92, 0.90, 0.84)
 	var swing := sin(p.phase) * 4.0 if walking else 0.0
 	var work := p.wait > 0.0 or p.sitting
 	var repairing := p.fix != "" and p.pos == p.target
 	# Arme: beim Gehen schwingen, bei der Arbeit nach vorne
 	for side in [-1.0, 1.0]:
 		var hand := Vector2(swing * side, side * 8.0)
-		if repairing or (work and p.job in ["smith", "farmer", "read"]):
+		if repairing or (work and p.job in ["smith", "farmer", "read", "miller"]):
 			hand = Vector2(7, side * 5.0)
 		if p.carry:
 			hand = Vector2(8, side * 4.0)
@@ -123,7 +125,9 @@ func _human(p: Villagers.Person) -> void:
 	else:
 		Disc.ring_dot(self, Vector2(1, 0), 5.0, skin, INK, 1.5)
 		var hair: Color = HAIR[(p.look / 18) % HAIR.size()]
-		if p.job == "farmer" or p.look % 7 == 0:   # Strohhut
+		if p.job == "miller":   # Müllermütze
+			Disc.ring_dot(self, Vector2(-1, 0), 5.5, Color(0.98, 0.97, 0.94), INK, 1.5)
+		elif p.job == "farmer" or p.look % 7 == 0:   # Strohhut
 			Disc.ring_dot(self, Vector2(0, 0), 7.0, Color(0.94, 0.84, 0.52), INK, 1.5)
 			Disc.dot(self, Vector2(0, 0), 3.5, Color(0.84, 0.70, 0.40))
 		else:
@@ -142,6 +146,8 @@ func _human(p: Villagers.Person) -> void:
 		var chop := sin(p.act * 6.0) * 3.0
 		draw_line(Vector2(6, 4), Vector2(18 + chop, 4), Color(0.55, 0.40, 0.26), 2.0)
 		draw_line(Vector2(18 + chop, 0), Vector2(18 + chop, 8), Color(0.45, 0.45, 0.48), 2.5)
+	elif p.job == "miller" and work:   # Mehlsack auf der Schulter
+		Disc.ring_dot(self, Vector2(2, 9), 5.5, Color(0.96, 0.92, 0.82), INK, 1.5)
 	elif p.job == "read" and p.sitting:
 		var flip := 1.0 if fmod(p.act, 6.0) < 5.6 else 0.3
 		draw_rect(Rect2(Vector2(8, -6), Vector2(6, 12)), Color(0.82, 0.30, 0.30))

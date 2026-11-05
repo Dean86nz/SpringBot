@@ -1,5 +1,5 @@
 {
-	"_info": "Einführung und Hinweise. intro = Seiten der Einleitung beim Neuen Spiel (A weiter, B überspringen); art = Bild der Seite (grey, robot, bloom). hints = Hinweise im Spiel, jeder genau einmal je Spielstand; delay_sec = Wartezeit, show_sec = wie lange sichtbar. {name} wird durch die Taste aus keys ersetzt, passend zum Gerät (pad = Controller, keys = Tastatur). controls = Seite „Steuerung“ im Pause-Menü.",
+	"_info": "Einführung und Hinweise. intro = Seiten der Einleitung beim Neuen Spiel (A weiter, B überspringen); art = Bild der Seite (grey, robot, bloom). hints = Hinweise im Spiel, jeder genau einmal je Spielstand (birds_branch: sobald der Ast node erreichbar ist); delay_sec = Wartezeit, show_sec = wie lange sichtbar. {name} wird durch die Taste aus keys ersetzt, passend zum Gerät (pad = Controller, keys = Tastatur). controls = Seite „Steuerung“ im Pause-Menü.",
 	"intro": [
 		{"art": "grey", "title": "Die graue Welt", "text": "Ein langer Winter hat alle Farben verschluckt.\nAlles ist grau und still."},
 		{"art": "robot", "title": "Ein kleiner Roboter erwacht", "text": "Doch ein kleiner Gärtner-Roboter hat durchgehalten.\nWo er fährt, wächst wieder Gras."},
@@ -9,7 +9,9 @@
 		"move": {"text": "{move}: fahren. Wo der Roboter fährt, wird es grün.", "delay_sec": 1.0, "show_sec": 9.0, "done_px": 400},
 		"tree": {"text": "Genug Pollen für die erste Verbesserung!  {tree}: Skilltree öffnen", "delay_sec": 0.5, "show_sec": 14.0},
 		"tree_help": {"text": "{select}: wählen   ·   {buy}: kaufen   ·   {close}: schließen", "show_sec": 10.0},
-		"bees": {"text": "Die Bienen sind da! Sie fliegen vom Bienenstock zu grauen Stellen und lassen dort Grün erblühen – auch weit weg vom Roboter.", "delay_sec": 1.0, "show_sec": 11.0}
+		"bees": {"text": "Die Bienen sind da! Sie fliegen vom Bienenstock zu grauen Stellen und lassen dort Grün erblühen – auch weit weg vom Roboter.", "delay_sec": 1.0, "show_sec": 11.0},
+		"birds_branch": {"text": "Neu im Skilltree: die Samenvögel!  {tree}: Skilltree öffnen, der neue Ast liegt unten.", "node": "v1", "delay_sec": 6.0, "show_sec": 12.0},
+		"birds": {"text": "Die Samenvögel fliegen aus! Sie säen im Flug lange Streifen Grün, quer über graues Land.", "delay_sec": 1.0, "show_sec": 11.0}
 	},
 	"keys": {
 		"move": {"pad": "Linker Stick", "keys": "WASD / Pfeiltasten"},

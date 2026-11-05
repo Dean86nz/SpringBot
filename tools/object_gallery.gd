@@ -3,7 +3,7 @@ extends SceneTree
 ## ein Bild. Nicht headless (Fenster öffnet kurz).
 ##   Godot_v4.7.2-stable_win64_console.exe --path . -s tools/object_gallery.gd -- <ausgabe.png>
 
-const KINDS := ["oak", "fir", "birch", "fruit", "willow", "sapling", "rock", "pond", "bush", "log", "fence", "stones", "house", "fountain", "church", "school", "library", "shop", "smithy", "farmhouse", "barn", "stand", "field", "laundry", "cemetery"]
+const KINDS := ["oak", "fir", "birch", "fruit", "willow", "sapling", "rock", "pond", "bush", "log", "fence", "stones", "house", "fountain", "church", "school", "library", "shop", "smithy", "farmhouse", "barn", "stand", "field", "laundry", "cemetery", "windmill", "silo", "garden"]
 const STEP := 170.0
 
 var _out := "user://gallery.png"
@@ -14,20 +14,24 @@ func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
 	if args.size() >= 1:
 		_out = args[0]
-	root.size = Vector2i(int(STEP * 8), int(STEP * 6))
+	root.size = Vector2i(int(STEP * 8), int(STEP * 8))
 	for row in 2:
 		var bg := ColorRect.new()
 		bg.color = Color(0.70, 0.68, 0.64) if row == 0 else Color(0.46, 0.76, 0.33)
-		bg.position = Vector2(0, row * STEP * 3)
-		bg.size = Vector2(STEP * 8, STEP * 3)
+		bg.position = Vector2(0, row * STEP * 4)
+		bg.size = Vector2(STEP * 8, STEP * 4)
 		root.add_child(bg)
 	for i in KINDS.size():
 		for row in 2:
 			var o := WorldObject.new()
-			var pos := Vector2((i % 8 + 0.5) * STEP, (row * 3 + i / 8 + 0.5) * STEP)
+			var pos := Vector2((i % 8 + 0.5) * STEP, (row * 4 + i / 8 + 0.5) * STEP)
 			o.setup({"kind": KINDS[i], "pos": pos, "seed": 1234 + i * 7, "angle": 0.4})
 			root.add_child(o)
 			o.set_awake(row == 1, false)
+	var cam := Camera2D.new()   # alles ins Fenster (1080 hoch)
+	cam.zoom = Vector2.ONE * 1080.0 / (STEP * 8)
+	cam.position = Vector2(STEP * 4, STEP * 4)
+	root.add_child(cam)
 
 
 func _process(_delta: float) -> bool:

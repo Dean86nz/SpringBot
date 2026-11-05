@@ -15,7 +15,12 @@
 		"bees": {"label": "Bienen", "format": "+%s"},
 		"bee_speed": {"label": "% Flugtempo", "format": "+%s"},
 		"bloom": {"label": "Zellen Blütengröße", "format": "+%s"},
-		"bee_rest": {"label": "% kürzer schweben", "format": "+%s"}
+		"bee_rest": {"label": "% kürzer schweben", "format": "+%s"},
+		"birds": {"label": "Schwarm Samenvögel", "format": "+%s"},
+		"bird_speed": {"label": "% Flugtempo der Vögel", "format": "+%s"},
+		"strip": {"label": "Zellen längere Saatstreifen", "format": "+%s"},
+		"strip_width": {"label": "Zellen breitere Saatstreifen", "format": "+%s"},
+		"bird_rest": {"label": "% kürzere Rast", "format": "+%s"}
 	},
 	"nodes": [
 		{"id": "root", "branch": "root", "name": "Frühlingsfunke", "desc": "Der kleine Roboter erwacht. Von hier aus wächst alles.", "pos": [0, 0], "requires": [], "max_level": 1, "base_cost": 0, "cost_growth": 1, "effects": {}},
@@ -65,6 +70,20 @@
 		{"id": "b12", "branch": "bees", "name": "Volksfest", "desc": "Der Stock feiert und wächst.", "pos": [-5.4, 0.8], "requires": ["b9"], "max_level": 3, "base_cost": 90000, "cost_growth": 1.9, "effects": {"bees": 2}},
 		{"id": "b13", "branch": "bees", "name": "Prachtblüten", "desc": "Jede Biene hinterlässt eine prächtige Wiese.", "pos": [-6.4, 0.1], "requires": ["b10", "b12"], "max_level": 3, "base_cost": 300000, "cost_growth": 1.9, "effects": {"bloom": 0.4}},
 		{"id": "b14", "branch": "bees", "name": "Weitflug", "desc": "Bienen fliegen noch schneller.", "pos": [-6.4, 1.6], "requires": ["b11", "b12"], "max_level": 2, "base_cost": 270000, "cost_growth": 2.0, "effects": {"bee_speed": 15}},
-		{"id": "b15", "branch": "bees", "name": "Summendes Land", "desc": "Überall summt und brummt es.", "pos": [-7.4, 0.9], "requires": ["b13", "b14"], "max_level": 1, "base_cost": 900000, "cost_growth": 1, "effects": {"bees": 8}, "special": true}
+		{"id": "b15", "branch": "bees", "name": "Summendes Land", "desc": "Überall summt und brummt es.", "pos": [-7.4, 0.9], "requires": ["b13", "b14"], "max_level": 1, "base_cost": 900000, "cost_growth": 1, "effects": {"bees": 8}, "special": true},
+
+		{"id": "v1", "branch": "birds", "region": "felder", "name": "Vogelhäuschen", "desc": "Ein Schwarm Samenvögel zieht ein. Er fliegt weit hinaus und sät ganze Streifen Grün.", "pos": [0, 1.3], "requires": ["root"], "max_level": 1, "base_cost": 6000, "cost_growth": 1, "effects": {"birds": 1}},
+		{"id": "v2", "branch": "birds", "region": "felder", "name": "Lange Reise", "desc": "Die Vögel säen längere Streifen, bevor sie umkehren.", "pos": [-1, 2.0], "requires": ["v1"], "max_level": 3, "base_cost": 15000, "cost_growth": 1.8, "effects": {"strip": 10}},
+		{"id": "v3", "branch": "birds", "region": "felder", "name": "Starke Schwingen", "desc": "Die Vögel fliegen schneller.", "pos": [1, 2.0], "requires": ["v1"], "max_level": 3, "base_cost": 12000, "cost_growth": 1.8, "effects": {"bird_speed": 12}},
+		{"id": "v4", "branch": "birds", "region": "felder", "name": "Körnerfutter", "desc": "Gut genährte Vögel, reiche Ernte: mehr Pollen.", "pos": [0, 2.8], "requires": ["v2", "v3"], "max_level": 3, "base_cost": 40000, "cost_growth": 1.8, "effects": {"pollen": 5}},
+		{"id": "v5", "branch": "birds", "region": "felder", "name": "Zweiter Schwarm", "desc": "Noch ein Schwarm Samenvögel zieht ein.", "pos": [-2, 2.7], "requires": ["v2"], "max_level": 3, "base_cost": 45000, "cost_growth": 2.0, "effects": {"birds": 1}},
+		{"id": "v6", "branch": "birds", "region": "felder", "name": "Breite Saat", "desc": "Die Vögel streuen die Samen breiter.", "pos": [2, 2.7], "requires": ["v3"], "max_level": 3, "base_cost": 36000, "cost_growth": 1.9, "effects": {"strip_width": 0.5}},
+		{"id": "v7", "branch": "birds", "region": "felder", "name": "Zugvögel", "desc": "Die Vögel kennen weite Wege: noch längere Streifen.", "pos": [-2.6, 3.7], "requires": ["v5"], "max_level": 3, "base_cost": 150000, "cost_growth": 1.9, "effects": {"strip": 15}},
+		{"id": "v8", "branch": "birds", "region": "felder", "name": "Thermik", "desc": "Warme Luft trägt die Vögel.", "pos": [2.6, 3.7], "requires": ["v6"], "max_level": 3, "base_cost": 120000, "cost_growth": 1.9, "effects": {"bird_speed": 15}},
+		{"id": "v9", "branch": "birds", "region": "felder", "name": "Sonnenblumenkerne", "desc": "Aus jedem Streifen wachsen Sonnenblumen: mehr Pollen.", "pos": [0, 3.9], "requires": ["v4"], "max_level": 3, "base_cost": 200000, "cost_growth": 1.9, "effects": {"pollen": 5}},
+		{"id": "v10", "branch": "birds", "region": "felder", "name": "Großer Vogelzug", "desc": "Ein ganzer Himmel voller Samenvögel.", "pos": [-3.2, 4.9], "requires": ["v7"], "max_level": 1, "base_cost": 900000, "cost_growth": 1, "effects": {"birds": 3}, "special": true},
+		{"id": "v11", "branch": "birds", "region": "felder", "name": "Saatsturm", "desc": "Die Samen wirbeln breit über das Land.", "pos": [3.2, 4.9], "requires": ["v8"], "max_level": 1, "base_cost": 700000, "cost_growth": 1, "effects": {"strip_width": 1.5}, "special": true},
+		{"id": "v12", "branch": "birds", "region": "felder", "name": "Nimmermüde", "desc": "Die Vögel rasten kürzer im Häuschen.", "pos": [0, 5.0], "requires": ["v9"], "max_level": 3, "base_cost": 300000, "cost_growth": 1.9, "effects": {"bird_rest": 25}},
+		{"id": "v13", "branch": "birds", "region": "felder", "name": "Himmelsgarten", "desc": "Wo die Vögel fliegen, wird der Himmel zum Garten.", "pos": [0, 6.2], "requires": ["v10", "v11", "v12"], "max_level": 1, "base_cost": 2500000, "cost_growth": 1, "effects": {"birds": 3, "strip": 20}, "special": true}
 	]
 }
