@@ -26,6 +26,8 @@ func _draw() -> void:
 	_draw_hive(_swarm.hive)
 	for i in _swarm.bees.size():
 		var b: BeeSwarm.Bee = _swarm.bees[i]
+		if b.rest > 0.0:
+			continue   # ruht im Stock
 		var phase := _time * 7.0 + i * 1.7
 		var bob := Vector2(cos(phase * 0.5), sin(phase)) * (3.0 if b.hover > 0.0 else 1.0)
 		var dir := (b.target - b.pos).angle() if b.flying else sin(phase * 0.3) * 0.6

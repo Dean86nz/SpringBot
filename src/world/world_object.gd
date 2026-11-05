@@ -5,8 +5,10 @@ extends Node2D
 ## Objekte zeichnet. Die Erwach-Animation läuft über die Skalierung des Knotens; neu gezeichnet
 ## wird nur einmal, beim Wechsel von tot zu lebendig (ein blühender Baum hat über 200 Kreise).
 ## Arten: Bäume oak (Laubbaum), fir (Tanne), birch (Birke), fruit (Obstbaum), willow (Weide),
-## sapling (junger Baum); dazu rock, pond, bush; am Wegrand log, fence, stones; im Dorf house und fountain
-## (angle dreht das Haus so, dass seine Vorderseite, lokal +y, zum Dorfplatz zeigt).
+## sapling (junger Baum); dazu rock, pond, bush; am Wegrand log, fence, stones; im Dorf house, fountain,
+## church, school, library, shop, smithy, farmhouse, barn, stand (Honigstand), field, laundry (Wäscheleine)
+## (angle dreht Gebäude so, dass ihre Vorderseite, lokal +y, zum Dorfplatz zeigt).
+## Was sich im Dorf bewegt (Menschen, Wäsche, Honiggläser, Funken), zeichnet VillagerView.
 ## Jedes Objekt hat eine eigene Größe (size, über die Skalierung des Knotens).
 ## Godot zeichnet auch einmal aufgezeichnete Objekte jedes Bild neu; Kreise, Polygone und
 ## Linienzüge kosten dabei je Aufruf ein Vielfaches von Textur-Rechtecken, Dreiecken und Linien.
@@ -120,6 +122,26 @@ func _draw() -> void:
 			_house(alive)
 		"fountain":
 			_fountain(alive)
+		"church":
+			_church(alive)
+		"school":
+			_school(alive)
+		"library":
+			_library(alive)
+		"shop":
+			_shop(alive)
+		"smithy":
+			_smithy(alive)
+		"farmhouse":
+			_farmhouse(alive)
+		"barn":
+			_barn(alive)
+		"stand":
+			_stand(alive)
+		"field":
+			_field(alive)
+		"laundry":
+			_laundry(alive)
 	draw_set_transform(Vector2.ZERO)
 
 
@@ -538,3 +560,203 @@ func _fountain(alive: bool) -> void:
 	_ring(Vector2.ZERO, 9.0, Color(0.78, 0.78, 0.80), INK, 2.5)
 	if alive:
 		_dot(Vector2.ZERO, 4.0, Color(0.92, 0.97, 1.0))
+
+
+## Gemeinsamer Rahmen für Gebäude: Schatten, Satteldach (First quer, x-Richtung), Ziegelreihen, Umriss.
+## Tot: verblichen mit Löchern.
+func _gable(w: float, h: float, alive: bool, roof_alive: Color, holes: int = 4) -> void:
+	_tf(Vector2(8, 10), angle)
+	draw_rect(Rect2(-w, -h, w * 2, h * 2), SHADOW)
+	_tf(Vector2.ZERO, angle)
+	var roof := roof_alive if alive else Color(0.56, 0.52, 0.48)
+	draw_rect(Rect2(-w, -h, w * 2, h), roof.lightened(0.08))
+	draw_rect(Rect2(-w, 0, w * 2, h), roof.darkened(0.12))
+	var rows := int(h / 7.0) - 1
+	for k in rows:
+		var y := -h + 7.0 + k * 7.0
+		draw_line(Vector2(-w + 2, y), Vector2(w - 2, y), roof.darkened(0.22), 1.5)
+		draw_line(Vector2(-w + 2, -y), Vector2(w - 2, -y), roof.darkened(0.3), 1.5)
+	draw_line(Vector2(-w, 0), Vector2(w, 0), INK, 3.0)
+	_outline(PackedVector2Array([Vector2(-w, -h), Vector2(w, -h), Vector2(w, h), Vector2(-w, h)]), INK, 3.0)
+	if not alive:
+		_rng.seed = obj_seed
+		for k in holes:
+			var p := Vector2(_rng.randf_range(-w + 8, w - 16), _rng.randf_range(-h + 6, h - 12))
+			draw_rect(Rect2(p, Vector2(_rng.randf_range(8, 16), _rng.randf_range(5, 9))), Color(0.36, 0.33, 0.31))
+
+
+func _rect_ink(r: Rect2, col: Color, w: float = 2.0) -> void:
+	draw_rect(r, col)
+	_outline(PackedVector2Array([r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x, r.end.y)]), INK, w)
+
+
+## Kirche: langes Schiff (First längs), vorne ein Turm mit Spitzdach und Kreuz.
+func _church(alive: bool) -> void:
+	var w := 38.0
+	var h := 62.0
+	_tf(Vector2(8, 10), angle)
+	draw_rect(Rect2(-w, -h, w * 2, h * 2), SHADOW)
+	_dot(Vector2(0, h + 18), 30.0, SHADOW)
+	_tf(Vector2.ZERO, angle)
+	var roof := Color(0.52, 0.34, 0.32) if alive else Color(0.55, 0.52, 0.49)
+	draw_rect(Rect2(-w, -h, w, h * 2), roof.lightened(0.08))
+	draw_rect(Rect2(0, -h, w, h * 2), roof.darkened(0.12))
+	for k in 4:
+		var x := -w + 8.0 + k * 8.0
+		draw_line(Vector2(x, -h + 2), Vector2(x, h - 2), roof.darkened(0.22), 1.5)
+		draw_line(Vector2(-x, -h + 2), Vector2(-x, h - 2), roof.darkened(0.3), 1.5)
+	draw_line(Vector2(0, -h), Vector2(0, h), INK, 3.0)
+	_outline(PackedVector2Array([Vector2(-w, -h), Vector2(w, -h), Vector2(w, h), Vector2(-w, h)]), INK, 3.0)
+	# Turm vorne: quadratisch, Spitzdach aus vier Dreiecken, Kreuz
+	var c := Vector2(0, h + 12)
+	var t := 26.0
+	var stone := Color(0.80, 0.78, 0.72) if alive else Color(0.62, 0.60, 0.57)
+	var tip := Color(0.38, 0.50, 0.62) if alive else Color(0.50, 0.48, 0.46)
+	var pts := PackedVector2Array([c + Vector2(-t, -t), c + Vector2(t, -t), c + Vector2(t, t), c + Vector2(-t, t)])
+	draw_rect(Rect2(c - Vector2(t, t), Vector2(t, t) * 2), stone)
+	for k in 4:
+		_quad(PackedVector2Array([c, pts[k], pts[(k + 1) % 4]]), tip.lightened(0.12) if k % 2 == 0 else tip.darkened(0.08))
+	_outline(pts, INK, 3.0)
+	draw_line(pts[0], pts[2], INK, 1.5)
+	draw_line(pts[1], pts[3], INK, 1.5)
+	var gold := Color(1.0, 0.84, 0.35) if alive else Color(0.45, 0.42, 0.40)
+	draw_line(c + Vector2(0, -9), c + Vector2(0, 9), gold, 3.5)
+	draw_line(c + Vector2(-6, -3), c + Vector2(6, -3), gold, 3.5)
+	if not alive:
+		draw_rect(Rect2(Vector2(-20, -30), Vector2(14, 8)), Color(0.36, 0.33, 0.31))
+		draw_rect(Rect2(Vector2(8, 10), Vector2(12, 7)), Color(0.36, 0.33, 0.31))
+
+
+## Schule: breites Haus, davor ein Pausenhof mit Zaun, Fahnenmast und Hüpfkästchen.
+func _school(alive: bool) -> void:
+	_tf(Vector2.ZERO, angle)
+	var yard := Rect2(-56, 40, 112, 46)
+	draw_rect(yard, Color(0.78, 0.74, 0.66) if alive else Color(0.62, 0.60, 0.56))
+	_gable(66.0, 38.0, alive, Color(0.86, 0.52, 0.30))
+	var wood := Color(0.55, 0.42, 0.30)
+	draw_line(Vector2(yard.position.x, yard.end.y), Vector2(yard.end.x, yard.end.y), wood, 2.0)
+	for k in 8:   # Zaunpfosten
+		_dot(Vector2(yard.position.x + k * 16.0, yard.end.y), 3.0, wood)
+	var mast := Vector2(yard.end.x - 8, yard.position.y + 8)
+	if alive:
+		_quad(PackedVector2Array([mast, mast + Vector2(24, -6), mast + Vector2(24, 6), mast + Vector2(0, 4)]), Color(0.36, 0.62, 0.92))
+		for k in 5:   # Hüpfkästchen mit Kreide
+			var r := Rect2(-34 + k * 13, 56, 12, 12)
+			_outline(PackedVector2Array([r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x, r.end.y)]), Color(1, 1, 1, 0.85), 1.5)
+	_ring(mast, 3.5, Color(0.70, 0.70, 0.72), INK, 1.5)
+	draw_rect(Rect2(-9, 36, 18, 8), Color(0.48, 0.32, 0.22))
+
+
+## Bücherei: Haus mit rundem Oberlicht, davor eine Bank und ein Schild mit offenem Buch.
+func _library(alive: bool) -> void:
+	_gable(48.0, 38.0, alive, Color(0.36, 0.46, 0.66))
+	_ring(Vector2(0, -19), 9.0, Color(0.80, 0.88, 0.96) if alive else Color(0.50, 0.50, 0.50), INK, 2.0)
+	_rect_ink(Rect2(-40, 46, 34, 9), Color(0.62, 0.46, 0.30) if alive else Color(0.52, 0.48, 0.44))   # Bank
+	var sc := Vector2(26, 52)
+	_rect_ink(Rect2(sc - Vector2(13, 9), Vector2(26, 18)), Color(0.96, 0.92, 0.80) if alive else Color(0.60, 0.58, 0.55))
+	if alive:   # aufgeschlagenes Buch auf dem Schild
+		draw_rect(Rect2(sc + Vector2(-9, -5), Vector2(8, 10)), Color(0.82, 0.30, 0.30))
+		draw_rect(Rect2(sc + Vector2(1, -5), Vector2(8, 10)), Color(0.82, 0.30, 0.30))
+		draw_line(sc + Vector2(0, -5), sc + Vector2(0, 5), INK, 1.5)
+	draw_rect(Rect2(-8, 36, 16, 8), Color(0.48, 0.32, 0.22))
+
+
+## Dorfladen: Haus mit gestreifter Markise über dem Eingang, Obst- und Gemüsekisten davor.
+func _shop(alive: bool) -> void:
+	_gable(48.0, 36.0, alive, Color(0.80, 0.52, 0.30))
+	var aw := Rect2(-44, 34, 88, 16)
+	for k in 8:
+		var stripe := k % 2 == 0
+		var col := (Color(0.92, 0.32, 0.30) if stripe else Color(0.98, 0.96, 0.92)) if alive else (Color(0.55, 0.50, 0.47) if stripe else Color(0.66, 0.64, 0.60))
+		draw_rect(Rect2(aw.position.x + k * 11.0, aw.position.y, 11, aw.size.y), col)
+	_outline(PackedVector2Array([aw.position, Vector2(aw.end.x, aw.position.y), aw.end, Vector2(aw.position.x, aw.end.y)]), INK, 2.0)
+	var fruit := [Color(0.92, 0.30, 0.26), Color(1.0, 0.70, 0.22), Color(0.50, 0.78, 0.30), Color(0.62, 0.36, 0.70)]
+	for k in 4:   # Kisten
+		var r := Rect2(-42 + k * 22, 54, 18, 14)
+		_rect_ink(r, Color(0.66, 0.50, 0.32) if alive else Color(0.55, 0.51, 0.46), 1.5)
+		if alive:
+			for j in 3:
+				_dot(r.position + Vector2(4 + j * 5, 7), 3.0, fruit[k])
+
+
+## Schmiede: dunkles Dach, großer Kamin mit Glut, davor Amboss und Hufeisen.
+func _smithy(alive: bool) -> void:
+	_gable(44.0, 36.0, alive, Color(0.42, 0.40, 0.44))
+	var chim := Rect2(14, -30, 22, 22)
+	_rect_ink(chim, Color(0.56, 0.36, 0.30) if alive else Color(0.50, 0.47, 0.44))
+	_dot(chim.get_center(), 7.0, Color(0.20, 0.16, 0.14))
+	if alive:
+		_dot(chim.get_center(), 5.0, Color(1.0, 0.55, 0.20))
+		_dot(chim.get_center(), 2.5, Color(1.0, 0.85, 0.40))
+	var a := Vector2(22, 54)   # Amboss
+	var anvil := PackedVector2Array([a + Vector2(-13, -6), a + Vector2(13, -6), a + Vector2(9, 6), a + Vector2(-9, 6)])
+	_quad(anvil, Color(0.30, 0.32, 0.36))
+	_outline(anvil, INK, 1.5)
+	if alive:   # Hufeisen
+		for k in 3:
+			var hp := Vector2(-30 + k * 10, 54)
+			_outline(PackedVector2Array([hp + Vector2(-3, 3), hp + Vector2(-3, -2), hp + Vector2(0, -4), hp + Vector2(3, -2), hp + Vector2(3, 3)]), Color(0.42, 0.42, 0.46), 2.0, false)
+	draw_rect(Rect2(-8, 34, 16, 8), Color(0.30, 0.24, 0.20))
+
+
+## Bauernhaus: großes Haus mit Strohdach, daneben ein Gemüsegarten.
+func _farmhouse(alive: bool) -> void:
+	_tf(Vector2.ZERO, angle)
+	var g := Rect2(-48, 44, 52, 26)
+	draw_rect(g, Color(0.55, 0.40, 0.28) if alive else Color(0.58, 0.54, 0.48))
+	if alive:
+		for k in 3:
+			for j in 6:
+				_dot(g.position + Vector2(6 + j * 8, 6 + k * 8), 3.0, Color(0.40, 0.70, 0.30))
+	_gable(54.0, 40.0, alive, Color(0.86, 0.74, 0.40), 5)
+	draw_rect(Rect2(-8, 38, 16, 8), Color(0.48, 0.32, 0.22))
+
+
+## Scheune: lang, rotes Dach, große Tore vorne, Heuballen daneben.
+func _barn(alive: bool) -> void:
+	_gable(72.0, 42.0, alive, Color(0.72, 0.26, 0.22), 6)
+	var door := Rect2(-22, 40, 44, 10)
+	_rect_ink(door, Color(0.58, 0.32, 0.22) if alive else Color(0.52, 0.48, 0.44))
+	var cross := Color(0.95, 0.92, 0.85) if alive else Color(0.66, 0.64, 0.60)
+	draw_line(door.position, door.end, cross, 2.0)
+	draw_line(Vector2(door.position.x, door.end.y), Vector2(door.end.x, door.position.y), cross, 2.0)
+	for k in 3:   # Heuballen
+		var p := Vector2(86, -26 + k * 26)
+		_ring(p, 12.0, Color(0.92, 0.80, 0.42) if alive else Color(0.66, 0.62, 0.52), INK, 2.0)
+		_ring(p, 5.0, Color(0.84, 0.70, 0.34) if alive else Color(0.60, 0.56, 0.48), Color(0.70, 0.58, 0.30), 1.0)
+
+
+## Honigstand: kleiner Tisch mit gelb-brauner Markise (die Gläser zeichnet VillagerView).
+func _stand(alive: bool) -> void:
+	_tf(Vector2(6, 8), angle)
+	draw_rect(Rect2(-30, -16, 60, 32), SHADOW)
+	_tf(Vector2.ZERO, angle)
+	for k in 6:
+		var stripe := k % 2 == 0
+		var col := (Color(0.98, 0.78, 0.26) if stripe else Color(0.62, 0.42, 0.24)) if alive else (Color(0.62, 0.58, 0.50) if stripe else Color(0.52, 0.48, 0.44))
+		draw_rect(Rect2(-30 + k * 10, -16, 10, 18), col)
+	_rect_ink(Rect2(-28, 2, 56, 12), Color(0.66, 0.50, 0.32) if alive else Color(0.55, 0.51, 0.46), 1.5)
+	_outline(PackedVector2Array([Vector2(-30, -16), Vector2(30, -16), Vector2(30, 2), Vector2(-30, 2)]), INK, 2.0)
+
+
+## Feld: Ackerfurchen; lebendig mit Reihen junger Pflanzen.
+func _field(alive: bool) -> void:
+	_tf()
+	var r := Rect2(-104, -64, 208, 128)
+	draw_rect(r, Color(0.58, 0.44, 0.30) if alive else Color(0.62, 0.58, 0.52))
+	for k in 8:
+		var y := r.position.y + 8.0 + k * 16.0
+		draw_line(Vector2(r.position.x + 4, y), Vector2(r.end.x - 4, y), Color(0.46, 0.34, 0.22) if alive else Color(0.54, 0.50, 0.45), 3.0)
+		if alive:
+			for j in 13:
+				_dot(Vector2(r.position.x + 10 + j * 16, y - 4), 4.5, Color(0.42, 0.72, 0.30) if (j + k) % 3 else Color(0.56, 0.80, 0.34))
+	_outline(PackedVector2Array([r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x, r.end.y)]), Color(0.40, 0.32, 0.24), 2.0)
+
+
+## Wäscheleine: zwei Pfosten, Leine, Wäschekorb (die Wäsche selbst zeichnet VillagerView).
+func _laundry(alive: bool) -> void:
+	_tf()
+	draw_line(Vector2(-64, 0), Vector2(64, 0), Color(0.92, 0.92, 0.90) if alive else Color(0.70, 0.70, 0.68), 1.5)
+	for x in [-64.0, 64.0]:
+		_ring(Vector2(x, 0), 4.5, Color(0.58, 0.44, 0.30) if alive else Color(0.52, 0.48, 0.44), INK, 1.5)
+	_ring(Vector2(-80, 16), 11.0, Color(0.80, 0.66, 0.42) if alive else Color(0.60, 0.56, 0.50), INK, 2.0)

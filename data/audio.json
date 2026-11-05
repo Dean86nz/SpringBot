@@ -16,7 +16,8 @@
 		"open": -16.0,
 		"close": -16.0,
 		"select": -20.0,
-		"awake": -15.0
+		"awake": -15.0,
+		"fest": -16.0
 	},
 	"groups": {
 		"_info": "Klänge, die oft kurz hintereinander kommen. Innerhalb von window_sec nach dem letzten wird jeder weitere um step_db leiser, ab max ganz still. pitch = Tonhöhe zufällig zwischen [min, max].",

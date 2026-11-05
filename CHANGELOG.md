@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.17.1 – Ein belebtes Heimatdorf
+
+- **Größeres Dorf mit verschiedenen Gebäuden:** Kirche mit Turm und Kreuz, Schule mit Pausenhof (Zaun, Fahne, Hüpfkästchen), Bücherei mit Bank
+  und Buch-Schild, Dorfladen mit gestreifter Markise und Obstkisten, Schmiede mit glühendem Kamin und Amboss, Bauernhof (Bauernhaus mit Strohdach
+  und Gemüsegarten, Scheune mit Heuballen) östlich des Weges mit zwei Feldern, Honigstand beim Bienenstock, Wäscheleine, sieben Wohnhäuser.
+  Alle erwachen mit dem Grün (grau und kaputt → bunt, mit Blumen, Feldern voller Pflanzen, Glut in der Schmiede).
+- **Bewohner mit Arbeit:** Der Schmied hämmert am Amboss (Funken), Bauern gehen die Ackerreihen entlang und hacken, die Ladenbesitzerin steht bei ihren Kisten,
+  eine Frau hängt Wäsche Stück für Stück auf, lässt sie trocknen und nimmt sie wieder ab, Kinder rennen über den Platz einem Ball nach,
+  jemand liest auf der Bank vor der Bücherei, der Imker holt im weißen Anzug Honig am Bienenstock (Bienen um ihn herum) und bringt die Gläser zu seinem Stand,
+  andere schlendern zwischen Platz, Laden und Häusern. Zwischendurch machen alle mal eine Pause auf dem Platz.
+- **Hunde und Katzen:** Hunde laufen ihren Menschen nach (mit den Kindern wild herum, Schwanz wedelt), Katzen sitzen lange vor einem Haus und wechseln ab und zu den Platz.
+- **Rückkehr nach und nach:** Jeder Bewohner kommt zurück, sobald sein Haus erwacht ist und der Frühling seinen Wert erreicht hat (zwischen 8 und 93 %).
+  Sie kommen zu Fuß von außerhalb des Dorfes, Haustiere mit ihnen. Ein geladener Spielstand hat die Bewohner gleich an ihrem Platz.
+- **Fest bei 100 %:** Alle kommen auf dem Platz zusammen und hüpfen vor Freude; nach dem Endbildschirm gehen sie wieder an die Arbeit.
+- **Bienen ohne Arbeit:** Ist alles grün, fliegen sie zu Blüten und zu erwachten Bäumen und Büschen in der Nähe des Stocks, naschen dort und kriechen ab und zu in den Stock zum Ausruhen.
+- **Klänge am Ende:** Kein Meilenstein-Jingle mehr bei 100 % und keiner beim Endbildschirm. Beim Fest erklingt nur ein leises Glöckchen (Kenney Interface Sounds, CC0).
+  Andere Klänge zum Anhören in `sound_kandidaten/fest/`.
+- Alles in `data/regions/heimatdorf/region.json` („village“: buildings, props, types, residents).
+
 ## 0.17.0 – Phase 3, Meilenstein 2: Heimatdorf
 
 - In der Mitte der Karte, gleich nördlich vom Start, liegt jetzt das **Heimatdorf**: ein runder, befestigter Dorfplatz mit Brunnen,

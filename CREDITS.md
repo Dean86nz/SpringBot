@@ -24,6 +24,7 @@ Von **Kenney** (www.kenney.nl), Lizenz **CC0 1.0**, übernommen aus dem Projekt 
 | open_1, close_1, select_1 | open_001, close_001, switch_002 | Interface Sounds 1.0 |
 | deny_1 | impactSoft_heavy_000 | Impact Sounds 1.0 |
 | awake_1 bis awake_4 (Objekt erwacht, weiches Rascheln) | cloth1 bis cloth4 | RPG Audio (OpenGameArt: „50 RPG sound effects“) |
+| fest_1 (Dorffest, leises Glöckchen) | glass_006 | Interface Sounds (OpenGameArt: „Interface Sounds“) |
 
 Quellen: https://kenney.nl/assets/music-jingles, https://kenney.nl/assets/interface-sounds, https://kenney.nl/assets/impact-sounds,
-https://opengameart.org/content/50-rpg-sound-effects (CC0, geprüft am 2026-11-05)
+https://opengameart.org/content/50-rpg-sound-effects und https://opengameart.org/content/interface-sounds (CC0, geprüft am 2026-11-05)

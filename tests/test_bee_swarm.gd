@@ -49,3 +49,26 @@ func test_set_count() -> void:
 	assert_eq(s.bees[2].pos, s.hive, "neue Biene startet am Stock")
 	s.set_count(0)
 	assert_eq(s.bees.size(), 0)
+
+
+func test_idle_bees_visit_flowers_and_rest_in_hive() -> void:
+	var g := GroundGrid.new(60, 60)
+	for y in 60:
+		for x in 60:
+			g.set_green(Vector2i(x, y))
+	var s := BeeSwarm.new()
+	s.configure({}, Vector2(30.5, 30.5) * 24.0, 24.0)
+	s.trees = PackedVector2Array([Vector2(36, 30) * 24.0])
+	s.set_count(6)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 2
+	var rested := false
+	var far := 0.0
+	for i in 60 * 40:
+		s.update(1.0 / 60.0, g, rng)
+		for b in s.bees:
+			rested = rested or b.rest > 0.0
+			far = maxf(far, b.pos.distance_to(s.hive))
+	assert_true(rested, "Bienen ruhen ab und zu im Stock")
+	assert_true(far > 5.0 * 24.0, "Bienen fliegen zu Blüten weiter weg, nicht nur um den Stock (%d px)" % int(far))
+	assert_true(far < (s.idle_radius + 3.0) * 24.0, "aber bleiben in der Nähe des Stocks")

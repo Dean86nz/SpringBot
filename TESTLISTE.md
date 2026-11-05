@@ -1,20 +1,26 @@
-# Testliste v0.17.0: Phase 3, Meilenstein 2 (Heimatdorf)
+# Testliste v0.17.1: Ein belebtes Heimatdorf
 
-EXEs: `export/windows/SpringBot_v0.17.0.exe` (Release) und `SpringBot_v0.17.0_DEBUG.exe` (Debug mit Cheat-Menü).
-Cheat-Menü (nur Debug): L3 + R3 eine Sekunde halten, PC F12. Dort „Welt fast fertig (Ende testen)“ zum Testen des Festes.
+EXEs: `export/windows/SpringBot_v0.17.1.exe` (Release) und `SpringBot_v0.17.1_DEBUG.exe` (Debug mit Cheat-Menü).
+Cheat-Menü (nur Debug): L3 + R3 eine Sekunde halten, PC F12.
 
-## Dorf
-1. Gleich nördlich vom Start liegt das Dorf: Dorfplatz mit Brunnen, zwölf graue Häuser mit kaputten Dächern.
-2. Grün um ein Haus: Es erwacht mit buntem Dach, Blumenkästen und Büschen (Rascheln wie bei Bäumen).
-3. Ist rund um den Platz Grün, füllt sich der Brunnen mit Wasser und Blumen.
-4. Der Roboter kommt zwischen allen Häusern durch und fährt um sie herum.
-5. Beim Betreten erscheint „~ Dorfmitte ~“. Auf der Karte (View / M) steht „Dorfmitte“.
+## Gebäude
+1. Rund um den Dorfplatz: Kirche (Turm mit Kreuz), Schule (Pausenhof mit Fahne), Bücherei (Bank, Buch-Schild), Dorfladen (gestreifte Markise, Obstkisten),
+   Schmiede (Kamin, Amboss), Wohnhäuser. Östlich des Weges: Bauernhaus, Scheune mit Heuballen und zwei Felder. Beim Bienenstock: Honigstand. Im Westen: Wäscheleine.
+2. In der grauen Welt ist alles grau und kaputt; im Grün erwacht jedes Gebäude (Felder voller Pflanzen, Glut in der Schmiede).
 
-## Fest (am schnellsten mit der Debug-EXE: Neues Spiel, Cheat-Menü → „Welt fast fertig“, dann den letzten Fleck rechts vom Roboter begrünen)
-6. Bei 100 %: Die Kamera schwenkt zum Dorf, Menschen kommen von allen Seiten zum Platz, Blüten fliegen, Banner „Das Heimatdorf lebt wieder auf!“.
-7. Danach der Endbildschirm „Das Heimatdorf lebt wieder!“. „Weiterfahren“: Kamera zurück zum Roboter, man kann weiterfahren.
-8. Die Menschen bleiben im Dorf und schlendern herum, auch nach Beenden und Weiterspielen.
+## Bewohner (Neues Spiel in der Debug-EXE, oder eigener Spielstand)
+3. Am Anfang ist niemand da. Mit wachsendem Grün kommen die Bewohner nach und nach zu Fuß ins Dorf, sobald ihr Haus erwacht ist.
+4. Schmied hämmert am Amboss (Funken), Bauern hacken auf dem Feld, Ladenbesitzerin steht bei den Kisten, Wäsche wird Stück für Stück aufgehängt und später abgenommen,
+   Kinder jagen auf dem Platz einem Ball nach, jemand liest vor der Bücherei, der Imker im weißen Anzug holt Honig am Stock und bringt Gläser zum Stand.
+5. Hunde laufen mit ihren Menschen, Katzen sitzen vor den Häusern.
+
+## Fest und Klang
+6. Bei 100 % treffen sich alle auf dem Platz und hüpfen. Nur ein leises Glöckchen, keine Melodien mehr. Nach „Weiterfahren“ gehen alle wieder an die Arbeit.
+7. Gefällt dir das Glöckchen? Andere zum Anhören in `sound_kandidaten/fest/`.
+
+## Bienen
+8. Ist alles grün, fliegen die Bienen zu Blüten und Bäumen nahe dem Stock, verweilen dort und verschwinden ab und zu im Stock.
 
 ## Allgemein
-9. Dein Spielstand wird übernommen. War er schon fertig, sind die Menschen gleich da.
-10. Gefallen dir Dorf, Häuser und Menschen? Zu klein, zu groß, zu viele, zu wenige?
+9. Läuft es im Dorf flüssig auf dem Ally?
+10. Fehlt etwas im Dorf, ist etwas zu viel oder zu klein?
