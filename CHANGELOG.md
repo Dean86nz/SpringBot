@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.2 – Aufblühen wieder hörbar
+
+- Das Rascheln beim Aufblühen von Bäumen und Büschen war zu leise: -15 statt -24 dB (der alte Jingle hatte -12 dB).
+- Kurz hintereinander wird jeder weitere Klang um 4 statt 5 dB leiser, ab dem dritten bleibt es still wie bisher.
+- Werte in `data/audio.json` („sfx_level_db“ → „awake“, „groups“ → „awake“).
+
 ## 0.14.1 – Schönere Einleitung
 
 - Jede Seite der Einleitung hat jetzt ein bewegtes Bild im Stil des Spiels:

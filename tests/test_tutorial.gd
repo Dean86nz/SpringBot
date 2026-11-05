@@ -71,4 +71,4 @@ func test_bloom_sound_gets_quieter_then_silent() -> void:
 	assert_true(Sfx.group_db(1, step, max_n) < 0.0, "zweiter kurz danach: leiser")
 	assert_true(is_inf(Sfx.group_db(max_n, step, max_n)), "viele hintereinander: still")
 	var level := float(Game.load_json("res://data/audio.json")["sfx_level_db"]["awake"])
-	assert_true(level <= -20.0, "Aufblühen deutlich leiser als früher (-12 dB)")
+	assert_true(level < -12.0, "Aufblühen leiser als der alte Jingle (-12 dB)")
