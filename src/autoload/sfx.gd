@@ -3,6 +3,8 @@ extends Node
 ## Effekte liegen unter assets/audio/sfx/<id>_<n>.ogg, mehrere Dateien = Varianten, dazu leichte
 ## Tonhöhen-Variation. Musik: mehrere Stücke von ruhig nach voller; je mehr Fläche blüht,
 ## desto weiter wird zum nächsten Stück übergeblendet (Schwellen in data/audio.json).
+## Klänge, die oft kurz hintereinander kommen (Bäume erwachen), fasst play_grouped zusammen:
+## jeder weitere innerhalb des Zeitfensters leiser, ab einer Höchstzahl gar nicht mehr ("groups").
 ## Rein kosmetisch, keine Spiellogik.
 
 const AUDIO_PATH := "res://data/audio.json"
@@ -22,6 +24,7 @@ var _players: Array[AudioStreamPlayer] = []
 var _next := 0
 var _last_play: Dictionary = {}
 var _coverage := 0.0
+var _groups: Dictionary = {}            # id → {last: ms, n: Klänge im laufenden Fenster}
 
 
 func _ready() -> void:
@@ -68,7 +71,7 @@ func _ensure_bus(bus_name: String, db: float) -> void:
 	AudioServer.set_bus_volume_db(idx, db)
 
 
-func play(id: String, pitch: float = 1.0, pitch_jitter: float = JITTER) -> void:
+func play(id: String, pitch: float = 1.0, pitch_jitter: float = JITTER, db_add: float = 0.0) -> void:
 	var list: Array = _streams.get(id, [])
 	if list.is_empty():
 		return
@@ -76,8 +79,31 @@ func play(id: String, pitch: float = 1.0, pitch_jitter: float = JITTER) -> void:
 	_next = (_next + 1) % VOICES
 	p.stream = list[randi() % list.size()]
 	p.pitch_scale = pitch * (1.0 + randf_range(-pitch_jitter, pitch_jitter))
-	p.volume_db = float(cfg.get("sfx_level_db", {}).get(id, -6.0))
+	p.volume_db = float(cfg.get("sfx_level_db", {}).get(id, -6.0)) + db_add
 	p.play()
+
+
+## Zusammengefasst: Kommt der Klang innerhalb von window_sec nach dem letzten wieder, wird er um
+## step_db leiser, ab dem max-ten bleibt er still, bis window_sec lang Ruhe war.
+func play_grouped(id: String) -> void:
+	var g: Dictionary = cfg.get("groups", {}).get(id, {})
+	var now := Time.get_ticks_msec()
+	var st: Dictionary = _groups.get(id, {"last": -1000000, "n": 0})
+	if now - int(st["last"]) > int(float(g.get("window_sec", 2.0)) * 1000.0):
+		st["n"] = 0
+	var db := group_db(int(st["n"]), float(g.get("step_db", 4.0)), int(g.get("max", 3)))
+	st["n"] = int(st["n"]) + 1
+	st["last"] = now
+	_groups[id] = st
+	if is_inf(db):
+		return
+	var pr: Array = g.get("pitch", [1.0, 1.0])
+	play(id, randf_range(float(pr[0]), float(pr[1])), 0.0, db)
+
+
+## Abschwächung in dB für den n-ten Klang (ab 0) im Fenster; -INF = gar nicht spielen.
+static func group_db(n: int, step_db: float, max_n: int) -> float:
+	return -INF if n >= max_n else -step_db * n
 
 
 ## Wie play, aber höchstens einmal je min_gap Sekunden (Echtzeit).

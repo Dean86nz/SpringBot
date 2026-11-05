@@ -3,6 +3,8 @@ extends CanvasLayer
 ## Prozentanzeige der begrünten Fläche (oben Mitte), Pollen (oben links),
 ## Tastenhinweis (unten links) und Versionsnummer (unten rechts).
 ## Unter der Prozentanzeige erscheint beim Betreten eines Gebiets kurz und dezent sein Name.
+## Unten in der Mitte erscheinen Hinweise (Einführung) in einem dezenten Kasten; die Tasten im
+## Hinweis und unten links passen sich dem Gerät an (KeyHints).
 
 var _percent := Label.new()
 var _pollen := Label.new()
@@ -11,6 +13,12 @@ var _version := Label.new()
 var _region := Label.new()
 var _region_tw: Tween
 var banner_cfg: Dictionary = {}   # Zeiten der Namenseinblendung (regions.json "banner")
+const TIP_WIDTH := 1000.0
+var _tip_panel := PanelContainer.new()
+var _tip := Label.new()
+var _tip_raw := ""        # Hinweis mit {Platzhaltern}, damit er beim Gerätewechsel neu gefüllt wird
+var _tip_left := 0.0      # Sekunden, bis der Hinweis ausblendet
+var _keys_version := -1
 
 
 func _ready() -> void:
@@ -44,7 +52,6 @@ func _ready() -> void:
 	_hint.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	_hint.offset_left = 24
 	_hint.offset_bottom = -10
-	_hint.text = "Y / Tab: Skilltree   ·   Start / Esc: Pause"
 	_hint.add_theme_font_size_override("font_size", 22)
 	_hint.add_theme_color_override("font_color", Color(1, 1, 1, 0.9))
 	_hint.add_theme_color_override("font_outline_color", Color(0.3, 0.3, 0.35))
@@ -61,6 +68,67 @@ func _ready() -> void:
 	_version.add_theme_color_override("font_outline_color", Color(0.3, 0.3, 0.35))
 	_version.add_theme_constant_override("outline_size", 6)
 	add_child(_version)
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.16, 0.24, 0.18, 0.78)
+	style.set_corner_radius_all(16)
+	style.content_margin_left = 28
+	style.content_margin_right = 28
+	style.content_margin_top = 14
+	style.content_margin_bottom = 14
+	_tip_panel.add_theme_stylebox_override("panel", style)
+	_tip_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tip_panel.modulate.a = 0.0
+	# Zeile über die ganze Breite unten, der Kasten darin mittig
+	var row := CenterContainer.new()
+	row.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	row.offset_top = -190
+	row.offset_bottom = -56
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(row)
+	_tip.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_tip.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_tip.add_theme_font_size_override("font_size", 28)
+	_tip.add_theme_color_override("font_color", Color(1, 1, 0.94))
+	_tip_panel.add_child(_tip)
+	row.add_child(_tip_panel)
+
+
+func _process(delta: float) -> void:
+	if _keys_version != KeyHints.version:
+		_keys_version = KeyHints.version
+		_hint.text = KeyHints.fill("{tree}: Skilltree   ·   {pause}: Pause")
+		_set_tip_text()
+	if _tip_left > 0.0:
+		_tip_left -= delta
+		_tip_panel.modulate.a = minf(_tip_panel.modulate.a + delta * 2.5, 1.0)
+	elif _tip_panel.modulate.a > 0.0:
+		_tip_panel.modulate.a = maxf(_tip_panel.modulate.a - delta * 1.5, 0.0)
+
+
+## Hinweis einblenden (text mit {Tasten}), nach sec Sekunden blendet er aus.
+func show_tip(text: String, sec: float) -> void:
+	_tip_raw = text
+	_set_tip_text()
+	_tip_left = sec
+
+
+## Lange Hinweise umbrechen (höchstens TIP_WIDTH breit), kurze bleiben einzeilig und schmal.
+func _set_tip_text() -> void:
+	_tip.text = KeyHints.fill(_tip_raw)
+	var w := _tip.get_theme_font("font").get_string_size(_tip.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 28).x
+	_tip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if w > TIP_WIDTH else TextServer.AUTOWRAP_OFF
+	_tip.custom_minimum_size = Vector2(TIP_WIDTH if w > TIP_WIDTH else 0.0, 0.0)
+	_tip.reset_size()
+	_tip_panel.reset_size()
+
+
+## Hinweis vorzeitig ausblenden (z. B. wenn der Spieler schon tut, was er sagt).
+func hide_tip() -> void:
+	_tip_left = 0.0
+
+
+func tip_visible() -> bool:
+	return _tip_left > 0.0 or _tip_panel.modulate.a > 0.0
 
 
 func set_coverage(fraction: float) -> void:

@@ -1,0 +1,45 @@
+{
+	"_info": "Einführung und Hinweise. intro = Bilder der Einleitung beim Neuen Spiel (A weiter, B überspringen). hints = Hinweise im Spiel, jeder genau einmal je Spielstand; delay_sec = Wartezeit, show_sec = wie lange sichtbar. {name} wird durch die Taste aus keys ersetzt, passend zum Gerät (pad = Controller, keys = Tastatur). controls = Seite „Steuerung“ im Pause-Menü.",
+	"intro": [
+		{"title": "Die graue Welt", "text": "Ein langer, kalter Winter hat alle Farben verschluckt.\nDie Wiesen sind grau, die Bäume kahl, die Teiche ausgetrocknet."},
+		{"title": "Ein kleiner Roboter", "text": "Ein kleiner Gärtner-Roboter hat den Winter überstanden.\nÜberall, wo er hinfährt, sprießt wieder Gras – und mit der Zeit Blumen."},
+		{"title": "Bring den Frühling zurück", "text": "Grünes Land bringt Pollen. Damit wird der Roboter besser,\nund bald helfen ihm Bienen. Ziel: Die ganze Welt soll blühen."}
+	],
+	"hints": {
+		"move": {"text": "{move}: fahren. Wo der Roboter fährt, wird es grün.", "delay_sec": 1.0, "show_sec": 9.0, "done_px": 400},
+		"tree": {"text": "Genug Pollen für die erste Verbesserung!  {tree}: Skilltree öffnen", "delay_sec": 0.5, "show_sec": 14.0},
+		"tree_help": {"text": "{select}: wählen   ·   {buy}: kaufen   ·   {close}: schließen", "show_sec": 10.0},
+		"bees": {"text": "Die Bienen sind da! Sie fliegen vom Bienenstock zu grauen Stellen und lassen dort Grün erblühen – auch weit weg vom Roboter.", "delay_sec": 1.0, "show_sec": 11.0}
+	},
+	"keys": {
+		"move": {"pad": "Linker Stick", "keys": "WASD / Pfeiltasten"},
+		"tree": {"pad": "Y", "keys": "Tab"},
+		"pause": {"pad": "Start", "keys": "Esc"},
+		"select": {"pad": "Linker Stick / Steuerkreuz", "keys": "Pfeiltasten / Mausklick"},
+		"buy": {"pad": "A", "keys": "Enter / zweiter Klick"},
+		"close": {"pad": "B", "keys": "Esc / Tab"},
+		"pan": {"pad": "Rechter Stick", "keys": "Maus ziehen / I J K L"},
+		"zoom": {"pad": "LB / RB", "keys": "Mausrad / Q E"},
+		"next": {"pad": "A", "keys": "Enter"},
+		"skip": {"pad": "B", "keys": "Esc"},
+		"confirm": {"pad": "A", "keys": "Enter"},
+		"back": {"pad": "B", "keys": "Esc"},
+		"fullscreen": {"pad": "–", "keys": "F11"}
+	},
+	"controls": [
+		{"head": "Im Spiel"},
+		{"key": "move", "text": "Fahren und begrünen"},
+		{"key": "tree", "text": "Skilltree öffnen"},
+		{"key": "pause", "text": "Pause"},
+		{"head": "Im Skilltree"},
+		{"key": "select", "text": "Verbesserung wählen"},
+		{"key": "buy", "text": "Kaufen"},
+		{"key": "pan", "text": "Ansicht schieben"},
+		{"key": "zoom", "text": "Zoomen"},
+		{"key": "close", "text": "Schließen"},
+		{"head": "Menüs"},
+		{"key": "confirm", "text": "Auswählen"},
+		{"key": "back", "text": "Zurück"},
+		{"key": "fullscreen", "text": "Vollbild an / aus"}
+	]
+}

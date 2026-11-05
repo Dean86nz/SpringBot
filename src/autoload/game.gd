@@ -3,6 +3,7 @@ extends Node
 
 const BALANCE_PATH := "res://data/balance.json"
 const SKILLTREE_PATH := "res://data/skilltree.json"
+const TUTORIAL_PATH := "res://data/tutorial.json"
 
 var balance: Dictionary = {}
 
@@ -10,6 +11,7 @@ var balance: Dictionary = {}
 func _ready() -> void:
 	InputSetup.apply()
 	balance = load_json(BALANCE_PATH)
+	KeyHints.setup(load_json(TUTORIAL_PATH).get("keys", {}))
 	# Exportierte Builds (Ally) starten im Vollbild; im Editor bleibt es ein Fenster.
 	if OS.has_feature("template"):
 		get_window().mode = Window.MODE_FULLSCREEN
@@ -44,6 +46,7 @@ static func load_json(path: String) -> Dictionary:
 
 
 func _input(event: InputEvent) -> void:
+	KeyHints.observe(event)   # Tastennamen passend zum zuletzt benutzten Gerät
 	if event.is_action_pressed("toggle_fullscreen"):
 		var w := get_window()
 		w.mode = Window.MODE_WINDOWED if w.mode == Window.MODE_FULLSCREEN else Window.MODE_FULLSCREEN

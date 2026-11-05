@@ -9,6 +9,8 @@ extends Node2D
 ## Gebiete (data/regions.json) geben Boden und Objekten ihren Charakter; beim Betreten eines
 ## Gebiets blendet das HUD dezent seinen Namen ein.
 ## Tiere (data/animals.json) leben als Deko nahe der Kamera über dem Grün (Animals, AnimalView).
+## Einführung (data/tutorial.json): beim Neuen Spiel eine kurze Einleitung (IntroScreen), im Spiel
+## Hinweise genau einmal im richtigen Moment (Tutorial), Tasten passend zum Gerät (KeyHints).
 ## Läuft auch während der Pause (Menü-Eingaben), Roboter und Boden pausieren.
 ## Rahmen: Start mit Titelbildschirm (dahinter der gespeicherte Garten), Speichern alle
 ## paar Sekunden und bei jedem Menü, Endbildschirm, sobald die ganze Welt blüht.
@@ -56,6 +58,10 @@ var _tree := SkillTreeMenu.new()
 var _pause := PauseMenu.new()
 var _title := TitleScreen.new()
 var _end := EndScreen.new()
+var _intro := IntroScreen.new()
+var _tutorial: Tutorial
+var _tip_id := ""            # gerade sichtbarer Hinweis
+var _tip_from := Vector2.ZERO   # Roboterposition beim Einblenden (Fahr-Hinweis endet nach etwas Weg)
 var _store := SaveStore.new()
 var _play_sec := 0.0         # Spielzeit in echten Sekunden (ohne Pause und Menüs)
 var _world_sec := 0.0        # Spielzeit der Welt (läuft mit Zeit ×10 schneller), für „seit wann grün“
@@ -154,6 +160,12 @@ func _ready() -> void:
 	add_child(_hud)
 	_tree.setup(skills)
 	add_child(_tree)
+	var tut_data := Game.load_json(Game.TUTORIAL_PATH)
+	_tutorial = Tutorial.new(tut_data)
+	_pause.controls = tut_data.get("controls", [])
+	_intro.setup(tut_data.get("intro", []))
+	_intro.finished.connect(_start_playing)
+	add_child(_intro)
 	_pause.title_requested.connect(show_title)
 	_pause.quit_requested.connect(quit)
 	add_child(_pause)
@@ -163,7 +175,8 @@ func _ready() -> void:
 	_title.new_game_requested.connect(func() -> void:
 		reset_game()
 		save()
-		_start_playing())
+		_title.close()
+		_intro.open())
 	_title.quit_requested.connect(quit)
 	add_child(_title)
 	if OS.is_debug_build():
@@ -203,6 +216,7 @@ func _process(delta: float) -> void:
 	_animals.update(delta, _view_rect(), _robot.position)
 	if _region_watch.update(_regions.at_px(_robot.position, cell_px), real):
 		_hud.show_region(_regions.name_of(_region_watch.current))
+	_update_tips(real)
 	_autosave += real
 	if _autosave >= Game.num("save/autosave_sec", 30.0):
 		save()
@@ -250,9 +264,32 @@ func _wake_objects(animate: bool) -> void:
 			var big := not o.quiet
 			_petals.burst(o.position, int(_obj_cfg.get("awake_petals" if big else "wayside_petals", 10)), Vector2(60, 220), Vector2(0.6, 1.2), Vector2(6, 10))
 			if big:
-				Sfx.play_throttled("awake", 0.15, randf_range(0.9, 1.15))
+				Sfx.play_grouped("awake")
 	for k in _ponds.size():
 		_animals.ponds[k]["awake"] = _ponds[k].awake
+
+
+## Hinweise der Einführung: der fällige wird eingeblendet; der Fahr-Hinweis verschwindet,
+## sobald der Roboter ein Stück gefahren ist, der Skilltree-Hinweis beim Öffnen des Skilltrees.
+func _update_tips(delta: float) -> void:
+	if _tip_id == "move" and _robot.position.distance_to(_tip_from) > float(_tutorial.hints.get("move", {}).get("done_px", 400.0)):
+		_hud.hide_tip()
+	if not _hud.tip_visible():
+		_tip_id = ""
+	var ctx := {"can_buy": not _tutorial.seen.has("tree") and _first_buy_possible(), "bees": _bees.bees.size(),
+		"quiet": _tip_id != "" or not _hud.visible or MenuKit.any_open(get_tree())}
+	var id := _tutorial.due(ctx, delta)
+	if id != "":
+		_tip_id = id
+		_tip_from = _robot.position
+		_hud.show_tip(_tutorial.text(id), _tutorial.show_sec(id))
+
+
+func _first_buy_possible() -> bool:
+	for id in skills.order:
+		if skills.can_buy(id):
+			return true
+	return false
 
 
 ## Sichtbarer Ausschnitt der Welt in Pixeln.
@@ -317,8 +354,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 	elif _pause.visible:
 		if event.is_action_pressed("pause") or event.is_action_pressed("ui_cancel"):
-			_pause.close()
-			Sfx.play("close")
+			if _pause.on_subpage() and not event.is_action_pressed("pause"):
+				_pause.back()
+			else:
+				_pause.close()
+				Sfx.play("close")
 			get_viewport().set_input_as_handled()
 	elif MenuKit.any_open(get_tree()):
 		return
@@ -326,6 +366,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		_robot.input_enabled = false
 		_tree.open()
 		Sfx.play("open")
+		_tutorial.first("tree")   # schon gefunden: der Hinweis zum Öffnen kommt nicht mehr
+		if _tip_id == "tree":
+			_hud.hide_tip()
+		if _tutorial.first("tree_help"):
+			_tree.show_help(_tutorial.text("tree_help"), _tutorial.show_sec("tree_help"))
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("pause"):
 		save()
@@ -348,6 +393,9 @@ func reset_game() -> void:
 	_end_wait = -1.0
 	_bees.set_count(0)
 	_animals.clear()
+	_tutorial.reset()
+	_tip_id = ""
+	_hud.hide_tip()
 	_robot.position = _start_px
 	_robot.velocity = Vector2.ZERO
 	_camera.reset_smoothing()
@@ -410,6 +458,7 @@ func save() -> void:
 		"robot": [_robot.position.x, _robot.position.y],
 		"grid": {"w": grid.width, "h": grid.height},
 		"skills": skills.to_dict(),
+		"tutorial": _tutorial.to_list(),
 	}
 	var cells := grid.cells.duplicate()
 	var since := grid.since.duplicate()
@@ -438,6 +487,7 @@ func load_game(data: Dictionary) -> void:
 		return
 	grid.load_since(Marshalls.base64_to_raw(str(g.get("since", ""))))
 	skills.from_dict(data.get("skills", {}))
+	_tutorial.from_list(data.get("tutorial", []))   # alte Spielstände: Hinweise kommen noch einmal
 	_play_sec = float(data.get("play_sec", 0.0))
 	_world_sec = float(data.get("world_sec", _play_sec))
 	grid.time_sec = _world_sec

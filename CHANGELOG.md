@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.14.0 – Einführung am Spielstart und sanftere Klänge
+
+- Einleitung beim Neuen Spiel: drei Bilder (graue Welt, kleiner Roboter, Ziel), von Grau zu Grün. A / Enter: weiter, B / Esc: überspringen.
+- Hinweise im Spiel, jeder genau einmal je Spielstand, dezent unten in der Mitte:
+  - zu Beginn: wie man fährt (verschwindet, sobald der Roboter ein Stück gefahren ist),
+  - sobald der erste Kauf möglich ist: wie man den Skilltree öffnet,
+  - beim ersten Öffnen des Skilltrees: wählen, kaufen, schließen (heller Kasten oben),
+  - sobald es Bienen gibt: was sie tun.
+  Welche Hinweise schon kamen, steht im Spielstand. Ältere Spielstände bekommen die Hinweise einmal.
+- Tasten passend zum Gerät: Wer zuletzt den Controller benutzt hat, sieht „A“, „Y“, „Linker Stick“, sonst „Enter“, „Tab“, „WASD“. Gilt für Hinweise, die Zeile unten links, die Tastenzeile im Skilltree und die Einleitung.
+- Pause-Menü: neuer Punkt „Steuerung“ mit allen Tasten zum Nachlesen; B / Esc führt zurück ins Pause-Menü.
+- Aufblühen klingt sanft: weiches Rascheln (4 Varianten, Kenney RPG Audio, CC0) statt Jingle, deutlich leiser (-24 statt -12 dB).
+  Blühen mehrere Objekte kurz hintereinander auf, wird jeder weitere Klang leiser und ab dem dritten still, bis 2,5 s Ruhe war.
+  Werte in `data/audio.json` („groups“). Andere Klänge zum Anhören in `sound_kandidaten/aufbluehen/`.
+- Alle Texte und Tastennamen in `data/tutorial.json`.
+
 ## 0.13.0 – Phase 2, Meilenstein 6: Gebiete
 
 - Fünf Gebiete mit eigenem Charakter, Grenzen natürlich geschwungen und weich ineinander übergehend:

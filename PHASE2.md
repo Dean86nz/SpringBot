@@ -21,5 +21,8 @@ Arbeitsweise wie bisher: ein Meilenstein, dann anhalten, Release- und Debug-EXE,
    (erledigt in 0.12.0)
 6. **Gebiete mit eigenem Charakter:** 4 bis 6 Gebiete (z. B. Wiese, Hügel, Seenlandschaft, Wald) mit eigener Mischung aus Pflanzen, Objekten und Farben, auch eigener Blumendichte. Name dezent einblenden beim Betreten.
    (erledigt in 0.13.0: Blumental, Stiller Wald, Seenland, Felsenhügel, Obstgarten)
+7. **Eingeschoben: Einführung am Spielstart und sanftere Klänge:** kurze Einleitung beim Neuen Spiel (A weiter, B überspringen),
+   Hinweise genau einmal im richtigen Moment (fahren, Skilltree öffnen, im Skilltree wählen/kaufen/schließen, Bienen),
+   Tasten passend zum Gerät, „Steuerung“ im Pause-Menü, Aufblüh-Klang sanft und zusammengefasst. (erledigt in 0.14.0)
 
 Reihenfolge: Wege und Wasser kommen vor den Objekten, weil Objekte (Wegrand-Details, Teiche, Brücken) sich an ihnen ausrichten.

@@ -4,7 +4,7 @@ extends SceneTree
 ##   Godot_v4.7.2-stable_win64_console.exe --path . -s tests/screenshot.gd -- <ausgabe.png> [frames] [plan]
 ##   plan: "aktion:von:bis" getrennt durch Komma, z. B. "move_right:2:60,move_down:40:120" ("-" = nichts)
 ##   Das Spiel startet mit dem Titel: im Plan zuerst "ui_accept:10:11" (Spielen / Weiterspielen).
-##   CHEATS=1 öffnet bei Bild 5 das Cheat-Menü, POLLEN=n gibt bei Bild 5 Pollen,
+##   CHEATS=1 öffnet bei Bild 5 das Cheat-Menü, POLLEN=n gibt bei Bild 5 (oder POLLEN_AT) Pollen,
 ##   MAXALL=1 setzt bei Bild 20 alle Upgrades auf Maximum, TIMEX=n beschleunigt ab Bild 20 die Zeit,
 ##   ROBOT=x,y setzt den Roboter bei Bild 15 auf diese Zelle.
 ##   LUSH=1 spult bei Bild 15 die Weltzeit um 2000 s vor (alles Grün üppig, bunte Blumen).
@@ -44,7 +44,8 @@ func _process(_delta: float) -> bool:
 			_send(s["action"], true)
 		elif _frames == s["to"]:
 			_send(s["action"], false)
-	if _frames == 5 and OS.get_environment("POLLEN") != "":
+	var pollen_at := int(OS.get_environment("POLLEN_AT")) if OS.get_environment("POLLEN_AT") != "" else 5
+	if _frames == pollen_at and OS.get_environment("POLLEN") != "":
 		current_scene.skills.pollen += float(OS.get_environment("POLLEN"))
 	if _frames == 20 and OS.get_environment("MAXALL") == "1":
 		current_scene.skills.max_all()

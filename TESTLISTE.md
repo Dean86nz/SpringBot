@@ -1,21 +1,21 @@
-# Testliste Phase 2, Meilenstein 6 (v0.13.0)
+# Testliste v0.14.0: Einführung am Spielstart und sanftere Klänge
 
-EXEs: `export/windows/SpringBot_v0.13.0.exe` (Release) und `SpringBot_v0.13.0_DEBUG.exe` (Debug mit Cheat-Menü).
-Dein Spielstand wird übernommen. Cheat-Menü (nur Debug): L3 + R3 eine Sekunde halten, PC F12.
+EXEs: `export/windows/SpringBot_v0.14.0.exe` (Release) und `SpringBot_v0.14.0_DEBUG.exe` (Debug mit Cheat-Menü).
+Cheat-Menü (nur Debug): L3 + R3 eine Sekunde halten, PC F12.
+Achtung: Punkt 1 braucht „Neues Spiel“ und löscht den Garten. Zum Ausprobieren am besten die Debug-EXE nehmen (eigener Spielstand).
 
-## Gebiete
-1. Nach „Weiterspielen“ erscheint unter der Prozentanzeige kurz der Name des Gebiets, in dem der Roboter steht (Start: „~ Blumental ~“).
-2. Fahre in jedes Gebiet. Beim Betreten erscheint der Name dezent und verschwindet wieder. An der Grenze hin und her fahren: kein Flackern.
-   - Norden: **Stiller Wald**, viele Bäume, dunkleres Grün, wenig Blumen
-   - Westen hinter dem Fluss: **Seenland**, viele Teiche, bläuliches Grün, blaue Blumen
-   - Nordosten: **Felsenhügel**, viele Felsen und Tannen, gelbliches Grün, violette Blumen
-   - Südosten: **Obstgarten**, viele Obstbäume, rosa Blumen
-   - Mitte und Süden: **Blumental**, sehr viele Blumen, kaum Bäume
-3. Die Gebiete gehen weich ineinander über, ohne harte Kanten.
-4. Bunte Blumen kommen wie bisher erst, wenn eine Stelle schon länger grün ist. Im Blumental sollte es dann deutlich mehr blühen als im Wald.
-5. Im Wald ist es dichter: Kommt der Roboter überall gut zwischen den Bäumen durch?
-6. Gefallen dir die Namen? Passen Farben und Dichte, oder soll ein Gebiet stärker oder schwächer auffallen?
+## Einführung
+1. Titel → „Neues Spiel“: Es kommen drei Bilder (grau → grün). A weiter, beim letzten „Los geht's!“. Nochmal neu beginnen und B drücken: überspringt alles.
+2. Kurz nach dem Start erscheint unten „Linker Stick: fahren …“. Nach ein paar Metern Fahrt blendet er aus.
+3. Sobald genug Pollen für den ersten Kauf da sind: Hinweis, wie man den Skilltree öffnet (Y).
+4. Beim ersten Öffnen des Skilltrees: heller Kasten oben mit wählen / kaufen / schließen. Beim zweiten Öffnen nicht mehr.
+5. Sobald die erste Biene da ist (nach dem Skilltree schließen): Hinweis, was Bienen tun.
+6. Jeder Hinweis kommt nur einmal, auch nach Beenden und Weiterspielen nicht nochmal.
 
-## Allgemein
-7. Bäume, Büsche, Felsen, Teiche und Wegrand sehen aus wie in 0.12.0 (sie werden jetzt schneller gezeichnet).
-8. Läuft es auf dem Ally weiterhin flüssig, auch im Wald?
+## Tasten je Gerät
+7. Mit Controller stehen überall Controller-Tasten (A, Y, Start, Linker Stick). Kurz eine Taste auf der Tastatur drücken: Die Anzeigen wechseln auf Tab, Esc, WASD. Wieder am Controller: zurück.
+8. Pause → „Steuerung“: alle Tasten zum Nachlesen, passend zum Gerät. B führt zurück ins Pause-Menü.
+
+## Klang
+9. Bäume und Büsche blühen jetzt mit einem leisen, weichen Rascheln auf. Blühen viele auf einmal (z. B. mit Bienen), wird es leiser statt lauter.
+10. Gefällt dir das Rascheln, oder lieber ein Glöckchen? Zum Anhören: `sound_kandidaten/aufbluehen/`.

@@ -57,6 +57,10 @@ var _free := false               # Ansicht frei geschoben statt der Auswahl folg
 var _bounds := Rect2()           # alle Knoten plus Rand, in Baum-Pixeln
 var _press := false              # linke Maustaste gedrückt
 var _dragged := 0.0              # Mausweg seit dem Drücken
+var _keys_hint := Label.new()    # Tastenzeile unten, passend zum Gerät
+var _keys_version := -1
+var _help := Label.new()         # Hilfe beim ersten Öffnen (Einführung)
+var _help_left := 0.0
 
 
 func setup(tree: SkillTree) -> void:
@@ -123,13 +127,35 @@ func _build_info() -> void:
 	_info_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_info_desc.add_theme_color_override("font_color", Color(0.85, 0.90, 0.85))
 	_info_effect.add_theme_color_override("font_color", Color(0.72, 0.95, 0.60))
-	var hint := Label.new()
-	hint.text = "Linker Stick / D-Pad: wählen  ·  Rechter Stick: schieben  ·  LB / RB: zoomen  ·  A: kaufen  ·  B: schließen\n" \
-		+ "PC: Pfeile wählen  ·  Maus ziehen schiebt  ·  Mausrad / Q / E zoomt  ·  Enter oder zweiter Klick kauft  ·  Esc schließt"
-	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hint.add_theme_font_size_override("font_size", 18)
-	hint.modulate = Color(1, 1, 1, 0.65)
-	box.add_child(hint)
+	_keys_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_keys_hint.add_theme_font_size_override("font_size", 18)
+	_keys_hint.modulate = Color(1, 1, 1, 0.65)
+	box.add_child(_keys_hint)
+	# Hilfe beim ersten Öffnen: großer, heller Kasten unter der Kopfzeile
+	var help_box := CenterContainer.new()
+	help_box.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	help_box.offset_top = 96
+	help_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(help_box)
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.98, 0.93, 0.62, 0.95)
+	style.set_corner_radius_all(16)
+	style.content_margin_left = 28
+	style.content_margin_right = 28
+	style.content_margin_top = 12
+	style.content_margin_bottom = 12
+	_help.add_theme_stylebox_override("normal", style)
+	_help.add_theme_font_size_override("font_size", 28)
+	_help.add_theme_color_override("font_color", Color(0.22, 0.26, 0.18))
+	_help.modulate.a = 0.0
+	help_box.add_child(_help)
+
+
+## Hilfe einblenden (text mit {Tasten}), nach sec Sekunden blendet sie aus.
+func show_help(text: String, sec: float) -> void:
+	_help.set_meta("raw", text)
+	_help.text = KeyHints.fill(text)
+	_help_left = sec
 
 
 func open() -> void:
@@ -146,9 +172,20 @@ func open() -> void:
 
 func close() -> void:
 	visible = false
+	_help_left = 0.0
+	_help.modulate.a = 0.0
 
 
 func _process(delta: float) -> void:
+	if _keys_version != KeyHints.version:
+		_keys_version = KeyHints.version
+		_keys_hint.text = KeyHints.fill("{select}: wählen  ·  {pan}: schieben  ·  {zoom}: zoomen  ·  {buy}: kaufen  ·  {close}: schließen")
+		_help.text = KeyHints.fill(str(_help.get_meta("raw", "")))
+	if _help_left > 0.0:
+		_help_left -= delta
+		_help.modulate.a = minf(_help.modulate.a + delta * 3.0, 1.0)
+	elif _help.modulate.a > 0.0:
+		_help.modulate.a = maxf(_help.modulate.a - delta * 1.5, 0.0)
 	if not visible:
 		return
 	_time += delta
