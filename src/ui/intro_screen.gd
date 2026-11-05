@@ -2,7 +2,7 @@ class_name IntroScreen
 extends CanvasLayer
 ## Kurze Einleitung beim Neuen Spiel: drei Seiten mit bewegtem Bild (IntroArt), Überschrift und
 ## ein, zwei Sätzen (data/tutorial.json, "intro"). A / Enter / Klick: weiter, B / Esc: überspringen.
-## Die Seiten erzählen den Frühling im Kleinen: grau, der Roboter erwacht, alles blüht.
+## Die Seiten erzählen die Geschichte im Kleinen: grau, der Roboter erwacht, alles blüht.
 ## Seitenwechsel blenden weich über; nach „Los geht's!“ (nicht beim Überspringen) gibt es Blütenregen.
 
 signal finished

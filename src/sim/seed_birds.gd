@@ -4,6 +4,8 @@ extends RefCounted
 ## hinaus und säen im Flug einen geraden Streifen Grün. Den Streifen wählen sie so, dass er möglichst
 ## viel graues Land kreuzt (einige Versuche, der beste gewinnt). Nach ein paar Streifen kehren sie heim
 ## und rasten kurz. Ist alles grün, ziehen sie gemächliche Runden um das Häuschen und rasten öfter.
+## Dürre Stellen (wo Ausbreitung und Bienen nichts schaffen) zählen bei der Wahl dreifach.
+## In der Mitte jedes Streifens wächst eine Reihe Sonnenblumen (GroundGrid.mark_sown): so sieht man, wo sie waren.
 ## Reine Logik, Positionen in Weltpixeln; gezeichnet von BirdView. Fertige Saat-Orte stehen in blooms
 ## (für Blütenblätter), fallende Samen in seeds (Weltpixel und Zeitpunkt, für die Darstellung).
 
@@ -18,6 +20,7 @@ class Flock:
 	var rest := 0.0
 	var sow_left := 0.0          # Pixel Streifen, die noch zu säen sind
 	var carry := 0.0             # Pixel seit dem letzten Samen
+	var row := 0.0               # Pixel seit der letzten Sonnenblume
 	var trips := 0               # Streifen seit dem letzten Besuch im Häuschen
 	var idle := false            # nichts mehr zu säen: Runden um das Häuschen
 
@@ -131,6 +134,15 @@ func _sow(f: Flock, step: float, grid: GroundGrid, rng: RandomNumberGenerator) -
 		seeds.append(Vector3(at.x + jitter.x, at.y + jitter.y, time))
 		if n > 0 and rng.randf() < 0.3:
 			blooms.append(at)
+		if n > 0:
+			seeds.append(Vector3(at.x - jitter.x * 0.5, at.y - jitter.y * 0.5, time + 0.05))
+	f.row += step
+	var row_every := cell_px * 2.2
+	while f.row >= row_every:   # Sonnenblumen in der Mitte des Streifens, nur wo gerade etwas aufging
+		f.row -= row_every
+		var rc := Vector2i((f.pos - f.dir * f.row) / cell_px)
+		if grid.is_green(rc) and grid.green_since(rc.y * grid.width + rc.x) >= grid.time_sec - 2.0:
+			grid.mark_sown(rc)
 	var c := Vector2i(f.pos / cell_px)
 	if f.sow_left <= 0.0 or not grid.in_bounds(c):
 		f.sow_left = 0.0
@@ -181,17 +193,19 @@ func _plan(f: Flock, grid: GroundGrid, rng: RandomNumberGenerator) -> void:
 	f.target = best_start
 	f.sow_left = len_px
 	f.carry = 0.0
+	f.row = 0.0
 	f.sow_dir = best_dir
 	f.state = State.FLY
 
 
-## Graue Zellen entlang eines Streifens (alle zwei Zellen eine Probe).
+## Graue Zellen entlang eines Streifens (alle zwei Zellen eine Probe; dürre zählen dreifach).
 func _grey_along(grid: GroundGrid, start: Vector2, dir: Vector2, len_px: float) -> int:
 	var n := 0
 	var step := cell_px * 2.0
 	var d := 0.0
 	while d < len_px:
-		if grid.is_open(Vector2i((start + dir * d) / cell_px)):
-			n += 1
+		var c := Vector2i((start + dir * d) / cell_px)
+		if grid.is_open(c):
+			n += 3 if grid.is_dry(c) else 1
 		d += step
 	return n

@@ -33,7 +33,7 @@ func _ready() -> void:
 	col.add_theme_constant_override("separation", 28)
 	add_child(col)
 	var title := Label.new()
-	title.text = "Frühlings-Roboter"
+	title.text = "Regrowth"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 104)
 	title.add_theme_color_override("font_color", Color(1.0, 0.98, 0.9))
@@ -41,7 +41,7 @@ func _ready() -> void:
 	title.add_theme_constant_override("outline_size", 28)
 	col.add_child(title)
 	var sub := Label.new()
-	sub.text = "Bring den Frühling zurück in die graue Welt."
+	sub.text = "Mach die graue Welt wieder schön."
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sub.add_theme_font_size_override("font_size", 32)
 	sub.add_theme_color_override("font_color", Color(1, 1, 1))

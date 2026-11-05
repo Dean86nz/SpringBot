@@ -123,8 +123,8 @@ func _update_text() -> void:
 	_name.text = "???" if st["state"] == "planned" else str(st["name"])
 	match st["state"]:
 		"done": _status.text = "Blüht schon – besuchen"
-		"current": _status.text = "Du bist hier   ·   Frühling: %s %%" % Hud.format_percent(float(st.get("progress", 0.0)))
-		"open": _status.text = "Frei – hierhin reisen" + ("   ·   Frühling: %s %%" % Hud.format_percent(float(st["progress"])) if float(st.get("progress", 0.0)) > 0.0 else "")
+		"current": _status.text = "Du bist hier   ·   Wiederhergestellt: %s %%" % Hud.format_percent(float(st.get("progress", 0.0)))
+		"open": _status.text = "Frei – hierhin reisen" + ("   ·   Wiederhergestellt: %s %%" % Hud.format_percent(float(st["progress"])) if float(st.get("progress", 0.0)) > 0.0 else "")
 		"locked": _status.text = "Erst muss %s blühen" % str(st.get("needs", ""))
 		_: _status.text = "Kommt später"
 	_status.add_theme_color_override("font_color", Color(1, 1, 1, 0.55) if hidden else Color(0.80, 0.95, 0.70))

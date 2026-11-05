@@ -71,7 +71,7 @@ func _ready() -> void:
 func open(robot: Vector2, hive: Vector2, coverage: float) -> void:
 	_robot = robot / _world_px
 	_hive = hive / _world_px
-	_title.text = "Karte   ·   Frühling: %s %%" % Hud.format_percent(coverage)
+	_title.text = "Karte   ·   Wiederhergestellt: %s %%" % Hud.format_percent(coverage)
 	_keys_version = -1
 	visible = true
 	get_tree().paused = true
@@ -88,7 +88,7 @@ func _process(delta: float) -> void:
 	_t += delta
 	if _keys_version != KeyHints.version:
 		_keys_version = KeyHints.version
-		_hint.text = KeyHints.fill("Grau = hier fehlt noch der Frühling   ·   {back}: zurück")
+		_hint.text = KeyHints.fill("Grau = hier ist noch nichts wiederhergestellt   ·   {back}: zurück")
 	_overlay.queue_redraw()
 
 

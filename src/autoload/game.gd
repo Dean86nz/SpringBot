@@ -11,13 +11,41 @@ var balance: Dictionary = {}
 var arrival := ""
 
 
+## Bis 0.19.0 hieß das Spiel „Frühlings-Roboter“; Godot legt Spielstände nach dem Namen ab.
+const OLD_USER_DIR := "Frühlings-Roboter"
+
+
 func _ready() -> void:
+	adopt_old_user_dir(OS.get_user_data_dir().get_base_dir().path_join(OLD_USER_DIR), OS.get_user_data_dir())
 	InputSetup.apply()
 	balance = load_json(BALANCE_PATH)
 	KeyHints.setup(load_json(TUTORIAL_PATH).get("keys", {}))
 	# Exportierte Builds (Ally) starten im Vollbild; im Editor bleibt es ein Fenster.
 	if OS.has_feature("template"):
 		get_window().mode = Window.MODE_FULLSCREEN
+
+
+## Spielstände und Einstellungen aus dem alten Ordner übernehmen, wenn es im neuen noch keine gibt
+## (Kopie, der alte Ordner bleibt). Gibt die Zahl kopierter Dateien zurück.
+static func adopt_old_user_dir(old_dir: String, new_dir: String) -> int:
+	if not DirAccess.dir_exists_absolute(old_dir):
+		return 0
+	var n := 0
+	for sub in ["saves", "saves_debug"]:
+		var from := old_dir.path_join(sub)
+		var to := new_dir.path_join(sub)
+		if not DirAccess.dir_exists_absolute(from) or (DirAccess.dir_exists_absolute(to) and not DirAccess.get_files_at(to).is_empty()):
+			continue
+		DirAccess.make_dir_recursive_absolute(to)
+		for f in DirAccess.get_files_at(from):
+			if DirAccess.copy_absolute(from.path_join(f), to.path_join(f)) == OK:
+				n += 1
+	var settings := old_dir.path_join("settings.json")
+	if FileAccess.file_exists(settings) and not FileAccess.file_exists(new_dir.path_join("settings.json")):
+		DirAccess.make_dir_recursive_absolute(new_dir)
+		if DirAccess.copy_absolute(settings, new_dir.path_join("settings.json")) == OK:
+			n += 1
+	return n
 
 
 func version() -> String:

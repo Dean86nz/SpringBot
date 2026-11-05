@@ -5,7 +5,7 @@ extends RefCounted
 ## Ladenbesitzer, Wäsche an der Leine, Imker zwischen Bienenstock und Honigstand, Kinder, die auf dem
 ## Platz spielen, jemand liest auf der Bank, andere schlendern.
 ## Manche haben einen Hund oder eine Katze.
-## Sie kehren nach und nach zurück: sobald um ihr Haus Grün ist (ready) und der Frühling ihren Wert "from"
+## Sie kehren nach und nach zurück: sobald um ihr Haus Grün ist (ready) und die Region ihren Anteil "from"
 ## erreicht hat. Sie kommen zu Fuß von außerhalb des Dorfes. Die Gebäude sind kaputt, bis die Bewohner sie
 ## reparieren (repair): zuerst das eigene Haus, dann die Arbeitsstelle (Bauern das Feld), dann helfen sie
 ## dort, wo noch etwas kaputt ist (höchstens zwei an einem Gebäude). Fertige Gebäude stehen in "repaired",
@@ -25,7 +25,7 @@ class Person:
 	var job := "stroll"
 	var home := ""
 	var work := ""
-	var from := 0.0        # ab diesem Frühlings-Anteil kommt die Person zurück
+	var from := 0.0        # ab diesem wiederhergestellten Anteil kommt die Person zurück
 	var back := false      # schon zurück
 	var arriving := false  # noch auf dem Weg ins Dorf
 	var owner := -1        # Haustier: Index des Menschen

@@ -5,7 +5,8 @@ extends RefCounted
 ## eine zufällige Grenzzelle der ganzen Karte (so schließen Bienen am Ende die letzten Lücken).
 ## Ist alles grün, benehmen sie sich wie echte Bienen: Sie fliegen zu Blüten auf der Wiese und zu
 ## erwachten Bäumen und Büschen (trees) in der Nähe des Stocks, verweilen dort und kriechen ab und zu
-## in den Stock, um auszuruhen (rest: unsichtbar). Reine Logik, Positionen in Weltpixeln.
+## in den Stock, um auszuruhen (rest: unsichtbar). Dürre Stellen meiden sie, dort blüht für sie nichts.
+## Reine Logik, Positionen in Weltpixeln.
 
 class Bee:
 	var pos := Vector2.ZERO
@@ -69,7 +70,7 @@ func update(delta: float, grid: GroundGrid, rng: RandomNumberGenerator, speed_fa
 			if b.hover <= 0.0:
 				# Kleiner Versatz unterhalb einer Zelle: Flecken werden rund und verschieden statt rautenförmig
 				var jitter := Vector2(rng.randf_range(-0.5, 0.5), rng.randf_range(-0.5, 0.5))
-				var n := grid.paint_circle(b.pos / cell_px + jitter, bloom_radius)
+				var n := grid.paint_circle(b.pos / cell_px + jitter, bloom_radius, true)
 				added += n
 				if n > 0:
 					blooms.append(b.pos)
@@ -82,7 +83,7 @@ func update(delta: float, grid: GroundGrid, rng: RandomNumberGenerator, speed_fa
 			b.pos = b.target
 			b.flying = false
 			# Über grauem Land schweben und blühen lassen; über Grün, Weg oder Wasser gleich weiterfliegen
-			if grid.is_open(Vector2i(b.pos / cell_px)):
+			if grid.is_open(Vector2i(b.pos / cell_px), false):
 				b.hover = hover_sec
 			elif b.idle and b.pos.distance_to(hive) < cell_px:
 				b.rest = rng.randf_range(3.0, 8.0)   # im Stock ausruhen
@@ -104,7 +105,7 @@ func pick_target(from: Vector2, grid: GroundGrid, rng: RandomNumberGenerator) ->
 	for t in tries:
 		var p := from + Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(hop_min, hop_max) * cell_px
 		var c := Vector2i(p / cell_px)
-		if grid.is_open(c):
+		if grid.is_open(c, false):
 			return (Vector2(c) + Vector2(0.5, 0.5)) * cell_px
 	if not grid.frontier.is_empty():
 		var i := grid.frontier[rng.randi_range(0, grid.frontier.size() - 1)]

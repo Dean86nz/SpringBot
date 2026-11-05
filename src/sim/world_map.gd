@@ -53,6 +53,30 @@ static func build(grid: GroundGrid, data: Dictionary) -> Array[Dictionary]:
 
 
 ## Punkte der Linie im Abstand von etwa einer Zelle, mit leichtem Schlängeln quer zur Richtung.
+## Dürre Stellen aus region.json "dry": {"seed", "wobble", "patches": [[x, y, Radius], ...]} in Zellen.
+## Der Rand schlängelt sich (wobble = Anteil des Radius); nur Land wird dürr. Gibt die Zahl dürrer Zellen zurück.
+static func build_dry(grid: GroundGrid, cfg: Dictionary) -> int:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = int(cfg.get("seed", 1))
+	var wob := float(cfg.get("wobble", 0.25))
+	var n := 0
+	for pa: Array in cfg.get("patches", []):
+		var c := Vector2(pa[0], pa[1])
+		var r := float(pa[2])
+		var ph := [rng.randf() * TAU, rng.randf() * TAU, rng.randf() * TAU]
+		var reach := ceili(r * (1.0 + wob))
+		for y in range(maxi(int(c.y) - reach, 0), mini(int(c.y) + reach + 1, grid.height)):
+			for x in range(maxi(int(c.x) - reach, 0), mini(int(c.x) + reach + 1, grid.width)):
+				var d := Vector2(x + 0.5, y + 0.5) - c
+				var a := d.angle()
+				var edge := r * (1.0 + wob * (0.5 * sin(2.0 * a + ph[0]) + 0.3 * sin(3.0 * a + ph[1]) + 0.2 * sin(5.0 * a + ph[2])))
+				var i := y * grid.width + x
+				if d.length() <= edge and grid.terrain[i] == GroundGrid.LAND and grid.dry[i] == 0:
+					grid.dry[i] = 1
+					n += 1
+	return n
+
+
 static func curve(line: Dictionary) -> PackedVector2Array:
 	var ctrl: Array = line.get("points", [])
 	var pts := PackedVector2Array()

@@ -39,7 +39,7 @@ func _ready() -> void:
 	_title_l.add_theme_font_size_override("font_size", 56)
 	_box.add_child(_title_l)
 	if _text_l.text.is_empty():
-		_text_l.text = "Kein grauer Fleck mehr: Der kleine Roboter, seine Bienen\nund der Wind haben den Frühling überall hingebracht."
+		_text_l.text = "Kein grauer Fleck mehr: Der kleine Roboter und seine Helfer\nhaben die Welt wieder schön gemacht."
 	_text_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_text_l.add_theme_font_size_override("font_size", 26)
 	_box.add_child(_text_l)

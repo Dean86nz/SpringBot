@@ -9,13 +9,14 @@ extends Node2D
 ## Reisen (TravelScreen): speichern, Zielregion im Spielstand vermerken, Hauptszene neu laden (Game.arrival).
 ## Fertige Regionen bringen weiter einen Teil ihrer Pollen (campaign.json "finished_pollen_share").
 ## Wege, Flüsse und Brücken kommen aus world.json der Region (WorldMap); sie werden nie grün.
+## Dürre Stellen (region.json "dry"): Dort wächst nichts von allein, Bienen schaffen nichts, nur Roboter und Samenvögel.
 ## Objekte (Bäume, Teiche, Büsche, Felsen, Wegrand) aus objects.json der Region erwachen, sobald unter
 ## ihnen Grün ist; um Bäume und Felsen fährt der Roboter herum.
 ## Gebiete (areas.json der Region) geben Boden und Objekten ihren Charakter; beim Betreten eines
 ## Gebiets blendet das HUD dezent seinen Namen ein.
 ## Dorf (region.json "village"): Gebäude (Wohnhäuser, Kirche mit Friedhof, Schule, Bücherei, Laden, Schmiede,
 ## Hof), Felder, Wäscheleine und Brunnen stehen fest. Die Gebäude bleiben kaputt, bis die Bewohner (Villagers)
-## sie reparieren; die kehren nach und nach zurück, sobald um ihr Haus Grün und genug Frühling ist.
+## sie reparieren; die kehren nach und nach zurück, sobald um ihr Haus Grün und genug wiederhergestellt ist.
 ## Ist die Region fertig, gibt es ein Fest auf dem Dorfplatz; danach der Endbildschirm der Region.
 ## Tiere (data/animals.json) leben als Deko nahe der Kamera über dem Grün (Animals, AnimalView).
 ## Einführung (data/tutorial.json): beim Neuen Spiel eine kurze Einleitung (IntroScreen), im Spiel
@@ -121,7 +122,8 @@ func _ready() -> void:
 	var t0 := Time.get_ticks_msec()
 	var world_data: Dictionary = rdata["world"]
 	var bridges := WorldMap.build(grid, world_data)
-	print("Wege und Wasser: %d Brücken, %d ms" % [bridges.size(), Time.get_ticks_msec() - t0])
+	var dry_cells := WorldMap.build_dry(grid, region.get("dry", {}))
+	print("Wege und Wasser: %d Brücken, %d dürre Zellen, %d ms" % [bridges.size(), dry_cells, Time.get_ticks_msec() - t0])
 	var areas_data: Dictionary = rdata["areas"]
 	_areas = Areas.new(w, h, areas_data)
 	var banner: Dictionary = areas_data.get("banner", {})
@@ -545,6 +547,7 @@ func _update_tips(delta: float) -> void:
 	var branch := str(_tutorial.hints.get("birds_branch", {}).get("node", ""))
 	var ctx := {"can_buy": not _tutorial.seen.has("tree") and _first_buy_possible(), "bees": _bees.bees.size(),
 		"birds": _birds.flocks.size(),
+		"dry": grid.is_dry(Vector2i(_robot.position / cell_px)) and not grid.is_green(Vector2i(_robot.position / cell_px)),
 		"birds_branch": skills.nodes.has(branch) and not skills.is_gated(branch) and skills.level(branch) == 0,
 		"quiet": _tip_id != "" or not _hud.visible or MenuKit.any_open(get_tree()) or _end_wait >= 0.0}
 	var id := _tutorial.due(ctx, delta)
@@ -739,7 +742,7 @@ func _start_playing() -> void:
 func _save_info() -> String:
 	if _play_sec <= 0.0:
 		return ""
-	var state := "%s blüht!" % str(_region_info.get("name", "Die Welt")) if _finished else "Frühling: %s %%" % Hud.format_percent(grid.coverage())
+	var state := "ganz wiederhergestellt" if _finished else "Wiederhergestellt: %s %%" % Hud.format_percent(grid.coverage())
 	return "%s   ·   %s   ·   Spielzeit %s" % [str(_region_info.get("name", "")), state, EndScreen.format_time(_play_sec)]
 
 
@@ -772,9 +775,11 @@ func save(force: bool = false) -> void:
 	data["regions"] = regions
 	var cells := grid.cells.duplicate()
 	var since := grid.since.duplicate()
+	var sown := grid.sown.duplicate()
 	_save_task = WorkerThreadPool.add_task(func() -> void:
 		entry["grid"]["cells"] = Marshalls.raw_to_base64(cells.compress(FileAccess.COMPRESSION_DEFLATE))
 		entry["grid"]["since"] = Marshalls.raw_to_base64(since.compress(FileAccess.COMPRESSION_DEFLATE))
+		entry["grid"]["sown"] = Marshalls.raw_to_base64(sown.compress(FileAccess.COMPRESSION_DEFLATE))
 		_store.write(data))
 
 
@@ -818,6 +823,7 @@ func load_game(data: Dictionary) -> void:
 		_wake_objects(false)
 		return
 	grid.load_since(Marshalls.base64_to_raw(str(g.get("since", ""))))
+	grid.load_sown(Marshalls.base64_to_raw(str(g.get("sown", ""))))
 	_finished = bool(entry.get("finished", false))
 	var r: Array = entry.get("robot", [])
 	if r.size() == 2:

@@ -72,6 +72,8 @@ Die Helfer sind eigene Ideen (nichts aus Unharvest oder Moon Sweepers). Größen
    21 Bewohner, Höfe mit eigenem Treffpunkt; Samenvögel mit 13 Knoten, verdeckt bis zur Ankunft in Felder und Vorort)
    Balancing (Modell `tools/balance_sim.py --reise`): Heimatdorf rund 32 bis 37 Minuten, Felder und Vorort nur rund 18 bis 24 Minuten,
    weil der Roboter alle Verbesserungen aus dem Heimatdorf mitbringt. Ziel 45 bis 75 Minuten offen, siehe Rückfrage im Bericht zu 0.19.0.
+   Rückmeldung in 0.20.0: neuer Name „Regrowth“ (weg vom Frühlings-Thema, es geht ums Wieder-schön-Machen), Anzeige „Wiederhergestellt“;
+   dürre Stellen in Felder und Vorort (nur Roboter und Samenvögel schaffen sie), Samenvögel hinterlassen Sonnenblumen-Reihen.
 5. **Großstadt** mit Gärtner-Drohnen.
 6. **Die ganze Welt** mit Regenwolken, großer Abschluss und Abspann.
 

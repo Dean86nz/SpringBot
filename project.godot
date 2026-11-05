@@ -10,8 +10,8 @@ config_version=5
 
 [application]
 
-config/name="Frühlings-Roboter"
-config/version="0.19.0"
+config/name="Regrowth"
+config/version="0.20.0"
 run/main_scene="res://src/world/main.tscn"
 run/flush_stdout_on_print=true
 config/features=PackedStringArray("4.7", "Mobile")

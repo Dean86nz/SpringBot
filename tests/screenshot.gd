@@ -7,7 +7,7 @@ extends SceneTree
 ##   CHEATS=1 öffnet bei Bild 5 das Cheat-Menü, POLLEN=n gibt bei Bild 5 (oder POLLEN_AT) Pollen,
 ##   MAXALL=1 setzt bei Bild 20 alle Upgrades auf Maximum, TIMEX=n beschleunigt ab Bild 20 die Zeit,
 ##   ROBOT=x,y setzt den Roboter bei Bild 15 auf diese Zelle. REGION=id reist bei Bild 2 dorthin (beim ersten
-##   Besuch kommt die Einleitung der Region: im Plan "ui_accept:10:11").
+##   Besuch kommt die Einleitung der Region: im Plan "ui_accept:10:11"). RESET=1 macht bei Bild 12 alles grau.
 ##   ZOOM=z setzt bei Bild 16 den Kamera-Zoom (z. B. 2.5 für Nahaufnahmen).
 ##   LUSH=1 spult bei Bild 15 die Weltzeit um 2000 s vor (alles Grün üppig, bunte Blumen).
 ##   ALMOST=1 begrünt bei Bild 15 (oder ALMOST_AT) die Welt bis auf einen Fleck rechts vom Roboter (Ende testen).
@@ -48,6 +48,8 @@ func _process(_delta: float) -> bool:
 			_send(s["action"], false)
 	if _frames == 2 and OS.get_environment("REGION") != "" and current_scene.region_id != OS.get_environment("REGION"):
 		current_scene.travel_to(OS.get_environment("REGION"))   # speichert und lädt neu (Debug-Spielstand vorher sichern!)
+	if _frames == 12 and OS.get_environment("RESET") == "1":
+		current_scene.reset_game()   # Region bleibt, alles grau (Debug-Spielstand vorher sichern!)
 	var pollen_at := int(OS.get_environment("POLLEN_AT")) if OS.get_environment("POLLEN_AT") != "" else 5
 	if _frames == pollen_at and OS.get_environment("POLLEN") != "":
 		current_scene.skills.pollen += float(OS.get_environment("POLLEN"))

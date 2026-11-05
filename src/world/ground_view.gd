@@ -5,6 +5,8 @@ extends Node2D
 ## Prinzip aus Scrap Empire (DirtView). Die Maske wird höchstens 30× pro Sekunde hochgeladen,
 ## „seit wann grün“ (GroundGrid.since) seltener, weil sich das Üppigwerden langsam ändert.
 ## Deko-Werte aus data/balance.json ("ground"), als Uniforms an den Shader.
+## Dürre Stellen (GroundGrid.dry) gehen einmal als weiche Maske an den Shader, die Sonnenblumen der
+## Samenvögel (GroundGrid.sown) als Maske je Zelle, neu hochgeladen, wenn sich etwas ändert.
 ## Gebiete (Areas) gehen als drei kleine Texturen mit je einem Pixel pro AREA_PX Zellen an den
 ## Shader; jedes Pixel mittelt seine Blöcke, die weiche Filterung macht die Grenzen sanft.
 
@@ -23,6 +25,8 @@ var _timer := 0.0
 var _since_timer := 0.0
 var _since_dirty := false
 var _since_upload := 0.25
+var _sown_img: Image
+var _sown_tex: ImageTexture
 
 
 ## cfg: Abschnitt "ground" aus balance.json (Shader-Werte), leer = Standardwerte des Shaders.
@@ -40,6 +44,14 @@ func bind(grid: GroundGrid, cell_px: float, cfg: Dictionary = {}, areas: Areas =
 	# Wege und Wasser ändern sich nie: einmal hochladen
 	var terrain_img := Image.create_from_data(grid.width, grid.height, false, Image.FORMAT_RG8, grid.terrain_vis)
 	mat.set_shader_parameter("terrain_tex", ImageTexture.create_from_image(terrain_img))
+	var drought := grid.dry.duplicate()
+	for i in drought.size():
+		drought[i] *= 255
+	mat.set_shader_parameter("drought_tex", ImageTexture.create_from_image(Image.create_from_data(grid.width, grid.height, false, Image.FORMAT_R8, drought)))
+	_sown_img = Image.create_from_data(grid.width, grid.height, false, Image.FORMAT_R8, _sown_bytes())
+	_sown_tex = ImageTexture.create_from_image(_sown_img)
+	mat.set_shader_parameter("sown_tex", _sown_tex)
+	grid.sown_dirty = false
 	mat.set_shader_parameter("cell_px", cell_px)
 	mat.set_shader_parameter("map_size", _size_px)
 	for k: String in cfg:
@@ -81,6 +93,15 @@ func _bind_areas(mat: ShaderMaterial, areas: Areas, grid: GroundGrid) -> void:
 	mat.set_shader_parameter("area_c", ImageTexture.create_from_image(imgs[2]))
 
 
+## sown (0/1) als Bytes 0/255 für die Textur.
+func _sown_bytes() -> PackedByteArray:
+	var b := _grid.sown.duplicate()
+	for i in b.size():
+		if b[i] != 0:
+			b[i] = 255
+	return b
+
+
 ## Ein Wert des Boden-Shaders (z. B. die Masken für die Übersichtskarte).
 func shader_value(param: String) -> Variant:
 	return (material as ShaderMaterial).get_shader_parameter(param) if material else null
@@ -110,6 +131,10 @@ func _process(delta: float) -> void:
 		_since_tex.update(_since_img)
 	if _timer > 0.0:
 		return
+	if _grid.sown_dirty:
+		_grid.sown_dirty = false
+		_sown_img.set_data(_grid.width, _grid.height, false, Image.FORMAT_R8, _sown_bytes())
+		_sown_tex.update(_sown_img)
 	if _grid.take_dirty().has_area():
 		_timer = UPLOAD_SECONDS
 		_since_dirty = true

@@ -143,7 +143,7 @@ func tip_visible() -> bool:
 
 
 func set_coverage(fraction: float) -> void:
-	_percent.text = "Frühling: %s %%" % format_percent(fraction)
+	_percent.text = "Wiederhergestellt: %s %%" % format_percent(fraction)
 
 
 ## Prozentanzeige springt kurz auf (bei jedem vollen Zehntel).

@@ -46,6 +46,8 @@ uniform float stalk_density = 0.25;
 uniform float path_pebbles = 0.45;   // Anteil der Kachel-Plätze mit Kiesel, wenn ganz grün daneben
 uniform float path_twigs = 0.22;
 uniform float path_leaves = 0.35;
+uniform sampler2D drought_tex : filter_linear, repeat_disable;   // dürre Stellen (1 = dürr), weicher Rand
+uniform sampler2D sown_tex : filter_nearest, repeat_disable;     // Sonnenblumen der Samenvögel je Zelle
 uniform bool use_areas = false;
 uniform sampler2D area_a : filter_linear, repeat_disable;
 uniform sampler2D area_b : filter_linear, repeat_disable;
@@ -154,6 +156,25 @@ vec4 flower(vec2 p, float amount, vec4 fav) {
 	vec3 pc = mix(base * 0.82, base, smoothstep(0.0, 2.0, edge - length(q)));   // Rand etwas dunkler
 	vec3 col = mix(pc, vec3(1.0, 0.80, 0.25), centre);
 	return petal > shadow ? vec4(col, petal) : vec4(vec3(0.0), shadow);
+}
+
+// Sonnenblume der Samenvögel in der Mitte der Zelle (bleibt ganz in der Zelle: ein einziger Textur-Zugriff)
+vec4 sunflower(vec2 p) {
+	vec2 id = floor(p / cell_px);
+	vec2 c = (id + 0.5) * cell_px + (vec2(hash(id + 3.1), hash(id + 7.7)) - 0.5) * 2.0;
+	float R = cell_px * (0.40 + 0.05 * hash(id + 5.5));
+	vec2 q = p - c;
+	float a = atan(q.y, q.x) + hash(id + 2.9) * 6.2832;
+	float edge = R * (0.72 + 0.28 * abs(cos(6.0 * a)));
+	float d = length(q);
+	float petal = 1.0 - smoothstep(edge - 0.8, edge + 0.6, d);
+	float centre = 1.0 - smoothstep(R * 0.42 - 0.7, R * 0.42 + 0.6, d);
+	float dots = step(0.55, hash(floor(q * 0.9) + id)) * centre * 0.35;   // Kerne
+	vec3 col = mix(vec3(0.98, 0.78, 0.14) * (0.88 + 0.12 * abs(cos(6.0 * a))), vec3(0.45, 0.27, 0.10), centre);
+	col = mix(col, vec3(0.30, 0.18, 0.07), dots);
+	float ring = (1.0 - smoothstep(0.0, 1.2, abs(d - edge))) * (1.0 - centre);   // feiner Rand
+	col = mix(col, col * 0.75, ring * 0.6);
+	return vec4(col, petal);
 }
 
 // Riss: kurze Zickzacklinie in der Kachel
@@ -354,9 +375,17 @@ void fragment() {
 		rc = texture(area_c, uv);
 	}
 	dry *= rc.rgb * 2.0;
+	float drought = texture(drought_tex, p / map_size).r;
 	if (g < 0.999) {
 		// Trocken: helles, warmes Grau mit Rissen, Steinchen und Halmen – trist, aber nie dunkel
 		dry = mix(dry, dry * 0.72, crack(p) * 0.8);
+		if (drought > 0.01) {
+			// Dürre Stelle: rissige, braune Erde mit dichten, groben Rissen
+			vec3 parched = mix(vec3(0.66, 0.53, 0.38), vec3(0.74, 0.62, 0.45), big) + (small - 0.5) * 0.06;
+			float cr = max(crack(p * 0.55 + 13.0), crack(p * 0.8 + 41.0));
+			parched = mix(parched, parched * 0.62, cr * 0.9);
+			dry = mix(dry, parched, smoothstep(0.2, 0.7, drought));
+		}
 		vec4 s = stalk(p);
 		dry = mix(dry, s.rgb, s.a);
 		vec4 pb = pebble(p);
@@ -373,6 +402,11 @@ void fragment() {
 		lush *= ra.rgb * 2.0;   // Farbe des Gebiets (auch für die Büschel)
 		vec4 f = flower(p, ra.a * 2.0, rb);
 		lush = mix(lush, f.rgb, f.a);
+		lush = mix(lush, lush * vec3(1.06, 1.0, 0.82), drought * 0.35);   // einst dürr: etwas goldener
+		if (texture(sown_tex, p / map_size).r > 0.5) {
+			vec4 sf = sunflower(p);
+			lush = mix(lush, sf.rgb, sf.a);
+		}
 	}
 	col = mix(dry, lush, g);
 	// Heller gelbgrüner Saum an der Wachstumsgrenze

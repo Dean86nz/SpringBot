@@ -393,7 +393,7 @@ func _refresh() -> void:
 	_info_effect.text = ("Je Stufe: " if _tree.max_level(id) > 1 else "Wirkung: ") + eff
 	var col := Color.WHITE
 	if d.get("requires", []).is_empty():
-		_info_cost.text = "Hier beginnt der Frühling."
+		_info_cost.text = "Hier beginnt alles."
 	elif _tree.is_maxed(id):
 		_info_cost.text = "Stufe %d / %d   ·   voll ausgebaut" % [_tree.level(id), _tree.max_level(id)]
 		col = Color(0.75, 0.95, 0.65)

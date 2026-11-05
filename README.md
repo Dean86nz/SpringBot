@@ -1,8 +1,8 @@
-# Frühlings-Roboter (Arbeitstitel)
+# Regrowth
 
-Kleines 2D-Incremental-Spiel: Ein Roboter bringt einer grauen Welt den Frühling zurück. Wo er fährt, wird der Boden grün. Godot 4.7.2, GDScript, Gamepad zuerst (ROG Ally X).
+Kleines 2D-Incremental-Spiel: Ein Roboter macht eine graue, verfallene Welt wieder schön. Wo er fährt, wird der Boden grün. Godot 4.7.2, GDScript, Gamepad zuerst (ROG Ally X).
 
-Stand: **Phase 3, Meilenstein 4 (Felder und Vorort, Samenvögel)**, Version 0.19.0. Plan und Stand in `PHASE3.md`. Plan der Phase 2 in `PHASE2.md`. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`, fremde Inhalte in `CREDITS.md`.
+Stand: **Phase 3, Meilenstein 4 mit Rückmeldung (neuer Name, dürre Stellen, Sonnenblumen der Samenvögel)**, Version 0.20.0. Plan und Stand in `PHASE3.md`. Plan der Phase 2 in `PHASE2.md`. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`, fremde Inhalte in `CREDITS.md`.
 
 ## Steuerung
 
@@ -42,6 +42,9 @@ Stand: **Phase 3, Meilenstein 4 (Felder und Vorort, Samenvögel)**, Version 0.19
 - `areas.json` + `src/sim/areas.gd` (Klasse `Areas`): Gebiete mit eigenen Farben, Blumen, Objekten; ground_view.gd gibt sie als kleine Texturen an den Shader, das HUD blendet den Namen beim Betreten ein.
 - `src/sim/skill_tree.gd`: Pollen, Knoten-Stufen, Sichtbarkeit (gekauft / kaufbar / „?“ / verdeckt), Summen der Werte (reine Logik, getestet).
 - `src/sim/bee_swarm.gd`: Bienen-Logik (Zielwahl, Schweben, Begrünen), `src/world/bee_view.gd` zeichnet Stock und Bienen.
+- Dürre Stellen: `region.json` „dry“ (Flecken mit welligem Rand, `WorldMap.build_dry`) → `GroundGrid.dry`. Dort wächst nichts von allein
+  (nie in der Grenze), Bienen begrünen sie nicht; der Boden-Shader zeigt rissige braune Erde (`drought_tex`).
+  Sonnenblumen der Samenvögel: `GroundGrid.sown` (im Spielstand), vom Shader in der Zelle gezeichnet (`sown_tex`).
 - `src/sim/seed_birds.gd`: Samenvögel (ab Felder und Vorort): Schwärme wählen den Streifen mit dem meisten Grau, säen ihn im Flug
   und rasten nach ein paar Streifen im Vogelhäuschen (`region.json` „nest_cell“). `src/world/bird_view.gd` zeichnet Häuschen, Schwärme in V-Form und fallende Samen.
 - `src/sim/ground_grid.gd`: Boden-Raster (1 Byte je Zelle), Begrünen im Kreis, Zähler, Schmutz-Rechteck,
@@ -53,7 +56,7 @@ Stand: **Phase 3, Meilenstein 4 (Felder und Vorort, Samenvögel)**, Version 0.19
   Dateien in `assets/audio/`, Lautstärken und Schwellen in `data/audio.json`.
 - `src/world/petal_fx.gd`: Blütenblätter-Partikel (fester Vorrat, ein Zeichenaufruf für alle).
 - `src/sim/save_store.gd`: Spielstand als zwei abwechselnde JSON-Dateien plus Meta-Datei unter `user://saves/` (Debug-EXE: `user://saves_debug/`).
-  Unter Windows: `%APPDATA%\Godot\app_userdata\Frühlings-Roboter\`. Was gespeichert wird, steht in `main.gd` (`save` / `load_game`).
+  Unter Windows: `%APPDATA%\Godot\app_userdata\Regrowth\` (bis 0.19.0 `Frühlings-Roboter`; `Game.adopt_old_user_dir` kopiert alte Stände einmal herüber). Was gespeichert wird, steht in `main.gd` (`save` / `load_game`).
 - `src/ui/title_screen.gd`, `src/ui/end_screen.gd`: Titel- und Endbildschirm über der pausierten Welt.
 - `src/ui/skill_tree_menu.gd` (statische Ebene, nur bei Änderungen neu gezeichnet), `src/ui/pause_menu.gd`, `src/ui/cheat_menu.gd`, gemeinsame Bausteine in `src/ui/menu_kit.gd`.
 

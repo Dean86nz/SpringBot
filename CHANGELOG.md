@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.20.0 – Neuer Name, dürre Stellen, Sonnenblumen der Samenvögel
+
+- **Neuer Name: Regrowth.** Weg vom Frühlings-Thema: Es geht darum, die graue, verfallene Welt wieder schön zu machen.
+  Die Anzeige oben heißt jetzt „Wiederhergestellt: 42 %“ (auch Karte, Reisekarte, Titel). Einleitung, Endtexte und
+  Skilltree-Namen ohne Frühling (Lebensfunke, Blütenduft, Gärtnerherz, Blütenflut, Neues Leben).
+  Dein Spielstand wird beim ersten Start aus dem alten Ordner übernommen (der alte bleibt als Sicherung liegen).
+- **Dürre Stellen** in Felder und Vorort: zehn große, rissige braune Flecken (etwa ein Fünftel der Fläche).
+  Dort wächst nichts von allein, und die Bienen schaffen nichts; nur der Roboter und die Samenvögel. Hinweis beim ersten Befahren.
+- **Man sieht, was die Samenvögel tun:** Sie fliegen bevorzugt zu dürren Stellen. Wo sie säen, wächst in der Mitte des Streifens
+  eine Reihe Sonnenblumen (bleibt im Spielstand). Mehr und größere fallende Samen. Neuer Hinweistext.
+- Spieldauer-Rechnung kennt dürre Stellen.
+
 ## 0.19.0 – Phase 3, Meilenstein 4: Felder und Vorort mit Samenvögeln
 
 - **Samenvögel**, der neue Helfer: Schwärme fliegen vom Vogelhäuschen weit hinaus und säen im Flug lange Streifen Grün,

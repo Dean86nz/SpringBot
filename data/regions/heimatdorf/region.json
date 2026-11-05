@@ -48,7 +48,7 @@
 			"laundry": {"block": 0, "radius": 70},
 			"cemetery": {"block": 0, "radius": 96}
 		},
-		"_info_residents": "residents: Bewohner mit Arbeit (smith Schmied, farmer Bauer auf work-Feld, shop Ladenbesitzer, laundry Wäsche an work-Leine, beekeeper Imker zwischen Bienenstock und Honigstand, kid Kinder spielen auf dem Platz, read liest auf der Bank, hike wandert die Wege entlang aus dem Dorf hinaus und zurück, stroll schlendert). Sie kehren zurück, sobald ihr Haus (home) erwacht ist und der Frühling mindestens from erreicht hat. dog/cat: Haustier kommt mit.",
+		"_info_residents": "residents: Bewohner mit Arbeit (smith Schmied, farmer Bauer auf work-Feld, shop Ladenbesitzer, laundry Wäsche an work-Leine, beekeeper Imker zwischen Bienenstock und Honigstand, kid Kinder spielen auf dem Platz, read liest auf der Bank, hike wandert die Wege entlang aus dem Dorf hinaus und zurück, stroll schlendert). Sie kehren zurück, sobald ihr Haus (home) erwacht ist und die Region mindestens zum Anteil from wiederhergestellt ist. dog/cat: Haustier kommt mit.",
 		"residents": [
 			{"job": "smith", "home": "schmiede", "from": 0.12},
 			{"job": "farmer", "home": "hof", "work": "feld1", "from": 0.18, "dog": true},

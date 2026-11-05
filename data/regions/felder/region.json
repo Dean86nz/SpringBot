@@ -1,11 +1,12 @@
 {
-	"_info": "Region Felder und Vorort (zweite Region). Größe in Zellen, Start des Roboters, Bienenstock und Vogelhäuschen (nest_cell) in Zellen. intro = Ankunft (ein Bild, zwei Sätze; art: grey, robot, bloom). village wie im Heimatdorf (siehe heimatdorf/region.json); die Höfe liegen weit draußen: face = Punkt, zu dem ein Gebäude schaut (der Hof statt des Vorplatzes), hub_cells = wer weiter vom Vorplatz wohnt, trifft sich auf dem eigenen Hof, local_cells = so weit hilft man beim Reparieren. finished_*: Text am Ende der Region.",
+	"_info": "Region Felder und Vorort (zweite Region). Größe in Zellen, Start des Roboters, Bienenstock und Vogelhäuschen (nest_cell) in Zellen. dry = dürre Stellen (Mitte und Radius in Zellen, wobble = welliger Rand): Dort wächst nichts von allein, Bienen schaffen nichts, nur Roboter und Samenvögel. intro = Ankunft (ein Bild, zwei Sätze; art: grey, robot, bloom). village wie im Heimatdorf (siehe heimatdorf/region.json); die Höfe liegen weit draußen: face = Punkt, zu dem ein Gebäude schaut (der Hof statt des Vorplatzes), hub_cells = wer weiter vom Vorplatz wohnt, trifft sich auf dem eigenen Hof, local_cells = so weit hilft man beim Reparieren. finished_*: Text am Ende der Region.",
 	"name": "Felder und Vorort",
 	"width_cells": 800,
 	"height_cells": 600,
 	"start_cell": [400, 330],
 	"hive_cell": [393, 324],
 	"nest_cell": [409, 339],
+	"dry": {"seed": 5, "wobble": 0.3, "patches": [[110, 230, 56], [335, 210, 46], [140, 430, 58], [320, 510, 48], [505, 300, 52], [490, 480, 50], [710, 160, 62], [560, 70, 44], [745, 340, 40], [60, 70, 46]]},
 	"village": {
 		"center": [625, 465],
 		"plaza_radius": 8.0,
@@ -88,8 +89,8 @@
 		"fest_sec": 10.0,
 		"fest_petals_per_sec": 40
 	},
-	"intro": {"art": "robot", "title": "Felder und Vorort", "text": "Hinter dem Heimatdorf liegen weite Felder, ein Mühlbach\nund ein kleiner Vorort. Auch hier hat der Winter alles grau gemacht."},
+	"intro": {"art": "robot", "title": "Felder und Vorort", "text": "Hinter dem Heimatdorf liegen weite Felder, ein Mühlbach\nund ein kleiner Vorort. Auch hier ist alles grau, und manche Äcker sind völlig ausgedörrt."},
 	"finished_title": "Die Felder blühen!",
-	"finished_text": "Von den Mohnwiesen bis zum Vorort: Überall ist der Frühling zurück.",
+	"finished_text": "Von den Mohnwiesen bis zum Vorort: Überall ist das Leben zurück.",
 	"finished_banner": "Felder und Vorort blühen!"
 }

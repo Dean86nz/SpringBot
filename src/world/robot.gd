@@ -1,6 +1,6 @@
 class_name Robot
 extends Node2D
-## Der kleine Frühlings-Roboter (Platzhalter-Grafik, von oben gesehen, vorne = +x).
+## Der kleine Gärtner-Roboter (Platzhalter-Grafik, von oben gesehen, vorne = +x).
 ## Linker Stick fährt analog, WASD/Pfeile digital. Bleibt innerhalb der Karte und fährt
 ## nicht durch Hindernisse (Kreise, z. B. der Bienenstock), sondern gleitet an ihnen entlang.
 ## Über Wasser fährt er nicht (walkable sagt, ob ein Punkt befahrbar ist); am Ufer gleitet er

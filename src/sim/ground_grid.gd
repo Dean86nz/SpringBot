@@ -16,6 +16,9 @@ extends RefCounted
 ## liegen; sobald alle Nachbarn grün (oder kein Land) sind, werden sie voll grün (_settle).
 ## Weg- und Wasserzellen neben grünem Land gelten in der Anzeige als grün, sonst fiele die
 ## weich gefilterte Maske am Wegrand ab und dort schiene Grau durch.
+## Dürre Stellen (dry, von WorldMap.build_dry gesetzt): Land, auf dem nichts von allein wächst. Sie gehören
+## nie zur Grenze (keine Ausbreitung), Bienen begrünen sie nicht (paint_circle mit wet_only); nur der Roboter
+## und die Samenvögel. Sonnenblumen (sown): Zellen, durch die ein Saatstreifen der Samenvögel lief.
 
 const GREY := 0
 const GREEN := 255
@@ -36,6 +39,9 @@ var terrain_vis := PackedByteArray() # nur Darstellung: 2 Byte je Zelle, Weg- un
 var land_count := 0                  # Zellen, die grün werden können (= 100 %)
 var hop_cells := 12                  # so weit springt die Ausbreitung über Wege und Wasser
 var green_count := 0
+var dry := PackedByteArray()         # 1 = dürre Stelle (bleibt wie das Gelände)
+var sown := PackedByteArray()        # 1 = hier wächst eine Sonnenblume der Samenvögel
+var sown_dirty := false              # sown hat sich geändert (Darstellung lädt neu hoch)
 var frontier := PackedInt32Array()   # Zellindizes der Grenze
 var _slot := PackedInt32Array()      # Zellindex → Position in frontier, -1 = nicht in der Grenze
 var _dirty := Rect2i()
@@ -54,6 +60,8 @@ func setup(w: int, h: int) -> void:
 	terrain.resize(w * h)
 	terrain_vis = PackedByteArray()
 	terrain_vis.resize(w * h * 2)
+	dry = PackedByteArray()
+	dry.resize(w * h)
 	land_count = w * h
 	_reset_state()
 
@@ -70,12 +78,23 @@ func is_walkable(c: Vector2i) -> bool:
 	return in_bounds(c) and terrain[c.y * width + c.x] != WATER
 
 
-## Land, das noch grau ist (Ziel für Bienen).
-func is_open(c: Vector2i) -> bool:
+## Land, das noch grau ist (Ziel für Bienen: ohne dürre Stellen, allow_dry false).
+func is_open(c: Vector2i, allow_dry: bool = true) -> bool:
 	if not in_bounds(c):
 		return false
 	var i := c.y * width + c.x
-	return terrain[i] == LAND and cells[i] == GREY
+	return terrain[i] == LAND and cells[i] == GREY and (allow_dry or dry[i] == 0)
+
+
+func is_dry(c: Vector2i) -> bool:
+	return in_bounds(c) and dry[c.y * width + c.x] != 0
+
+
+## Sonnenblume der Samenvögel in dieser Zelle (nur auf Land).
+func mark_sown(c: Vector2i) -> void:
+	if in_bounds(c) and terrain[c.y * width + c.x] == LAND and sown[c.y * width + c.x] == 0:
+		sown[c.y * width + c.x] = 1
+		sown_dirty = true
 
 
 ## Alles außer dem Gelände zurücksetzen: grau, keine Grenze, keine Zeiten.
@@ -88,6 +107,9 @@ func _reset_state() -> void:
 	vis.resize(w * h)
 	since = PackedByteArray()
 	since.resize(w * h * 2)
+	sown = PackedByteArray()
+	sown.resize(w * h)
+	sown_dirty = true
 	frontier = PackedInt32Array()
 	_slot = PackedInt32Array()
 	_slot.resize(w * h)
@@ -129,7 +151,8 @@ func set_green(c: Vector2i) -> bool:
 ## (Zelle (x, y) hat ihren Mittelpunkt bei x + 0,5 / y + 0,5). Gibt die Zahl neuer grüner Zellen zurück.
 ## Anzeige: Zellen nahe dem Rand bekommen 0,5 + (radius − Abstand), so liegt die 0,5-Linie der
 ## weich gefilterten Maske genau auf dem Kreis (zählt nicht als grün).
-func paint_circle(center: Vector2, radius: float) -> int:
+## wet_only: dürre Stellen bleiben, wie sie sind (Bienen).
+func paint_circle(center: Vector2, radius: float, wet_only: bool = false) -> int:
 	var reach := radius + 0.5
 	var x0 := maxi(int(floor(center.x - reach)), 0)
 	var x1 := mini(int(ceil(center.x + reach)), width - 1)
@@ -152,7 +175,7 @@ func paint_circle(center: Vector2, radius: float) -> int:
 				continue
 			var i := row + x
 			var v := 255 if d2 <= inner2 else mini(int((0.5 + radius - sqrt(d2)) * 255.0), 255)
-			if terrain[i] == LAND:
+			if terrain[i] == LAND and not (wet_only and dry[i] != 0):
 				var old := vis[i]
 				vis[i] = maxi(old, v)
 				if d2 <= r2 and _green_index(i, false):
@@ -177,7 +200,8 @@ func spread(events: int, reach: float, seed_chance: float, rng: RandomNumberGene
 		var c := Vector2i(i % width, i / width)
 		if reach >= 2.0 and rng.randf() < seed_chance:
 			var off := Vector2.from_angle(rng.randf() * TAU) * rng.randf_range(2.0, reach)
-			if set_green(c + Vector2i(roundi(off.x), roundi(off.y))):
+			var t := c + Vector2i(roundi(off.x), roundi(off.y))
+			if not is_dry(t) and set_green(t):   # Samen gehen auf dürrem Boden nicht auf
 				added += 1
 				continue
 		if set_green(c):
@@ -227,6 +251,18 @@ func load_since(packed: PackedByteArray) -> void:
 	_mark(Rect2i(0, 0, width, height))
 
 
+## Sonnenblumen gepackt (für den Spielstand) und das Gegenstück (fehlt oder passt nicht: keine).
+func sown_to_bytes() -> PackedByteArray:
+	return sown.compress(FileAccess.COMPRESSION_DEFLATE)
+
+
+func load_sown(packed: PackedByteArray) -> void:
+	var raw := packed.decompress(width * height, FileAccess.COMPRESSION_DEFLATE) if packed.size() > 0 else PackedByteArray()
+	if raw.size() == width * height:
+		sown = raw
+		sown_dirty = true
+
+
 ## Gegenstück zu to_bytes: übernimmt die Zellen und baut Zähler und Grenze neu auf.
 ## false (und nichts geändert), wenn die Daten nicht zu dieser Kartengröße passen.
 func load_bytes(packed: PackedByteArray) -> bool:
@@ -242,7 +278,7 @@ func load_bytes(packed: PackedByteArray) -> bool:
 		green_count += 1
 		_cover_edges(i)   # einmalig beim Laden
 	for i in cells.size():
-		if cells[i] == GREY and terrain[i] == LAND and _has_green_neighbor(i):
+		if cells[i] == GREY and terrain[i] == LAND and dry[i] == 0 and _has_green_neighbor(i):
 			_slot[i] = frontier.size()
 			frontier.append(i)
 	return true
@@ -360,7 +396,7 @@ func _settle(i: int) -> void:
 
 
 func _frontier_add(i: int) -> void:
-	if cells[i] == GREY and terrain[i] == LAND and _slot[i] < 0:
+	if cells[i] == GREY and terrain[i] == LAND and dry[i] == 0 and _slot[i] < 0:
 		_slot[i] = frontier.size()
 		frontier.append(i)
 
