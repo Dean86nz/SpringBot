@@ -26,3 +26,31 @@ Arbeitsweise wie bisher: ein Meilenstein, dann anhalten, Release- und Debug-EXE,
    Tasten passend zum Gerät, „Steuerung“ im Pause-Menü, Aufblüh-Klang sanft und zusammengefasst. (erledigt in 0.14.0)
 
 Reihenfolge: Wege und Wasser kommen vor den Objekten, weil Objekte (Wegrand-Details, Teiche, Brücken) sich an ihnen ausrichten.
+
+---
+
+# Ausblick: Phase 3 „Regionen“ (geplant, noch nicht freigegeben)
+
+Info vom 2026-11-05. **Nicht umsetzen**, bis Phase 3 ausdrücklich gestartet wird.
+
+- Man startet im eigenen **Heimatdorf**. Ist die Region fertig (alles grün), kehren Menschen zurück und das Dorf lebt wieder auf.
+- Danach geht es in **größere Regionen** weiter, z. B. Felder oder Vorort, dann Großstadt, am Ende die ganze Welt.
+- Jede Region bringt einen **neuen Helfer** für mehr Automatisierung (so wie heute die Bienen).
+- Der **Skilltree bleibt** über alle Regionen erhalten.
+
+## Wie die Gebiete aus Phase 2 darauf vorbereitet sind
+
+Phase 2 unterscheidet **Gebiete** (Teile einer Karte mit eigenem Charakter, z. B. Blumental, Stiller Wald) und Phase 3 **Regionen** (eigene Karten, nacheinander gespielt).
+Die heutige Karte mit ihren fünf Gebieten kann später die erste Region werden (oder ihr Vorbild). Was schon passt:
+
+- **Alles steckt in Daten, nicht im Code:** Wege und Wasser (`data/world.json`), Objekte (`data/objects.json`), Gebiete (`data/regions.json`), Tiere (`data/animals.json`), Boden (`data/balance.json` → „ground“).
+  Eine neue Region braucht vor allem einen eigenen Satz dieser Dateien, z. B. in einem Ordner je Region.
+- **Die Logik nimmt Daten entgegen statt feste Pfade:** `WorldMap.build`, `WorldObjects.place`, `Regions.new`, `Animals.new` bekommen ihre Daten übergeben.
+  Nur `main.gd` kennt die Pfade (Konstanten oben); dort käme später „welche Region ist gerade dran“ hinein.
+- **Kartengröße steht in den Daten** (`balance.json` → „map“), das Raster hat keine feste Größe. Größere Regionen = größere Zahlen; für sehr große Karten müsste man Leistung neu messen.
+- **Skilltree und Welt sind im Spielstand getrennt** („skills“ und „grid“). Für Phase 3 bekäme jede Region ihren eigenen Raster-Eintrag, die Skills bleiben gemeinsam.
+- **Gebiete kennen ihre Fläche** (`Regions.share`, Gebiet je Zelle). Fortschritt je Gebiet oder „Region fertig“ lässt sich daraus ableiten, ohne die Gebiete umzubauen.
+- **Helfer nach dem Muster der Bienen:** reine Logik in `src/sim` (wie `bee_swarm.gd`), Zeichnung in `src/world` (wie `bee_view.gd`), Werte im Skilltree. Ein neuer Helfer wäre ein weiteres solches Paar.
+- **Hinweise sind erweiterbar:** neue Hinweise (z. B. „neuer Helfer“, „Region fertig“) sind neue Einträge in `data/tutorial.json` plus eine Bedingung in `tutorial.gd`.
+
+Offene Fragen für Phase 3 (später klären): Wie wird eine fertige Region verlassen und betreten (Karte, Weg, Fahrzeug)? Kann man zurück? Wie sehen Menschen und Häuser aus (Grafik selbst gezeichnet wie bisher)? Was passiert mit der Pollen-Menge beim Wechsel?
