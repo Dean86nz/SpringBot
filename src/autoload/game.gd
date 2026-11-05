@@ -6,6 +6,9 @@ const SKILLTREE_PATH := "res://data/skilltree.json"
 const TUTORIAL_PATH := "res://data/tutorial.json"
 
 var balance: Dictionary = {}
+## Nach dem Neuladen der Hauptszene: "" = Titel zeigen, "travel" = in der neuen Region ankommen,
+## "new_game" = Einleitung eines neuen Spiels (main.gd lädt die Szene für eine andere Region neu).
+var arrival := ""
 
 
 func _ready() -> void:

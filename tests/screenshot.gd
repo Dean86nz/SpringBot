@@ -69,7 +69,8 @@ func _process(_delta: float) -> bool:
 	if _frames > 30 and _last_us > 0:
 		var ms := (now - _last_us) / 1000.0
 		if ms > 30.0:
-			print("langsames Bild %d: %.1f ms, Grün %.1f %%" % [_frames, ms, current_scene.grid.coverage() * 100.0])
+			var cov: float = current_scene.grid.coverage() * 100.0 if current_scene else -1.0   # beim Neuladen (Reise) kurz leer
+			print("langsames Bild %d: %.1f ms, Grün %.1f %%" % [_frames, ms, cov])
 		_worst_ms = maxf(_worst_ms, ms)
 	_last_us = now
 	if _frames > 30:

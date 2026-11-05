@@ -1,0 +1,12 @@
+{
+	"_info": "Region Felder und Vorort (zweite Region). Größe in Zellen, Start des Roboters und Bienenstock in Zellen. intro = Ankunft (ein Bild, zwei Sätze; art: grey, robot, bloom). finished_*: Text am Ende der Region. Höfe, Häuser und der neue Helfer kommen mit Phase 3, Meilenstein 4.",
+	"name": "Felder und Vorort",
+	"width_cells": 800,
+	"height_cells": 600,
+	"start_cell": [400, 330],
+	"hive_cell": [393, 324],
+	"intro": {"art": "robot", "title": "Felder und Vorort", "text": "Hinter dem Heimatdorf liegen weite Felder, ein Mühlbach\nund ein kleiner Vorort. Auch hier hat der Winter alles grau gemacht."},
+	"finished_title": "Die Felder blühen!",
+	"finished_text": "Von den Mohnwiesen bis zum Vorort: Überall ist der Frühling zurück.",
+	"finished_banner": "Felder und Vorort blühen!"
+}

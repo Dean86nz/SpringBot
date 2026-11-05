@@ -9,6 +9,7 @@ const FILES := ["region", "world", "objects", "areas"]
 var start := ""
 var order: Array[String] = []
 var finished_pollen_share := 0.25
+var planned: Array[String] = []   # spätere Regionen, auf der Reisekarte verhüllt
 var _dirs: Dictionary = {}   # id → Ordner
 
 
@@ -21,6 +22,8 @@ func _init(data: Dictionary = {}) -> void:
 		_dirs[id] = str(r.get("dir", "res://data/regions/%s/" % id))
 	start = str(data.get("start", order[0] if not order.is_empty() else ""))
 	finished_pollen_share = float(data.get("finished_pollen_share", 0.25))
+	for n in data.get("planned", []):
+		planned.append(str(n))
 
 
 func has(id: String) -> bool:

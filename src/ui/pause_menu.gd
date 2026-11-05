@@ -1,6 +1,6 @@
 class_name PauseMenu
 extends CanvasLayer
-## Pause-Menü: Weiterspielen, Karte, Lautstärke, Steuerung, Titelbildschirm oder Spiel beenden.
+## Pause-Menü: Weiterspielen, Karte, Reisen, Lautstärke, Steuerung, Titelbildschirm oder Spiel beenden.
 ## Öffnen/Schließen steuert main.gd (Start / Esc), dort wird auch gespeichert. Pausiert das Spiel, solange es offen ist.
 ## „Karte“ öffnet die Übersichtskarte (MapScreen, über main.gd). „Lautstärke“: zwei Regler für Musik und
 ## Klänge (Sfx.set_volume). „Steuerung“ zeigt alle Tasten zum Nachlesen, passend zum Gerät (data/tutorial.json, "controls").
@@ -8,6 +8,7 @@ extends CanvasLayer
 signal title_requested
 signal quit_requested
 signal map_requested
+signal travel_requested
 
 var controls: Array = []   # Zeilen der Steuerungs-Seite: {head} oder {key, text}
 var _box: VBoxContainer
@@ -60,6 +61,7 @@ func _show_main() -> void:
 	MenuKit.title(_box, "Pause")
 	MenuKit.button(_box, "Weiterspielen").pressed.connect(close)
 	MenuKit.button(_box, "Karte").pressed.connect(func() -> void: map_requested.emit())
+	MenuKit.button(_box, "Reisen").pressed.connect(func() -> void: travel_requested.emit())
 	MenuKit.button(_box, "Lautstärke").pressed.connect(func() -> void:
 		Sfx.play("open")
 		_show_volume())

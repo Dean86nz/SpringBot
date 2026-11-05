@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.18.0 – Phase 3, Meilenstein 3: Reisekarte und Reisen
+
+- **Reisekarte:** Alle Regionen als Stationen auf einer geschwungenen Route: fertige grün mit Häkchen, die aktuelle als Stern, freie mit Pfeil,
+  spätere verhüllt („???“, „Kommt später“). Fortschrittsring um jede Station. Links / rechts wählen, A reisen, B zurück.
+  Öffnen über Pause → „Reisen“ oder nach dem Fest über „Weiterreisen“ (der Endbildschirm hat jetzt „Weiterreisen“, „Noch bleiben“, „Zum Titelbildschirm“).
+- **Freischalten:** Eine Region ist frei, sobald die vorige blüht. Fertige Regionen kann man jederzeit wieder besuchen; sie bleiben, wie sie waren.
+- **Zweite Region „Felder und Vorort“** (800 × 600 Zellen, größer als das Heimatdorf): Landstraße, Mühlbach mit Graben, Feldwege mit Brücken,
+  fünf Gebiete (Weizenfelder, Mohnwiesen mit roten Blumen, Obstwiesen, Vorort mit Gärten, Bachauen mit Teichen und Bäumen).
+  Beim ersten Besuch eine kurze Einleitung, bei jeder Ankunft der Name groß als Banner. Höfe, Häuser, Bewohner und der neue Helfer kommen in Meilenstein 4.
+- **Skilltree, Pollen, Spielzeit und Einführung reisen mit.** Fertige Regionen bringen weiter ein Viertel ihrer Pollen, während man woanders ist
+  (`data/campaign.json` → „finished_pollen_share“).
+- Titelbildschirm zeigt die aktuelle Region. Ein neues Spiel beginnt immer im Heimatdorf, auch wenn man gerade woanders ist.
+- Der Kartentest prüft jetzt jede Region (Start und Bienenstock auf Land, alles über Brücken erreichbar).
+
 ## 0.17.3 – Aufbau sichtbarer, Wanderer, sanftere Klänge
 
 - **Fehler behoben:** Beim Neuen Spiel standen die Bewohner des vorher geladenen Spielstands reglos im Dorf und verschwanden erst bei etwa 8 %.

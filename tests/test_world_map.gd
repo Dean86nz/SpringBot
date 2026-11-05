@@ -8,16 +8,25 @@ func _real_grid() -> GroundGrid:
 	return g
 
 
-func test_real_map_every_land_cell_reachable_over_bridges() -> void:
-	var g := _real_grid()
-	var region := Game.load_json("res://data/regions/heimatdorf/region.json")
+## Alle Regionen der Reise (data/campaign.json) einzeln prüfen.
+func test_every_region_land_reachable_over_bridges() -> void:
+	var c := Campaign.new(Game.load_json("res://data/campaign.json"))
+	for id in c.order:
+		_check_region(c, id)
+
+
+func _check_region(c: Campaign, id: String) -> void:
+	var d := c.load_region(id)
+	var region: Dictionary = d["region"]
+	var g := GroundGrid.new(int(region["width_cells"]), int(region["height_cells"]))
+	WorldMap.build(g, d["world"])
 	var start: Array = region["start_cell"]
 	var hive: Array = region["hive_cell"]
-	assert_eq(g.terrain[int(start[1]) * g.width + int(start[0])], GroundGrid.LAND, "Start liegt auf Land")
-	assert_eq(g.terrain[int(hive[1]) * g.width + int(hive[0])], GroundGrid.LAND, "Bienenstock liegt auf Land")
-	assert_true(g.terrain.count(GroundGrid.WATER) > 1000, "es gibt Wasser")
-	assert_true(g.terrain.count(GroundGrid.PATH) > 1000, "es gibt Wege")
-	assert_true(g.terrain.count(GroundGrid.BRIDGE) > 0, "es gibt Brücken")
+	assert_eq(g.terrain[int(start[1]) * g.width + int(start[0])], GroundGrid.LAND, "%s: Start liegt auf Land" % id)
+	assert_eq(g.terrain[int(hive[1]) * g.width + int(hive[0])], GroundGrid.LAND, "%s: Bienenstock liegt auf Land" % id)
+	assert_true(g.terrain.count(GroundGrid.WATER) > 1000, "%s: es gibt Wasser" % id)
+	assert_true(g.terrain.count(GroundGrid.PATH) > 1000, "%s: es gibt Wege" % id)
+	assert_true(g.terrain.count(GroundGrid.BRIDGE) > 0, "%s: es gibt Brücken" % id)
 	# Breitensuche über befahrbare Zellen: ohne Brücken wäre ein Teil der Karte abgeschnitten
 	var seen := PackedByteArray()
 	seen.resize(g.width * g.height)
@@ -33,10 +42,12 @@ func test_real_map_every_land_cell_reachable_over_bridges() -> void:
 				seen[n] = 1
 				queue.append(n)
 	var missed := 0
+	var example := -1
 	for i in seen.size():
 		if seen[i] == 0 and g.terrain[i] == GroundGrid.LAND:
 			missed += 1
-	assert_eq(missed, 0, "Landzellen ohne Weg zum Start")
+			example = i
+	assert_eq(missed, 0, "%s: Landzellen ohne Weg zum Start (z. B. %d,%d)" % [id, example % g.width, example / g.width])
 
 
 func test_water_and_paths_never_green_and_not_counted() -> void:

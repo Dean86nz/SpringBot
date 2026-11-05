@@ -1,0 +1,17 @@
+{
+	"_info": "Wege und Wasser der Region Felder und Vorort. Punkte in Zellen (Karte 800 × 600), Breite in Zellen, wiggle = Schlängeln in Zellen. Brücken entstehen, wo ein Weg Wasser kreuzt.",
+	"rivers": [
+		{"name": "Mühlbach", "width": 5.5, "wiggle": 1.4, "points": [[-6, 140], [120, 170], [260, 150], [380, 200], [470, 190], [560, 260], [700, 250], [806, 300]]},
+		{"name": "Graben", "width": 3.0, "wiggle": 1.0, "points": [[430, -6], [440, 80], [420, 150], [380, 200]]}
+	],
+	"paths": [
+		{"name": "Landstraße", "width": 5.0, "wiggle": 0.6, "points": [[-6, 380], [150, 370], [300, 385], [450, 370], [600, 385], [806, 375]]},
+		{"width": 4.0, "wiggle": 1.0, "points": [[220, -6], [225, 120], [215, 250], [225, 375]]},
+		{"width": 4.0, "wiggle": 1.0, "points": [[560, 380], [565, 500], [555, 606]]},
+		{"width": 4.0, "wiggle": 1.2, "points": [[450, 372], [470, 280], [520, 200], [600, 120], [650, -6]]},
+		{"width": 3.5, "wiggle": 0.8, "points": [[600, 383], [680, 440], [700, 520], [620, 560], [562, 520]]},
+		{"width": 4.0, "wiggle": 1.2, "points": [[100, 606], [110, 480], [150, 372]]}
+	],
+	"bridge_width": 6.0,
+	"bridge_overhang": 1.5
+}

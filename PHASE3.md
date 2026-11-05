@@ -66,6 +66,7 @@ Die Helfer sind eigene Ideen (nichts aus Unharvest oder Moon Sweepers). Größen
    und sichtbarer Aufbau (Dachstuhl, neue Ziegel), kleinere Haustiere, Wanderer gehen aus dem Dorf hinaus.
 3. **Regionenkarte und Reisen:** Reiseroute mit allen Regionen, Weiterreisen, Zurückkehren, Pollen-Regel für fertige Regionen,
    Einleitung je Region. (Die Übersichtskarte aus 0.15.0 ist dafür die Grundlage.)
+   (erledigt in 0.18.0, mit einer ersten Karte von „Felder und Vorort“ als Reiseziel; Höfe, Häuser und Samenvögel folgen in Meilenstein 4)
 4. **Felder und Vorort** mit Samenvögeln (neuer Skilltree-Ast).
 5. **Großstadt** mit Gärtner-Drohnen.
 6. **Die ganze Welt** mit Regenwolken, großer Abschluss und Abspann.

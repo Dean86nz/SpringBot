@@ -1,8 +1,10 @@
 {
-	"_info": "Regionen der Reise in ihrer Reihenfolge (Phase 3). Jede Region hat einen Ordner mit region.json (Name, Größe, Start, Bienenstock), world.json (Wege und Wasser), objects.json (Objekte) und areas.json (Gebiete). start = Region eines neuen Spiels. finished_pollen_share = Anteil der Pollen, den fertige Regionen weiter bringen (ab Meilenstein 3).",
+	"_info": "Regionen der Reise in ihrer Reihenfolge (Phase 3). Jede Region hat einen Ordner mit region.json (Name, Größe, Start, Bienenstock), world.json (Wege und Wasser), objects.json (Objekte) und areas.json (Gebiete). start = Region eines neuen Spiels. finished_pollen_share = Anteil der Pollen, den fertige Regionen weiter bringen, wenn man woanders ist. planned = spätere Regionen (auf der Reisekarte verhüllt). Eine Region ist frei, sobald die vorige fertig ist.",
 	"start": "heimatdorf",
 	"finished_pollen_share": 0.25,
 	"regions": [
-		{"id": "heimatdorf", "dir": "res://data/regions/heimatdorf/"}
-	]
+		{"id": "heimatdorf", "dir": "res://data/regions/heimatdorf/"},
+		{"id": "felder", "dir": "res://data/regions/felder/"}
+	],
+	"planned": ["Großstadt", "Die ganze Welt"]
 }

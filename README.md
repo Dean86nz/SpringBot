@@ -2,7 +2,7 @@
 
 Kleines 2D-Incremental-Spiel: Ein Roboter bringt einer grauen Welt den Frühling zurück. Wo er fährt, wird der Boden grün. Godot 4.7.2, GDScript, Gamepad zuerst (ROG Ally X).
 
-Stand: **Phase 3, Meilenstein 2 (Heimatdorf)**, Version 0.17.3. Plan und Stand in `PHASE3.md`. Plan der Phase 2 in `PHASE2.md`. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`, fremde Inhalte in `CREDITS.md`.
+Stand: **Phase 3, Meilenstein 3 (Reisekarte und Reisen)**, Version 0.18.0. Plan und Stand in `PHASE3.md`. Plan der Phase 2 in `PHASE2.md`. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`, fremde Inhalte in `CREDITS.md`.
 
 ## Steuerung
 
@@ -31,6 +31,7 @@ Stand: **Phase 3, Meilenstein 2 (Heimatdorf)**, Version 0.17.3. Plan und Stand i
 - `data/tutorial.json`: Einleitung, Hinweise, Tastennamen je Gerät und die Seite „Steuerung“. `src/sim/tutorial.gd` entscheidet, wann welcher Hinweis kommt (je Spielstand einmal, gespeichert); `src/ui/key_hints.gd` merkt sich das zuletzt benutzte Gerät; `src/ui/intro_screen.gd` zeigt die Einleitung, `src/ui/intro_art.gd` malt ihre bewegten Bilder (mit Roboter und Objekten aus dem Spiel).
 - `src/ui/map_screen.gd` + `map.gdshader`: Übersichtskarte (Pause-Menü oder View-Taste / M), nutzt die Masken des Bodens.
 - Lautstärke: `Sfx.set_volume`, Regler im Pause-Menü, gespeichert in `user://settings.json` (nicht im Spielstand).
+- Reisen: `src/ui/travel_screen.gd` (Reisekarte); main.gd speichert, vermerkt die Zielregion und lädt die Hauptszene neu (`Game.arrival`).
 - `data/campaign.json` + `src/sim/campaign.gd`: die Regionen der Reise (Phase 3). Jede Region hat einen Ordner `data/regions/<id>/` mit `region.json` (Name, Größe, Start, Bienenstock), `world.json`, `objects.json` und `areas.json`. Der Spielstand (Version 2) hat je Region einen Eintrag, Skills und Pollen gelten für alle; ältere Stände hebt `SaveStore.migrate` an.
 - Dorf: `region.json` → „village“ (Platz, Brunnen, Gebäude, Felder, Wäscheleine, Bewohner, Fest). Gebäude und Requisiten sind feste Objekte (`WorldObjects.place(..., fixed)`), der Platz ist in `world.json` („plazas“) befestigt.
   `src/sim/villagers.gd` + `src/world/villager_view.gd`: die Bewohner mit ihrer Arbeit und ihren Haustieren; sie kehren mit dem Fortschritt zurück

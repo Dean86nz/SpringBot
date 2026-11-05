@@ -5,6 +5,8 @@ extends Node2D
 ## Bienen tragen das Grün zu neuen Stellen. Alle Werte kommen aus dem Skilltree.
 ## Regionen (Phase 3): data/campaign.json sagt, welche Regionen es gibt; die Daten der aktuellen Region
 ## liegen in ihrem Ordner (Campaign). Der Spielstand hat je Region einen Eintrag, Skills gelten für alle.
+## Reisen (TravelScreen): speichern, Zielregion im Spielstand vermerken, Hauptszene neu laden (Game.arrival).
+## Fertige Regionen bringen weiter einen Teil ihrer Pollen (campaign.json "finished_pollen_share").
 ## Wege, Flüsse und Brücken kommen aus world.json der Region (WorldMap); sie werden nie grün.
 ## Objekte (Bäume, Teiche, Büsche, Felsen, Wegrand) aus objects.json der Region erwachen, sobald unter
 ## ihnen Grün ist; um Bäume und Felsen fährt der Roboter herum.
@@ -66,6 +68,10 @@ var _pause := PauseMenu.new()
 var _title := TitleScreen.new()
 var _end := EndScreen.new()
 var _intro := IntroScreen.new()
+var _region_intro := IntroScreen.new()   # Ankunft in einer neuen Region
+var _travel := TravelScreen.new()
+var _next_region := ""       # beim nächsten Speichern als aktuelle Region vermerken (Reise)
+var _bonus_cells := 0.0      # Pollen-Zellen aus fertigen anderen Regionen
 var _map := MapScreen.new()
 var _map_from_pause := false   # Karte aus dem Pause-Menü geöffnet: beim Schließen dorthin zurück
 var _hive_px := Vector2.ZERO
@@ -221,6 +227,20 @@ func _ready() -> void:
 		else:
 			get_tree().paused = false)
 	add_child(_map)
+	_travel.travel_chosen.connect(func(id: String) -> void: travel_to(id))
+	_travel.closed.connect(func() -> void:
+		if _end.visible:
+			_end.refocus()
+		else:
+			_pause.open())
+	add_child(_travel)
+	_pause.travel_requested.connect(func() -> void:
+		_pause.visible = false
+		_open_travel())
+	_end.travel_requested.connect(_open_travel)
+	_region_intro.setup([_region_info.get("intro", {})] if _region_info.has("intro") else [])
+	_region_intro.finished.connect(_start_playing)
+	add_child(_region_intro)
 	_pause.map_requested.connect(func() -> void:
 		_pause.visible = false
 		_open_map(true))
@@ -234,7 +254,10 @@ func _ready() -> void:
 	_title.continue_requested.connect(_start_playing)
 	_title.new_game_requested.connect(func() -> void:
 		reset_game()
-		save()
+		if region_id != campaign.start:   # neues Spiel beginnt immer in der ersten Region
+			travel_to(campaign.start, "new_game")
+			return
+		save(true)
 		_title.close()
 		_intro.open())
 	_title.quit_requested.connect(quit)
@@ -251,7 +274,14 @@ func _ready() -> void:
 		add_child(cheats)
 	_apply_upgrades()
 	load_game(saved)
-	show_title()
+	var arrival := Game.arrival
+	Game.arrival = ""
+	match arrival:
+		"travel": _arrive()
+		"new_game":
+			_title.close()
+			_intro.open()
+		_: show_title()
 
 
 func _process(delta: float) -> void:
@@ -261,8 +291,9 @@ func _process(delta: float) -> void:
 	_spread(delta)
 	_bees.update(delta, grid, _rng, _bee_speed)
 	_bee_blooms()
-	skills.tick(delta, grid.green_count)
-	_hud.set_pollen(skills.pollen, skills.rate(grid.green_count))
+	var cells := grid.green_count + int(_bonus_cells)   # fertige andere Regionen bringen auch Pollen
+	skills.tick(delta, cells)
+	_hud.set_pollen(skills.pollen, skills.rate(cells))
 	var real := delta / maxf(Engine.time_scale, 0.001)
 	_play_sec += real
 	_world_sec += delta
@@ -432,6 +463,49 @@ func _wake_objects(animate: bool) -> void:
 func _building_green(id: String) -> bool:
 	var o: WorldObject = _village_by_id.get(id)
 	return o != null and _green_under(o.position)
+
+
+## Reisekarte mit allen Regionen: fertig, aktuell, frei (die vorige blüht), gesperrt, später.
+func _open_travel() -> void:
+	var st: Array[Dictionary] = []
+	var prev_done := true
+	var prev_name := ""
+	for id in campaign.order:
+		var info: Dictionary = campaign.load_region(id)["region"] if id != region_id else _region_info
+		var e: Dictionary = _region_saves.get(id, {})
+		var done := _finished if id == region_id else bool(e.get("finished", false))
+		var progress := grid.coverage() if id == region_id else float(e.get("green_cells", 0)) / maxf(float(e.get("land_cells", 1)), 1.0)
+		var state := "current" if id == region_id else ("done" if done else ("open" if prev_done else "locked"))
+		st.append({"id": id, "name": str(info.get("name", id)), "state": state, "progress": progress, "needs": prev_name})
+		prev_done = done
+		prev_name = str(info.get("name", id))
+	for n in campaign.planned:
+		st.append({"id": "", "name": n, "state": "planned"})
+	_travel.open(st)
+
+
+## In eine andere Region reisen: Stand sichern (Ziel als aktuelle Region), Hauptszene neu laden.
+func travel_to(id: String, arrival: String = "travel") -> void:
+	if not campaign.has(id):
+		return
+	_next_region = id
+	save(true)
+	finish_saving()
+	Game.arrival = arrival
+	Engine.time_scale = 1.0
+	get_tree().paused = false
+	get_tree().reload_current_scene()
+
+
+## Angereist: beim ersten Besuch die kurze Einleitung der Region, sonst gleich los; großer Name als Banner.
+func _arrive() -> void:
+	_title.close()
+	var first := not (_region_saves.get(region_id, {}) as Dictionary).has("grid")
+	if first and _region_info.has("intro"):
+		_region_intro.open()
+	else:
+		_start_playing()
+	_hud.show_banner(str(_region_info.get("name", "")), 4.0)
 
 
 func _open_map(from_pause: bool) -> void:
@@ -622,14 +696,15 @@ func _save_info() -> String:
 	if _play_sec <= 0.0:
 		return ""
 	var state := "%s blüht!" % str(_region_info.get("name", "Die Welt")) if _finished else "Frühling: %s %%" % Hud.format_percent(grid.coverage())
-	return "%s   ·   Spielzeit %s" % [state, EndScreen.format_time(_play_sec)]
+	return "%s   ·   %s   ·   Spielzeit %s" % [str(_region_info.get("name", "")), state, EndScreen.format_time(_play_sec)]
 
 
 ## Packen und Schreiben (ca. 10 ms am PC) laufen in einem Hintergrund-Thread, damit das
 ## automatische Speichern kein Bild verschluckt. Die Zellen werden vorher kopiert.
-func save() -> void:
+## force: auch ohne Spielzeit speichern (Reise, neues Spiel in einer anderen Region).
+func save(force: bool = false) -> void:
 	_autosave = 0.0
-	if _play_sec <= 0.0:
+	if _play_sec <= 0.0 and not force:
 		return   # noch nicht gespielt: nichts zu sichern
 	finish_saving()
 	var data := {
@@ -638,7 +713,7 @@ func save() -> void:
 		"world_sec": _world_sec,
 		"skills": skills.to_dict(),
 		"tutorial": _tutorial.to_list(),
-		"region": region_id,
+		"region": _next_region if _next_region != "" else region_id,
 	}
 	var regions := _region_saves.duplicate()   # andere Regionen bleiben, wie sie geladen wurden
 	var entry := {
@@ -646,6 +721,8 @@ func save() -> void:
 		"robot": [_robot.position.x, _robot.position.y],
 		"grid": {"w": grid.width, "h": grid.height},
 		"repaired": _villagers.done_ids(),
+		"green_cells": grid.green_count,
+		"land_cells": grid.total(),
 	}
 	regions[region_id] = entry
 	data["regions"] = regions
@@ -664,25 +741,34 @@ func finish_saving() -> void:
 		_save_task = -1
 
 
-## Übernimmt einen Spielstand (alte Stände vorher mit SaveStore.migrate anheben). Leer oder unpassend = frisches Spiel.
+## Übernimmt einen Spielstand (alte Stände vorher mit SaveStore.migrate anheben). Leer = frisches Spiel.
+## Skills, Pollen, Spielzeit und Einführung gelten für alle Regionen; hat die aktuelle Region noch keinen
+## Eintrag (gerade angereist), beginnt sie frisch.
 func load_game(data: Dictionary) -> void:
 	reset_game()
 	_region_saves = (data.get("regions", {}) as Dictionary).duplicate()
 	var entry: Dictionary = _region_saves.get(region_id, {})
+	if not data.is_empty():
+		skills.from_dict(data.get("skills", {}))
+		_tutorial.from_list(data.get("tutorial", []))   # alte Spielstände: Hinweise kommen noch einmal
+		_play_sec = float(data.get("play_sec", 0.0))
+		_world_sec = float(data.get("world_sec", _play_sec))
+		grid.time_sec = _world_sec
+		_ground.set_time(_world_sec)
+	_bonus_cells = 0.0
+	for id: String in _region_saves:
+		var e: Dictionary = _region_saves[id]
+		if id != region_id and bool(e.get("finished", false)):
+			_bonus_cells += float(e.get("green_cells", 0)) * campaign.finished_pollen_share
 	var g: Dictionary = entry.get("grid", {})
 	var fits := int(g.get("w", 0)) == grid.width and int(g.get("h", 0)) == grid.height
 	if not fits or not grid.load_bytes(Marshalls.base64_to_raw(str(g.get("cells", "")))):
-		if not data.is_empty():
-			push_warning("Spielstand passt nicht zur Karte, neues Spiel")
+		if not g.is_empty():
+			push_warning("Spielstand passt nicht zur Karte, Region beginnt neu")
 		_paint()
+		_wake_objects(false)
 		return
 	grid.load_since(Marshalls.base64_to_raw(str(g.get("since", ""))))
-	skills.from_dict(data.get("skills", {}))
-	_tutorial.from_list(data.get("tutorial", []))   # alte Spielstände: Hinweise kommen noch einmal
-	_play_sec = float(data.get("play_sec", 0.0))
-	_world_sec = float(data.get("world_sec", _play_sec))
-	grid.time_sec = _world_sec
-	_ground.set_time(_world_sec)
 	_finished = bool(entry.get("finished", false))
 	var r: Array = entry.get("robot", [])
 	if r.size() == 2:

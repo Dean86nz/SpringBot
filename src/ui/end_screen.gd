@@ -4,6 +4,7 @@ extends CanvasLayer
 ## oder zum Titelbildschirm zurückkehren. Erscheint nur einmal je Spielstand.
 
 signal title_requested
+signal travel_requested
 signal closed
 
 var _title_l := Label.new()
@@ -46,7 +47,8 @@ func _ready() -> void:
 	_stats.add_theme_font_size_override("font_size", 28)
 	_stats.add_theme_color_override("font_color", Color(1.0, 0.92, 0.55))
 	_box.add_child(_stats)
-	MenuKit.button(_box, "Weiterfahren").pressed.connect(close)
+	MenuKit.button(_box, "Weiterreisen").pressed.connect(func() -> void: travel_requested.emit())
+	MenuKit.button(_box, "Noch bleiben").pressed.connect(close)
 	MenuKit.button(_box, "Zum Titelbildschirm").pressed.connect(func() -> void:
 		close()
 		title_requested.emit())
@@ -66,6 +68,10 @@ func open(play_sec: float, earned: float, bought: int, nodes: int, bees: int) ->
 	get_tree().paused = true
 	MenuKit.focus_first(_box)
 	_rain.burst(Vector2(get_viewport().get_visible_rect().size.x * 0.5, 120.0), 120, Vector2(200, 700), Vector2(2.0, 3.5), Vector2(9, 15), Vector2.DOWN, 1.4)
+
+
+func refocus() -> void:
+	MenuKit.focus_first(_box)
 
 
 func close() -> void:

@@ -1,13 +1,13 @@
-# Testliste v0.17.3: Aufbau sichtbarer, Wanderer, sanftere Klänge
+# Testliste v0.18.0: Phase 3, Meilenstein 3 (Reisekarte und Reisen)
 
-EXEs: `export/windows/SpringBot_v0.17.3.exe` (Release) und `SpringBot_v0.17.3_DEBUG.exe` (Debug mit Cheat-Menü).
-Cheat-Menü (nur Debug): L3 + R3 eine Sekunde halten, PC F12.
+EXEs: `export/windows/SpringBot_v0.18.0.exe` (Release) und `SpringBot_v0.18.0_DEBUG.exe` (Debug mit Cheat-Menü).
+Cheat-Menü (nur Debug): L3 + R3 eine Sekunde halten, PC F12. Am schnellsten: Debug-EXE, Neues Spiel, Cheat-Menü „Welt fast fertig“, letzten Fleck begrünen.
 
-1. Neues Spiel: Im Dorf steht niemand herum. Die ersten Bewohner kommen ab etwa 8 % zu Fuß.
-2. Kaufen im Skilltree: kurzes, weiches Zupfen statt Melodie. Besondere Knoten und jedes volle Zehntel: leises Glöckchen. Angenehm genug?
-   Andere Klänge zum Anhören in `sound_kandidaten/upgrade/`.
-3. Die Häuser sind deutlich kaputter: große Löcher mit Sparren, eingestürzte Ecke, Schutt, umgestürzter Balken.
-4. Aufbau: Gerüst mit Balken, dann ein neuer Dachstuhl aus hellem Holz, dann neue Ziegel Reihe für Reihe, dann ist das Haus fertig und bunt.
-5. Hunde und Katzen sind kleiner.
-6. Zwei Wanderer gehen ab und zu die Wege entlang weit aus dem Dorf hinaus (über Brücken) und kommen zurück, einer mit Hund.
-7. Läuft alles flüssig auf dem Ally?
+1. Pause → „Reisen“: Reisekarte mit Heimatdorf (Stern), „Felder und Vorort“ (gesperrt: „Erst muss Heimatdorf blühen“) und zwei verhüllten Stationen.
+2. Heimatdorf auf 100 %: Fest, dann Endbildschirm mit „Weiterreisen“, „Noch bleiben“, „Zum Titelbildschirm“.
+3. „Weiterreisen“ → Reisekarte, „Felder und Vorort“ ist frei und vorgewählt. A: Reise. Kurze Einleitung der neuen Region, dann graue Felder, Name als Banner.
+4. In der neuen Region: Gebiete Weizenfelder, Mohnwiesen, Obstwiesen, Vorort, Bachauen; Mühlbach mit Brücken. Skilltree und Pollen sind dieselben.
+5. Pollen pro Sekunde sind höher als nur durch die neue Region: Das fertige Heimatdorf bringt ein Viertel seiner Pollen weiter.
+6. Pause → „Reisen“ → Heimatdorf: Es ist genau so, wie du es verlassen hast (grün, Bewohner, Häuser). Zurück nach „Felder und Vorort“: Fortschritt ist auch noch da.
+7. Beenden und neu starten: Titel zeigt die Region, in der du zuletzt warst; Weiterspielen geht dort weiter.
+8. Läuft „Felder und Vorort“ (größere Karte) flüssig auf dem Ally?

@@ -59,3 +59,12 @@ func test_old_save_file_is_still_read() -> void:
 	g.close()
 	assert_true(store.read().is_empty(), "Stand aus der Zukunft wird nicht geladen")
 	store.wipe()
+
+
+func test_journey_has_second_region_and_planned_ones() -> void:
+	var c := _campaign()
+	assert_true(c.order.size() >= 2, "es gibt mindestens eine zweite Region zum Reisen")
+	assert_eq(c.order[0], c.start, "die Reise beginnt mit der Startregion")
+	assert_true(c.planned.size() >= 1, "spätere Regionen sind angekündigt")
+	var first: Dictionary = c.load_region(c.order[1])["region"]
+	assert_true(first.has("intro"), "neue Region hat eine kurze Einleitung")
