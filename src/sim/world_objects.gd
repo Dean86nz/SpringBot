@@ -12,15 +12,46 @@ extends RefCounted
 ## fixed: Objekte mit fester Lage (Häuser, Brunnen des Dorfes), schon im Ergebnis-Format; sie kommen
 ## zuerst und ohne Prüfung, alle anderen halten Abstand zu ihnen.
 ## Ob ein Objekt erwacht ist, steht nicht hier: das ergibt sich aus dem Grün unter ihm.
+## Abstandsprüfung über ein Eimer-Raster (BUCKET_PX), damit auch Hunderte feste Gebäude (Großstadt) schnell gehen.
 
 ## Reihenfolge = Platzierung: Große und wählerische zuerst, damit sie noch Platz finden.
 const KINDS := ["pond", "willow", "oak", "fir", "rock", "fruit", "birch", "bush", "sapling"]
+const BUCKET_PX := 256.0
+
+
+## Platzierte Objekte nach Eimern (Zelle des Rasters → Indizes in out), dazu der größte Radius.
+class Buckets:
+	var map: Dictionary = {}
+	var max_r := 0.0
+
+	func add(i: int, pos: Vector2, r: float) -> void:
+		var k := Vector2i((pos / BUCKET_PX).floor())
+		var list: PackedInt32Array = map.get(k, PackedInt32Array())
+		list.append(i)
+		map[k] = list   # gepackte Arrays sind Werte: zurückschreiben
+		max_r = maxf(max_r, r)
+
+	## Indizes aller Objekte, die näher als reach (plus größter Radius) liegen könnten.
+	func near(pos: Vector2, reach: float) -> PackedInt32Array:
+		var out := PackedInt32Array()
+		var d := reach + max_r
+		var k0 := Vector2i(((pos - Vector2(d, d)) / BUCKET_PX).floor())
+		var k1 := Vector2i(((pos + Vector2(d, d)) / BUCKET_PX).floor())
+		for y in range(k0.y, k1.y + 1):
+			for x in range(k0.x, k1.x + 1):
+				var k := Vector2i(x, y)
+				if map.has(k):
+					out.append_array(map[k])
+		return out
 
 
 static func place(grid: GroundGrid, cell_px: float, data: Dictionary, world: Dictionary, keep_free: Array[Vector2], areas: Areas = null, fixed: Array[Dictionary] = []) -> Array[Dictionary]:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = int(data.get("seed", 1))
 	var out: Array[Dictionary] = fixed.duplicate()
+	var buckets := Buckets.new()
+	for i in out.size():
+		buckets.add(i, out[i]["pos"], float(out[i]["radius"]))
 	var gap := float(data.get("min_gap_px", 24.0))
 	var free_px := float((data.get("keep_free", {}) as Dictionary).get("radius_cells", 10.0)) * cell_px
 	var tries := int(data.get("tries", 60))
@@ -47,7 +78,8 @@ static func place(grid: GroundGrid, cell_px: float, data: Dictionary, world: Dic
 			var tan := (line[i + 1] - line[i - 1]).normalized()
 			var side := 1.0 if rng.randf() < 0.5 else -1.0
 			var pos := (line[i] + tan.orthogonal() * side * hw) * cell_px
-			if _fits(grid, cell_px, pos, ws_r, out, gap, keep_free, free_px):
+			if _fits(grid, cell_px, pos, ws_r, out, gap, keep_free, free_px, buckets):
+				buckets.add(out.size(), pos, ws_r)
 				out.append({"kind": kinds[rng.randi() % kinds.size()], "pos": pos, "angle": tan.angle(),
 					"seed": rng.randi(), "block": 0.0, "radius": ws_r, "size": 1.0, "quiet": true})
 	for kind in KINDS:
@@ -75,7 +107,8 @@ static func place(grid: GroundGrid, cell_px: float, data: Dictionary, world: Dic
 					continue
 				if water > 0.0 and not _near_water(grid, cell_px, pos, r + water * cell_px):
 					continue
-				if _fits(grid, cell_px, pos, r, out, gap, keep_free, free_px):
+				if _fits(grid, cell_px, pos, r, out, gap, keep_free, free_px, buckets):
+					buckets.add(out.size(), pos, r)
 					out.append({"kind": kind, "pos": pos, "angle": rng.randf() * TAU, "seed": rng.randi(),
 						"block": float(t.get("block_px", 0.0)) * f, "radius": r, "size": f,
 						"quiet": bool(t.get("quiet", false))})
@@ -95,11 +128,12 @@ static func _near_water(grid: GroundGrid, cell_px: float, pos: Vector2, reach: f
 
 
 ## Nur Land unter dem ganzen Kreis, Abstand zu anderen Objekten und zum Start.
-static func _fits(grid: GroundGrid, cell_px: float, pos: Vector2, r: float, placed: Array[Dictionary], gap: float, keep_free: Array[Vector2], free_px: float) -> bool:
+static func _fits(grid: GroundGrid, cell_px: float, pos: Vector2, r: float, placed: Array[Dictionary], gap: float, keep_free: Array[Vector2], free_px: float, buckets: Buckets) -> bool:
 	for f in keep_free:
 		if pos.distance_to(f) < free_px + r:
 			return false
-	for o in placed:
+	for i in buckets.near(pos, r + gap):
+		var o: Dictionary = placed[i]
 		if pos.distance_to(o["pos"]) < r + float(o["radius"]) + gap:
 			return false
 	var c0 := Vector2i((pos - Vector2(r, r)) / cell_px)

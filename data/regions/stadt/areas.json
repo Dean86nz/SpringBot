@@ -1,0 +1,317 @@
+{
+	"_info": "Gebiete der Großstadt, erzeugt von tools/gen_city.py. Felder wie in heimatdorf/areas.json.",
+	"seed": 23,
+	"warp_cells": 40,
+	"warp_scale_cells": 150,
+	"areas": [
+		{
+			"name": "Altstadt",
+			"points": [
+				[
+					523,
+					171
+				]
+			],
+			"grass": [
+				1.0,
+				1.04,
+				0.9
+			],
+			"dry": [
+				1.02,
+				1.0,
+				0.96
+			],
+			"flowers": 1.4,
+			"tufts": 0.8,
+			"flower_color": [
+				1.0,
+				0.56,
+				0.69
+			],
+			"flower_share": 0.5,
+			"objects": {
+				"pond": 0.1,
+				"oak": 0.15,
+				"fir": 0.1,
+				"rock": 0.2,
+				"fruit": 0.1,
+				"birch": 0.2,
+				"bush": 0.3,
+				"sapling": 0.3
+			},
+			"extra": {}
+		},
+		{
+			"name": "Innenstadt",
+			"points": [
+				[
+					413,
+					171
+				],
+				[
+					633,
+					171
+				],
+				[
+					523,
+					281
+				]
+			],
+			"grass": [
+				0.96,
+				1.04,
+				0.98
+			],
+			"dry": [
+				0.98,
+				0.98,
+				1.0
+			],
+			"flowers": 0.9,
+			"tufts": 0.7,
+			"flower_color": [
+				0.72,
+				0.55,
+				0.95
+			],
+			"flower_share": 0.4,
+			"objects": {
+				"pond": 0.1,
+				"oak": 0.15,
+				"fir": 0.1,
+				"rock": 0.2,
+				"fruit": 0.1,
+				"birch": 0.2,
+				"bush": 0.3,
+				"sapling": 0.3
+			},
+			"extra": {}
+		},
+		{
+			"name": "Stadtpark",
+			"points": [
+				[
+					175,
+					523
+				],
+				[
+					175,
+					581
+				],
+				[
+					233,
+					523
+				],
+				[
+					233,
+					581
+				],
+				[
+					755,
+					581
+				],
+				[
+					813,
+					581
+				]
+			],
+			"grass": [
+				0.92,
+				1.06,
+				0.92
+			],
+			"dry": [
+				0.98,
+				1.0,
+				1.0
+			],
+			"flowers": 1.6,
+			"tufts": 1.1,
+			"flower_color": [
+				1.0,
+				0.85,
+				0.3
+			],
+			"flower_share": 0.45,
+			"objects": {
+				"pond": 4.0,
+				"oak": 6.0,
+				"fir": 2.0,
+				"rock": 1.0,
+				"fruit": 2.0,
+				"birch": 5.0,
+				"bush": 4.0,
+				"sapling": 3.0
+			},
+			"extra": {
+				"oak": 20,
+				"birch": 16,
+				"pond": 4,
+				"bush": 40
+			}
+		},
+		{
+			"name": "Flussufer",
+			"points": [
+				[
+					120,
+					278
+				],
+				[
+					260,
+					336
+				],
+				[
+					400,
+					322
+				],
+				[
+					520,
+					384
+				],
+				[
+					640,
+					362
+				],
+				[
+					780,
+					424
+				],
+				[
+					900,
+					402
+				]
+			],
+			"grass": [
+				0.86,
+				1.0,
+				1.08
+			],
+			"dry": [
+				0.96,
+				0.99,
+				1.04
+			],
+			"flowers": 1.0,
+			"tufts": 1.2,
+			"flower_color": [
+				0.55,
+				0.75,
+				1.0
+			],
+			"flower_share": 0.5,
+			"objects": {
+				"pond": 0.5,
+				"oak": 2.0,
+				"fir": 0.5,
+				"rock": 1.0,
+				"fruit": 0.5,
+				"birch": 3.0,
+				"bush": 2.0,
+				"sapling": 2.0
+			},
+			"extra": {
+				"birch": 10
+			}
+		},
+		{
+			"name": "Wohnviertel",
+			"points": [
+				[
+					120,
+					100
+				],
+				[
+					150,
+					470
+				],
+				[
+					420,
+					620
+				],
+				[
+					700,
+					620
+				]
+			],
+			"grass": [
+				1.04,
+				1.05,
+				0.88
+			],
+			"dry": [
+				1.02,
+				1.0,
+				0.95
+			],
+			"flowers": 1.1,
+			"tufts": 0.9,
+			"flower_color": [
+				1.0,
+				0.45,
+				0.35
+			],
+			"flower_share": 0.45,
+			"objects": {
+				"pond": 0.1,
+				"oak": 0.15,
+				"fir": 0.1,
+				"rock": 0.2,
+				"fruit": 0.1,
+				"birch": 0.2,
+				"bush": 0.3,
+				"sapling": 0.3
+			},
+			"extra": {}
+		},
+		{
+			"name": "Gewerbegebiet",
+			"points": [
+				[
+					900,
+					120
+				],
+				[
+					920,
+					600
+				]
+			],
+			"grass": [
+				1.08,
+				1.04,
+				0.82
+			],
+			"dry": [
+				1.0,
+				0.99,
+				0.97
+			],
+			"flowers": 0.6,
+			"tufts": 1.0,
+			"flower_color": [
+				1.0,
+				1.0,
+				0.96
+			],
+			"flower_share": 0.5,
+			"objects": {
+				"pond": 0.1,
+				"oak": 0.15,
+				"fir": 0.1,
+				"rock": 0.2,
+				"fruit": 0.1,
+				"birch": 0.2,
+				"bush": 0.3,
+				"sapling": 0.3
+			},
+			"extra": {}
+		}
+	],
+	"banner": {
+		"confirm_sec": 1.0,
+		"fade_in_sec": 0.8,
+		"hold_sec": 2.5,
+		"fade_out_sec": 1.4
+	}
+}

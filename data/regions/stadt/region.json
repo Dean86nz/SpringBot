@@ -1,0 +1,6648 @@
+{
+	"_info": "Region Großstadt (dritte Region), erzeugt von tools/gen_city.py. Größe, Start, Bienenstock, Vogelhäuschen (nest_cell) und Ladestation der Drohnen (dock_cell) in Zellen. ground.paved = Straßen aus Asphalt. dry = Brachflächen (dürr). village = Altstadt um den Marktplatz wie im Heimatdorf (rot = Drehung in Grad statt Blick zum Platz). structures = Gebäude der übrigen Blöcke (types: Hindernis und Platzbedarf in Pixeln, Größe; list: Art, Zelle, Drehung in Grad): Sie erwachen mit dem Grün unter ihnen und bekommen dann einen Dachgarten.",
+	"name": "Großstadt",
+	"width_cells": 1000,
+	"height_cells": 700,
+	"start_cell": [
+		523,
+		184
+	],
+	"hive_cell": [
+		511,
+		190
+	],
+	"nest_cell": [
+		535,
+		190
+	],
+	"dock_cell": [
+		523,
+		193
+	],
+	"intro": {
+		"art": "robot",
+		"title": "Großstadt",
+		"text": "Straßen, Häuserblocks und ein Fluss, alles grau und verlassen.\nHier helfen bald Gärtner-Drohnen: Sie begrünen ganze Höfe und Dächer."
+	},
+	"finished_title": "Die Stadt lebt wieder!",
+	"finished_text": "Grüne Höfe, Gärten auf den Dächern, Menschen auf dem Marktplatz:\nDie Großstadt ist wiederhergestellt.",
+	"finished_banner": "Die Großstadt ist wiederhergestellt!",
+	"ground": {
+		"paved": 1.0
+	},
+	"dry": {
+		"seed": 9,
+		"wobble": 0.25,
+		"patches": [
+			[
+				117,
+				349,
+				22
+			],
+			[
+				349,
+				117,
+				22
+			],
+			[
+				407,
+				639,
+				22
+			],
+			[
+				639,
+				465,
+				22
+			],
+			[
+				697,
+				291,
+				22
+			],
+			[
+				871,
+				175,
+				22
+			],
+			[
+				929,
+				407,
+				22
+			]
+		]
+	},
+	"village": {
+		"center": [
+			523,
+			171
+		],
+		"plaza_radius": 10.0,
+		"fountain": [
+			523,
+			171
+		],
+		"buildings": [
+			{
+				"id": "dom",
+				"type": "church",
+				"pos": [
+					523,
+					152
+				]
+			},
+			{
+				"id": "schule",
+				"type": "school",
+				"pos": [
+					505,
+					156
+				]
+			},
+			{
+				"id": "buecherei",
+				"type": "library",
+				"pos": [
+					541,
+					156
+				]
+			},
+			{
+				"id": "laden",
+				"type": "shop",
+				"pos": [
+					504,
+					177
+				]
+			},
+			{
+				"id": "cafe",
+				"type": "shop",
+				"pos": [
+					542,
+					177
+				]
+			},
+			{
+				"id": "w1",
+				"type": "apartment",
+				"pos": [
+					448,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"id": "w2",
+				"type": "apartment",
+				"pos": [
+					482,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"id": "w3",
+				"type": "apartment",
+				"pos": [
+					448,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"id": "w4",
+				"type": "apartment",
+				"pos": [
+					482,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"id": "w5",
+				"type": "apartment",
+				"pos": [
+					564,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"id": "w6",
+				"type": "apartment",
+				"pos": [
+					598,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"id": "w7",
+				"type": "apartment",
+				"pos": [
+					564,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"id": "w8",
+				"type": "apartment",
+				"pos": [
+					598,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"id": "w9",
+				"type": "apartment",
+				"pos": [
+					506,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"id": "w10",
+				"type": "apartment",
+				"pos": [
+					540,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"id": "w11",
+				"type": "apartment",
+				"pos": [
+					506,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"id": "w12",
+				"type": "apartment",
+				"pos": [
+					540,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"id": "w13",
+				"type": "apartment",
+				"pos": [
+					506,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"id": "w14",
+				"type": "apartment",
+				"pos": [
+					540,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"id": "w15",
+				"type": "apartment",
+				"pos": [
+					506,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"id": "w16",
+				"type": "apartment",
+				"pos": [
+					540,
+					254
+				],
+				"rot": 0
+			}
+		],
+		"props": [
+			{
+				"id": "garten1",
+				"type": "garden",
+				"pos": [
+					465,
+					175
+				]
+			},
+			{
+				"id": "garten2",
+				"type": "garden",
+				"pos": [
+					581,
+					175
+				]
+			},
+			{
+				"id": "garten3",
+				"type": "garden",
+				"pos": [
+					523,
+					117
+				]
+			},
+			{
+				"id": "waesche",
+				"type": "laundry",
+				"pos": [
+					523,
+					233
+				]
+			}
+		],
+		"types": {
+			"church": {
+				"block": 66,
+				"radius": 110
+			},
+			"school": {
+				"block": 62,
+				"radius": 104
+			},
+			"library": {
+				"block": 52,
+				"radius": 82
+			},
+			"shop": {
+				"block": 50,
+				"radius": 80
+			},
+			"apartment": {
+				"block": 120,
+				"radius": 230
+			},
+			"garden": {
+				"block": 0,
+				"radius": 64
+			},
+			"laundry": {
+				"block": 0,
+				"radius": 70
+			}
+		},
+		"residents": [
+			{
+				"job": "shop",
+				"home": "laden",
+				"from": 0.08
+			},
+			{
+				"job": "stroll",
+				"home": "w1",
+				"from": 0.1,
+				"cat": true
+			},
+			{
+				"job": "farmer",
+				"home": "w2",
+				"work": "garten1",
+				"from": 0.14
+			},
+			{
+				"job": "shop",
+				"home": "cafe",
+				"from": 0.18
+			},
+			{
+				"job": "stroll",
+				"home": "dom",
+				"from": 0.22
+			},
+			{
+				"job": "farmer",
+				"home": "w5",
+				"work": "garten2",
+				"from": 0.26,
+				"dog": true
+			},
+			{
+				"job": "laundry",
+				"home": "w14",
+				"work": "waesche",
+				"from": 0.3
+			},
+			{
+				"job": "kid",
+				"home": "schule",
+				"from": 0.35,
+				"dog": true
+			},
+			{
+				"job": "read",
+				"home": "buecherei",
+				"from": 0.4
+			},
+			{
+				"job": "kid",
+				"home": "schule",
+				"from": 0.45
+			},
+			{
+				"job": "farmer",
+				"home": "w9",
+				"work": "garten3",
+				"from": 0.5
+			},
+			{
+				"job": "hike",
+				"home": "w3",
+				"from": 0.55,
+				"dog": true
+			},
+			{
+				"job": "kid",
+				"home": "schule",
+				"from": 0.6
+			},
+			{
+				"job": "stroll",
+				"home": "w7",
+				"from": 0.66,
+				"cat": true
+			},
+			{
+				"job": "read",
+				"home": "w11",
+				"from": 0.72
+			},
+			{
+				"job": "hike",
+				"home": "w13",
+				"from": 0.78
+			},
+			{
+				"job": "stroll",
+				"home": "w16",
+				"from": 0.85
+			},
+			{
+				"job": "stroll",
+				"home": "w10",
+				"from": 0.92,
+				"cat": true
+			}
+		],
+		"people_speed_px": 85,
+		"repair_sec": 12.0,
+		"hub_cells": 80,
+		"local_cells": 90,
+		"yard_radius_px": 110,
+		"arrive_from_cells": 22,
+		"arrive_spread_sec": 3.0,
+		"wait_sec": [
+			1.5,
+			5.0
+		],
+		"fest_sec": 10.0,
+		"fest_petals_per_sec": 40
+	},
+	"structures": {
+		"types": {
+			"apartment": {
+				"block": 120,
+				"radius": 230,
+				"size": [
+					0.95,
+					1.0
+				]
+			},
+			"tower": {
+				"block": 130,
+				"radius": 175,
+				"size": [
+					1.0,
+					1.05
+				]
+			}
+		},
+		"list": [
+			{
+				"type": "apartment",
+				"pos": [
+					42,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					76,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					42,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					76,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					42,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					76,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					42,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					76,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					38,
+					117
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					80,
+					117
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					42,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					76,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					42,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					76,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					38,
+					175
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					80,
+					175
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					42,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					76,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					42,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					76,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					42,
+					328
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					76,
+					328
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					42,
+					370
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					76,
+					370
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					38,
+					349
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					80,
+					349
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					42,
+					386
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					76,
+					386
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					42,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					76,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					38,
+					407
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					80,
+					407
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					42,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					76,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					42,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					76,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					42,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					76,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					42,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					76,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					38,
+					523
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					80,
+					523
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					42,
+					560
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					76,
+					560
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					42,
+					602
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					76,
+					602
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					42,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					76,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					42,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					76,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					100,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					134,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					100,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					134,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					96,
+					59
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					138,
+					59
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					100,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					134,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					100,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					134,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					100,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					134,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					100,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					134,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					96,
+					175
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					138,
+					175
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					100,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					134,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					100,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					134,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					100,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					134,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					96,
+					291
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					100,
+					386
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					134,
+					386
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					100,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					134,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					100,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					134,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					100,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					134,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					96,
+					465
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					138,
+					465
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					100,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					134,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					100,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					134,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					96,
+					523
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					138,
+					523
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					100,
+					560
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					134,
+					560
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					100,
+					602
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					134,
+					602
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					100,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					134,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					100,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					134,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					158,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					192,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					158,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					192,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					158,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					192,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					158,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					192,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					158,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					192,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					158,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					192,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					158,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					192,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					158,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					192,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					154,
+					233
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					196,
+					233
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					158,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					192,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					158,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					158,
+					328
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					192,
+					328
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					158,
+					370
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					192,
+					370
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					158,
+					386
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					192,
+					386
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					158,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					192,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					158,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					192,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					158,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					192,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					158,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					192,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					158,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					192,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					216,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					250,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					216,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					250,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					212,
+					59
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					254,
+					59
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					216,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					250,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					216,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					250,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					212,
+					117
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					254,
+					117
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					216,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					250,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					216,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					250,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					212,
+					175
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					254,
+					175
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					216,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					250,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					216,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					250,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					212,
+					233
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					254,
+					233
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					216,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					250,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					250,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					212,
+					291
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					254,
+					291
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					216,
+					370
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					250,
+					370
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					212,
+					349
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					216,
+					386
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					250,
+					386
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					216,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					250,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					216,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					250,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					216,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					250,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					216,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					250,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					216,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					250,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					274,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					308,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					274,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					308,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					270,
+					59
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					312,
+					59
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					274,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					308,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					274,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					308,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					270,
+					117
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					312,
+					117
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					274,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					308,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					274,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					308,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					274,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					308,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					274,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					308,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					274,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					308,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					274,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					308,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					274,
+					370
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					308,
+					370
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					274,
+					386
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					308,
+					386
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					274,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					308,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					274,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					308,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					274,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					308,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					274,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					308,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					274,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					308,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					270,
+					523
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					312,
+					523
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					274,
+					560
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					308,
+					560
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					274,
+					602
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					308,
+					602
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					270,
+					581
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					312,
+					581
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					274,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					308,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					274,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					308,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					270,
+					639
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					312,
+					639
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					332,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					366,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					332,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					366,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					332,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					366,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					332,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					366,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					328,
+					175
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					370,
+					175
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					332,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					366,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					332,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					366,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					328,
+					233
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					370,
+					233
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					332,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					366,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					332,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					328,
+					291
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					370,
+					291
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					332,
+					370
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					366,
+					370
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					328,
+					349
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					370,
+					349
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					332,
+					386
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					366,
+					386
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					332,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					366,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					328,
+					407
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					370,
+					407
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					332,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					366,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					332,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					366,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					332,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					366,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					332,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					366,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					328,
+					523
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					370,
+					523
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					332,
+					560
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					366,
+					560
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					332,
+					602
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					366,
+					602
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					332,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					366,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					332,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					366,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					390,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					424,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					390,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					424,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					386,
+					59
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					428,
+					59
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					390,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					424,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					390,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					424,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					386,
+					117
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					428,
+					117
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					390,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					424,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					390,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					424,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					386,
+					175
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					428,
+					175
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					390,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					424,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					390,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					424,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					386,
+					233
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					428,
+					233
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					390,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					424,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					424,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					386,
+					291
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					428,
+					291
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					390,
+					370
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					424,
+					370
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					386,
+					349
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					390,
+					386
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					424,
+					386
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					390,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					424,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					386,
+					407
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					428,
+					407
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					390,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					424,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					390,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					424,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					390,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					424,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					390,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					424,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					386,
+					523
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					428,
+					523
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					390,
+					560
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					424,
+					560
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					390,
+					602
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					424,
+					602
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					386,
+					581
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					428,
+					581
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					448,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					482,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					448,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					482,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					444,
+					59
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					486,
+					59
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					448,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					482,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					448,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					482,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					444,
+					117
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					486,
+					117
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					448,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					482,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					448,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					482,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					444,
+					233
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					486,
+					233
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					448,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					482,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					448,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					482,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					444,
+					291
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					486,
+					291
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					448,
+					328
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					482,
+					328
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					448,
+					370
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					448,
+					386
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					482,
+					386
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					448,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					482,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					448,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					482,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					448,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					482,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					448,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					482,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					448,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					482,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					444,
+					523
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					486,
+					523
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					448,
+					560
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					482,
+					560
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					448,
+					602
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					482,
+					602
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					448,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					482,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					448,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					482,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					506,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					540,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					506,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					540,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					502,
+					59
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					544,
+					59
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					506,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					540,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					506,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					540,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					502,
+					291
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					544,
+					291
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					506,
+					328
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					540,
+					328
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					502,
+					349
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					544,
+					349
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					506,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					540,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					502,
+					407
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					544,
+					407
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					506,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					540,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					506,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					540,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					502,
+					465
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					544,
+					465
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					506,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					540,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					506,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					540,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					506,
+					560
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					540,
+					560
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					506,
+					602
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					540,
+					602
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					502,
+					581
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					544,
+					581
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					506,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					540,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					506,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					540,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					502,
+					639
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					544,
+					639
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					564,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					598,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					564,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					598,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					560,
+					59
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					602,
+					59
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					564,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					598,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					564,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					598,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					560,
+					117
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					602,
+					117
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					564,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					598,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					564,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					598,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					560,
+					233
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					602,
+					233
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					564,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					598,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					564,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					598,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					560,
+					291
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					602,
+					291
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					564,
+					328
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					598,
+					328
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					598,
+					386
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					564,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					598,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					560,
+					407
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					602,
+					407
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					564,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					598,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					564,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					598,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					564,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					598,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					564,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					598,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					560,
+					523
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					602,
+					523
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					564,
+					560
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					598,
+					560
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					564,
+					602
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					598,
+					602
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					564,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					598,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					564,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					598,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					622,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					656,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					622,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					656,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					618,
+					59
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					660,
+					59
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					622,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					656,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					622,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					656,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					618,
+					117
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					660,
+					117
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					622,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					656,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					622,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					656,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					618,
+					175
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					660,
+					175
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					622,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					656,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					622,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					656,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					618,
+					233
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					660,
+					233
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					622,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					656,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					622,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					656,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					618,
+					291
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					660,
+					291
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					622,
+					328
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					656,
+					328
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					622,
+					386
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					622,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					656,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					618,
+					407
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					660,
+					407
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					622,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					656,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					622,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					656,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					618,
+					523
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					660,
+					523
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					622,
+					560
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					656,
+					560
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					622,
+					602
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					656,
+					602
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					622,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					656,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					622,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					656,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					680,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					714,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					680,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					714,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					676,
+					59
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					718,
+					59
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					680,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					714,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					680,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					714,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					680,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					714,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					680,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					714,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					680,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					714,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					680,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					714,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					676,
+					233
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					718,
+					233
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					680,
+					328
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					714,
+					328
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					714,
+					370
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					676,
+					349
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					718,
+					349
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					680,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					714,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					680,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					714,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					680,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					714,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					676,
+					465
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					718,
+					465
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					680,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					714,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					680,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					714,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					680,
+					560
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					714,
+					560
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					680,
+					602
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					714,
+					602
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					676,
+					581
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					718,
+					581
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					680,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					714,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					680,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					714,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					676,
+					639
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					718,
+					639
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					738,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					772,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					738,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					772,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					738,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					772,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					738,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					772,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					738,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					772,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					738,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					772,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					734,
+					175
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					776,
+					175
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					738,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					772,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					738,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					772,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					738,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					772,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					738,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					772,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					738,
+					328
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					772,
+					328
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					738,
+					370
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					772,
+					370
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					734,
+					349
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					776,
+					349
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					738,
+					386
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					772,
+					386
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					738,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					738,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					772,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					738,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					772,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					734,
+					465
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					776,
+					465
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					738,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					772,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					738,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					772,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					734,
+					523
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					776,
+					523
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					738,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					772,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					738,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					772,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					734,
+					639
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					776,
+					639
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					796,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					830,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					796,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					830,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					792,
+					59
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					834,
+					59
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					796,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					830,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					796,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					830,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					796,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					830,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					796,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					830,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					792,
+					175
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					834,
+					175
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					796,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					830,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					796,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					830,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					796,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					830,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					796,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					830,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					792,
+					291
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					834,
+					291
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					796,
+					328
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					830,
+					328
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					796,
+					370
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					830,
+					370
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					796,
+					386
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					830,
+					386
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					796,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					830,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					796,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					830,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					792,
+					465
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					834,
+					465
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					796,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					830,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					796,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					830,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					796,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					830,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					796,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					830,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					792,
+					639
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					834,
+					639
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					854,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					888,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					854,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					888,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					850,
+					59
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					892,
+					59
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					854,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					888,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					854,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					888,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					850,
+					117
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					892,
+					117
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					854,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					888,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					854,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					888,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					854,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					888,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					854,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					888,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					854,
+					328
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					888,
+					328
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					854,
+					370
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					888,
+					370
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					850,
+					349
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					892,
+					349
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					854,
+					386
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					888,
+					386
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					854,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					888,
+					428
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					854,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					888,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					854,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					888,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					850,
+					465
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					892,
+					465
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					854,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					888,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					854,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					888,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					850,
+					523
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					892,
+					523
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					854,
+					560
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					888,
+					560
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					854,
+					602
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					888,
+					602
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					850,
+					581
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					892,
+					581
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					854,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					888,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					854,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					888,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					912,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					946,
+					38
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					912,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					946,
+					80
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					908,
+					59
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					950,
+					59
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					912,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					946,
+					96
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					912,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					946,
+					138
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					912,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					946,
+					154
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					912,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					946,
+					196
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					908,
+					175
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					950,
+					175
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					912,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					946,
+					212
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					912,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					946,
+					254
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					912,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					946,
+					270
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					912,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					946,
+					312
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					912,
+					328
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					946,
+					328
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					912,
+					370
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					946,
+					370
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					912,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					946,
+					444
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					912,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					946,
+					486
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					912,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					946,
+					502
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					912,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					946,
+					544
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					908,
+					523
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					950,
+					523
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					912,
+					560
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					946,
+					560
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					912,
+					602
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					946,
+					602
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					908,
+					581
+				],
+				"rot": 90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					950,
+					581
+				],
+				"rot": -90
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					912,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					946,
+					618
+				],
+				"rot": -180
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					912,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "apartment",
+				"pos": [
+					946,
+					660
+				],
+				"rot": 0
+			},
+			{
+				"type": "tower",
+				"pos": [
+					908,
+					639
+				],
+				"rot": 90
+			},
+			{
+				"type": "tower",
+				"pos": [
+					950,
+					639
+				],
+				"rot": -90
+			}
+		]
+	}
+}

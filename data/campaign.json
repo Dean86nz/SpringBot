@@ -4,7 +4,8 @@
 	"finished_pollen_share": 0.25,
 	"regions": [
 		{"id": "heimatdorf", "dir": "res://data/regions/heimatdorf/"},
-		{"id": "felder", "dir": "res://data/regions/felder/"}
+		{"id": "felder", "dir": "res://data/regions/felder/"},
+		{"id": "stadt", "dir": "res://data/regions/stadt/"}
 	],
-	"planned": ["Großstadt", "Die ganze Welt"]
+	"planned": ["Die ganze Welt"]
 }

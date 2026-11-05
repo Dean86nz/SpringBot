@@ -1,0 +1,104 @@
+{
+	"_info": "Objekte der Großstadt: wenige, vor allem in Parks und am Fluss (Gewichte in areas.json). Am Straßenrand nichts.",
+	"seed": 3031,
+	"min_gap_px": 24,
+	"keep_free": {
+		"radius_cells": 10
+	},
+	"tries": 60,
+	"types": {
+		"pond": {
+			"count": 8,
+			"radius_px": 110,
+			"block_px": 0
+		},
+		"willow": {
+			"count": 14,
+			"radius_px": 80,
+			"block_px": 32,
+			"size": [
+				0.9,
+				1.15
+			],
+			"near_water_cells": 6,
+			"tries": 600
+		},
+		"oak": {
+			"count": 40,
+			"radius_px": 76,
+			"block_px": 36,
+			"size": [
+				0.85,
+				1.2
+			]
+		},
+		"fir": {
+			"count": 12,
+			"radius_px": 56,
+			"block_px": 28,
+			"size": [
+				0.8,
+				1.25
+			]
+		},
+		"rock": {
+			"count": 10,
+			"radius_px": 62,
+			"block_px": 44,
+			"size": [
+				0.75,
+				1.15
+			]
+		},
+		"fruit": {
+			"count": 10,
+			"radius_px": 58,
+			"block_px": 28,
+			"size": [
+				0.85,
+				1.1
+			]
+		},
+		"birch": {
+			"count": 40,
+			"radius_px": 50,
+			"block_px": 22,
+			"size": [
+				0.85,
+				1.15
+			]
+		},
+		"bush": {
+			"count": 140,
+			"radius_px": 48,
+			"block_px": 0,
+			"size": [
+				0.8,
+				1.15
+			]
+		},
+		"sapling": {
+			"count": 60,
+			"radius_px": 26,
+			"block_px": 0,
+			"size": [
+				0.8,
+				1.2
+			],
+			"quiet": true
+		}
+	},
+	"wayside": {
+		"every_cells": [
+			10,
+			18
+		],
+		"offset_cells": 1.4,
+		"kinds": [],
+		"radius_px": 40
+	},
+	"awake_check_sec": 0.2,
+	"awake_petals": 24,
+	"max_bursts_per_check": 6,
+	"wayside_petals": 8
+}

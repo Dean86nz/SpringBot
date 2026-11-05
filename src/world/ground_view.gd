@@ -27,6 +27,7 @@ var _since_dirty := false
 var _since_upload := 0.25
 var _sown_img: Image
 var _sown_tex: ImageTexture
+var _sown_timer := 0.0
 
 
 ## cfg: Abschnitt "ground" aus balance.json (Shader-Werte), leer = Standardwerte des Shaders.
@@ -48,7 +49,7 @@ func bind(grid: GroundGrid, cell_px: float, cfg: Dictionary = {}, areas: Areas =
 	for i in drought.size():
 		drought[i] *= 255
 	mat.set_shader_parameter("drought_tex", ImageTexture.create_from_image(Image.create_from_data(grid.width, grid.height, false, Image.FORMAT_R8, drought)))
-	_sown_img = Image.create_from_data(grid.width, grid.height, false, Image.FORMAT_R8, _sown_bytes())
+	_sown_img = Image.create_from_data(grid.width, grid.height, false, Image.FORMAT_R8, grid.sown)
 	_sown_tex = ImageTexture.create_from_image(_sown_img)
 	mat.set_shader_parameter("sown_tex", _sown_tex)
 	grid.sown_dirty = false
@@ -93,15 +94,6 @@ func _bind_areas(mat: ShaderMaterial, areas: Areas, grid: GroundGrid) -> void:
 	mat.set_shader_parameter("area_c", ImageTexture.create_from_image(imgs[2]))
 
 
-## sown (0/1) als Bytes 0/255 für die Textur.
-func _sown_bytes() -> PackedByteArray:
-	var b := _grid.sown.duplicate()
-	for i in b.size():
-		if b[i] != 0:
-			b[i] = 255
-	return b
-
-
 ## Ein Wert des Boden-Shaders (z. B. die Masken für die Übersichtskarte).
 func shader_value(param: String) -> Variant:
 	return (material as ShaderMaterial).get_shader_parameter(param) if material else null
@@ -129,12 +121,14 @@ func _process(delta: float) -> void:
 		_since_timer = _since_upload
 		_since_img.set_data(_grid.width, _grid.height, false, Image.FORMAT_RG8, _grid.since)
 		_since_tex.update(_since_img)
+	_sown_timer -= delta
+	if _grid.sown_dirty and _sown_timer <= 0.0:   # Sonnenblumen ändern sich langsam: höchstens zweimal pro Sekunde
+		_sown_timer = 0.5
+		_grid.sown_dirty = false
+		_sown_img.set_data(_grid.width, _grid.height, false, Image.FORMAT_R8, _grid.sown)
+		_sown_tex.update(_sown_img)
 	if _timer > 0.0:
 		return
-	if _grid.sown_dirty:
-		_grid.sown_dirty = false
-		_sown_img.set_data(_grid.width, _grid.height, false, Image.FORMAT_R8, _sown_bytes())
-		_sown_tex.update(_sown_img)
 	if _grid.take_dirty().has_area():
 		_timer = UPLOAD_SECONDS
 		_since_dirty = true

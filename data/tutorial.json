@@ -12,6 +12,8 @@
 		"bees": {"text": "Die Bienen sind da! Sie fliegen vom Bienenstock zu grauen Stellen und lassen dort Grün erblühen – auch weit weg vom Roboter.", "delay_sec": 1.0, "show_sec": 11.0},
 		"birds_branch": {"text": "Neu im Skilltree: die Samenvögel!  {tree}: Skilltree öffnen, der neue Ast liegt unten.", "node": "v1", "delay_sec": 6.0, "show_sec": 12.0},
 		"birds": {"text": "Die Samenvögel fliegen aus! Sie säen lange Streifen, am liebsten auf dürrem Boden. Wo sie gesät haben, wächst eine Reihe Sonnenblumen.", "delay_sec": 1.0, "show_sec": 12.0},
+		"drones_branch": {"text": "Neu im Skilltree: die Gärtner-Drohnen!  {tree}: Skilltree öffnen, der neue Ast liegt rechts unten.", "node": "d1", "delay_sec": 6.0, "show_sec": 12.0},
+		"drones": {"text": "Die Gärtner-Drohnen heben ab! Sie fliegen Runden über graue Höfe und Dächer und begrünen sie Stück für Stück, auch über Straßen hinweg.", "delay_sec": 1.0, "show_sec": 12.0},
 		"dry": {"text": "Dürrer Boden: Hier wächst nichts von allein, und die Bienen schaffen nichts. Fahr selbst darüber, oder hol dir die Samenvögel.", "delay_sec": 0.3, "show_sec": 11.0}
 	},
 	"keys": {

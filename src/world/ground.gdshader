@@ -48,6 +48,7 @@ uniform float path_twigs = 0.22;
 uniform float path_leaves = 0.35;
 uniform sampler2D drought_tex : filter_linear, repeat_disable;   // dürre Stellen (1 = dürr), weicher Rand
 uniform sampler2D sown_tex : filter_nearest, repeat_disable;     // Sonnenblumen der Samenvögel je Zelle
+uniform float paved = 0.0;   // 1 = Straßen aus Asphalt mit Gehweg (Großstadt)
 uniform bool use_areas = false;
 uniform sampler2D area_a : filter_linear, repeat_disable;
 uniform sampler2D area_b : filter_linear, repeat_disable;
@@ -317,6 +318,14 @@ vec3 paths_and_water(vec2 p, vec3 col, vec2 tr, float near, float big, float sma
 	float pe = smoothstep(0.45, 0.55, pv);
 	if (pe > 0.001) {
 		vec3 dirt = mix(vec3(0.60, 0.56, 0.49), vec3(0.76, 0.61, 0.43), near) + (big - 0.5) * 0.06 + (small - 0.5) * 0.05;
+		if (paved > 0.5) {
+			// Asphalt: dunkelgrau, zum Rand ein heller Gehweg mit Bordstein
+			vec3 tar = mix(vec3(0.40, 0.41, 0.43), vec3(0.44, 0.45, 0.48), near) + (small - 0.5) * 0.05;
+			float walk = 1.0 - smoothstep(0.62, 0.70, tr.x);
+			tar = mix(tar, vec3(0.70, 0.69, 0.66) + (big - 0.5) * 0.04, walk);
+			tar = mix(tar, tar * 0.8, (1.0 - smoothstep(0.0, 0.02, abs(tr.x - 0.66))) * 0.6);
+			dirt = tar;
+		}
 		float dull = 1.0 - near;
 		if (dull > 0.001) {
 			float blot = smoothstep(0.45, 0.75, vnoise(p / 30.0 + 71.0) * 0.7 + vnoise(p / 9.0 + 13.0) * 0.3);

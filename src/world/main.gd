@@ -14,6 +14,8 @@ extends Node2D
 ## ihnen Grün ist; um Bäume und Felsen fährt der Roboter herum.
 ## Gebiete (areas.json der Region) geben Boden und Objekten ihren Charakter; beim Betreten eines
 ## Gebiets blendet das HUD dezent seinen Namen ein.
+## Großstadt: region.json "structures" sind feste Gebäude ohne Bewohner (erwachen mit dem Grün unter ihnen).
+## Gärtner-Drohnen (GardenDrones) fliegen von der Ladestation (dock_cell) Runden über graue Höfe und Dächer.
 ## Dorf (region.json "village"): Gebäude (Wohnhäuser, Kirche mit Friedhof, Schule, Bücherei, Laden, Schmiede,
 ## Hof), Felder, Wäscheleine und Brunnen stehen fest. Die Gebäude bleiben kaputt, bis die Bewohner (Villagers)
 ## sie reparieren; die kehren nach und nach zurück, sobald um ihr Haus Grün und genug wiederhergestellt ist.
@@ -53,6 +55,11 @@ var _bird_view := BirdView.new()
 var _bird_speed := 1.0
 var _bird_base: Dictionary = {}   # Grundwerte der Samenvögel (Streifen, Breite, Rast)
 var _nest_blocks := false         # Vogelhäuschen steht (Hindernis für den Roboter)
+var _drones := GardenDrones.new()
+var _drone_view := DroneView.new()
+var _drone_speed := 1.0
+var _drone_base: Dictionary = {}  # Grundwerte der Drohnen (Fläche, Sprühkreis, Laden)
+var _dock_blocks := false
 var _start_px := Vector2.ZERO
 var _ground := GroundView.new()
 var _bridge_view := BridgeView.new()
@@ -137,7 +144,9 @@ func _ready() -> void:
 
 	_ground.process_mode = Node.PROCESS_MODE_ALWAYS   # zeigt den geladenen Garten auch hinter dem Titel
 	var ground_cfg: Variant = Game.dig(Game.balance, "ground")
-	_ground.bind(grid, cell_px, ground_cfg if ground_cfg is Dictionary else {}, _areas)
+	var gcfg: Dictionary = (ground_cfg as Dictionary).duplicate() if ground_cfg is Dictionary else {}
+	gcfg.merge(region.get("ground", {}), true)   # z. B. Asphalt in der Großstadt
+	_ground.bind(grid, cell_px, gcfg, _areas)
 	add_child(_ground)
 	_bridge_view.bind(bridges, cell_px)
 	add_child(_bridge_view)
@@ -150,17 +159,25 @@ func _ready() -> void:
 	var bird_cfg: Variant = Game.dig(Game.balance, "birds")
 	_birds.configure(bird_cfg if bird_cfg is Dictionary else {}, nest_px, cell_px)
 	_bird_base = {"strip": _birds.strip_cells, "width": _birds.width_cells, "rest": _birds.rest_sec}
+	var dock_px := Campaign.cell_px(region, "dock_cell", cell_px, hive_px + Vector2(0, 110))
+	var drone_cfg: Variant = Game.dig(Game.balance, "drones")
+	_drones.configure(drone_cfg if drone_cfg is Dictionary else {}, dock_px, cell_px)
+	_drone_base = {"area": _drones.area_cells, "spray": _drones.spray_cells, "charge": _drones.charge_sec}
 	_obj_cfg = rdata["objects"]
 	var blockers: Array[Dictionary] = []
 	var avoid: Array[Dictionary] = []   # wo keine Hasen hoppeln
 	var places := {}
 	var fixed := _village_objects(places)
-	for d in WorldObjects.place(grid, cell_px, _obj_cfg, world_data, [_start_px, hive_px, nest_px], _areas, fixed):
+	var village_fixed := fixed.duplicate()
+	fixed.append_array(_structure_objects(region.get("structures", {})))
+	for d in WorldObjects.place(grid, cell_px, _obj_cfg, world_data, [_start_px, hive_px, nest_px, dock_px], _areas, fixed):
 		var o := WorldObject.new()
 		o.setup(d)
 		add_child(o)
 		_objects.append(o)
-		if float(d["block"]) > 0.0:
+		if d.has("blockers"):   # lange Gebäude: mehrere Kreise entlang der Längsachse
+			blockers.append_array(d["blockers"])
+		elif float(d["block"]) > 0.0:
 			blockers.append({"pos": d["pos"], "radius": float(d["block"])})
 		if d["kind"] == "pond":
 			_ponds.append(o)
@@ -182,8 +199,8 @@ func _ready() -> void:
 			px.append(line[i] * cell_px)
 		if px.size() > 4:
 			_villagers.trails.append(px)
-	for d in fixed:
-		if float(d["block"]) > 0.0:
+	for d in fixed:   # Gebäude der Stadt nur in der Nähe des Dorfes (jeder Schritt prüft alle Hindernisse)
+		if float(d["block"]) > 0.0 and (village_fixed.has(d) or d["pos"].distance_to(_villagers.center) < 140.0 * cell_px):
 			_villagers.obstacles.append({"pos": d["pos"], "r": float(d["block"])})
 	_villagers.obstacles.append({"pos": hive_px, "r": Game.num("bees/hive_radius_px", 32.0)})
 	_villager_view.process_mode = Node.PROCESS_MODE_PAUSABLE
@@ -198,6 +215,9 @@ func _ready() -> void:
 	_bird_view.process_mode = Node.PROCESS_MODE_PAUSABLE
 	_bird_view.bind(_birds)
 	add_child(_bird_view)
+	_drone_view.process_mode = Node.PROCESS_MODE_PAUSABLE
+	_drone_view.bind(_drones)
+	add_child(_drone_view)
 	_petals.process_mode = Node.PROCESS_MODE_PAUSABLE
 	add_child(_petals)   # vor dem Roboter: Blätter liegen unter ihm
 	_robot.process_mode = Node.PROCESS_MODE_PAUSABLE
@@ -311,6 +331,11 @@ func _process(delta: float) -> void:
 		for p in _birds.blooms:   # wo die Saat aufgeht, ein paar Blätter
 			_petals.burst(p, 3, Vector2(30, 120), Vector2(0.6, 1.0), Vector2(5, 8))
 		_birds.blooms.clear()
+	if not _drones.drones.is_empty():
+		_drones.update(delta, grid, _rng, _drone_speed)
+		for p in _drones.blooms:
+			_petals.burst(p, 3, Vector2(30, 120), Vector2(0.6, 1.0), Vector2(5, 8))
+		_drones.blooms.clear()
 	var cells := grid.green_count + int(_bonus_cells)   # fertige andere Regionen bringen auch Pollen
 	skills.tick(delta, cells)
 	_hud.set_pollen(skills.pollen, skills.rate(cells))
@@ -398,15 +423,52 @@ func _village_objects(places: Dictionary) -> Array[Dictionary]:
 			face = (Vector2(b["face"][0], b["face"][1]) + Vector2(0.5, 0.5)) * cell_px
 		var to_plaza := (face - pos).normalized()
 		var rot := 0.0 if kind in ["field", "laundry", "garden", "windmill", "silo"] else to_plaza.angle() - PI / 2.0
+		if b.has("rot"):   # feste Drehung in Grad (z. B. zur Straße in der Großstadt)
+			rot = deg_to_rad(float(b["rot"]))
 		var block := float(t.get("block", 50.0)) * f
 		out.append({"id": str(b["id"]), "kind": kind, "pos": pos, "angle": rot, "seed": rng.randi(),
 			"block": block, "radius": float(t.get("radius", 76.0)) * f, "size": f, "quiet": kind in ["field", "laundry", "stand", "garden"]})
+		if kind == "apartment":
+			out[out.size() - 1]["blockers"] = _building_blockers(kind, pos, rot, f, block)
 		places[str(b["id"])] = {"pos": pos, "type": kind, "angle": rot, "block": block, "radius": float(t.get("radius", 76.0)) * f, "size": f,
 			"door": pos + Vector2(0, block + 16.0).rotated(rot) if block > 0.0 else pos + Vector2(0, 30)}
 	var fo: Variant = _village.get("fountain")
 	if fo is Array:
 		out.append({"kind": "fountain", "pos": (Vector2(fo[0], fo[1]) + Vector2(0.5, 0.5)) * cell_px, "angle": 0.0,
 			"seed": 5, "block": 46.0, "radius": 60.0, "size": 1.0, "quiet": false})
+	return out
+
+
+## Gebäude der Stadt (region.json "structures"): feste Objekte ohne Bewohner; sie erwachen mit dem Grün
+## unter ihnen. rot = Drehung in Grad (Vorderseite zur Straße).
+func _structure_objects(cfg: Dictionary) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	var types: Dictionary = cfg.get("types", {})
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 91
+	for b: Dictionary in cfg.get("list", []):
+		var kind := str(b.get("type", "apartment"))
+		var t: Dictionary = types.get(kind, {})
+		var sz: Array = t.get("size", [1.0, 1.0])
+		var f := rng.randf_range(float(sz[0]), float(sz[1]))
+		var pos := (Vector2(b["pos"][0], b["pos"][1]) + Vector2(0.5, 0.5)) * cell_px
+		var ang := deg_to_rad(float(b.get("rot", 0.0)))
+		var d := {"kind": kind, "pos": pos, "angle": ang, "seed": rng.randi(), "block": float(t.get("block", 60.0)) * f,
+			"radius": float(t.get("radius", 90.0)) * f, "size": f, "quiet": false}
+		d["blockers"] = _building_blockers(kind, pos, ang, f, float(d["block"]))
+		out.append(d)
+	return out
+
+
+## Hinderniskreise eines Gebäudes: ein Wohnblock bekommt drei Kreise entlang seiner Längsachse.
+func _building_blockers(kind: String, pos: Vector2, ang: float, f: float, block: float) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	if kind == "apartment":
+		var e := WorldObject.APARTMENT * f
+		for k in [-1.0, 0.0, 1.0]:
+			out.append({"pos": pos + Vector2(k * (e.x - e.y), 0).rotated(ang), "radius": e.y})
+	else:
+		out.append({"pos": pos, "radius": block})
 	return out
 
 
@@ -547,14 +609,22 @@ func _update_tips(delta: float) -> void:
 	var branch := str(_tutorial.hints.get("birds_branch", {}).get("node", ""))
 	var ctx := {"can_buy": not _tutorial.seen.has("tree") and _first_buy_possible(), "bees": _bees.bees.size(),
 		"birds": _birds.flocks.size(),
+		"drones": _drones.drones.size(),
+		"drones_branch": _branch_open("drones_branch"),
 		"dry": grid.is_dry(Vector2i(_robot.position / cell_px)) and not grid.is_green(Vector2i(_robot.position / cell_px)),
-		"birds_branch": skills.nodes.has(branch) and not skills.is_gated(branch) and skills.level(branch) == 0,
+		"birds_branch": _branch_open("birds_branch"),
 		"quiet": _tip_id != "" or not _hud.visible or MenuKit.any_open(get_tree()) or _end_wait >= 0.0}
 	var id := _tutorial.due(ctx, delta)
 	if id != "":
 		_tip_id = id
 		_tip_from = _robot.position
 		_hud.show_tip(_tutorial.text(id), _tutorial.show_sec(id))
+
+
+## Ist der Ast zum Hinweis id (tutorial.json "node") erreichbar, aber noch nichts davon gekauft?
+func _branch_open(id: String) -> bool:
+	var node := str(_tutorial.hints.get(id, {}).get("node", ""))
+	return skills.nodes.has(node) and not skills.is_gated(node) and skills.level(node) == 0
 
 
 func _first_buy_possible() -> bool:
@@ -618,6 +688,19 @@ func _apply_upgrades() -> void:
 	_birds.strip_cells = float(_bird_base["strip"]) + skills.stat("strip")
 	_birds.width_cells = float(_bird_base["width"]) + skills.stat("strip_width")
 	_birds.rest_sec = float(_bird_base["rest"]) * clampf(1.0 - skills.stat("bird_rest") / 100.0, 0.1, 1.0)
+	_drones.set_count(int(skills.stat("drones")))
+	_drone_speed = 1.0 + skills.stat("drone_speed") / 100.0
+	_drones.area_cells = float(_drone_base["area"]) + skills.stat("drone_area")
+	_drones.spray_cells = float(_drone_base["spray"]) + skills.stat("drone_spray")
+	_drones.charge_sec = float(_drone_base["charge"]) * clampf(1.0 - skills.stat("drone_charge") / 100.0, 0.1, 1.0)
+	var dock_on := not _drones.drones.is_empty()
+	if dock_on != _dock_blocks:   # die Station steht erst mit der ersten Drohne
+		_dock_blocks = dock_on
+		var db := {"pos": _drones.dock, "radius": Game.num("drones/dock_radius_px", 44.0)}
+		if dock_on:
+			_robot.obstacles.append(db)
+		else:
+			_robot.obstacles.erase(db)
 	var nest_on := not _birds.flocks.is_empty()
 	if nest_on != _nest_blocks:   # das Häuschen steht erst mit dem ersten Schwarm
 		_nest_blocks = nest_on
@@ -657,10 +740,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		_tree.open()
 		Sfx.play("open")
 		_tutorial.first("tree")   # schon gefunden: der Hinweis zum Öffnen kommt nicht mehr
-		var branch := str(_tutorial.hints.get("birds_branch", {}).get("node", ""))
-		if skills.nodes.has(branch) and not skills.is_gated(branch):
-			_tutorial.first("birds_branch")   # neuer Ast schon gesehen
-		if _tip_id in ["tree", "birds_branch"]:
+		for hint in ["birds_branch", "drones_branch"]:   # neuer Ast schon gesehen
+			var branch := str(_tutorial.hints.get(hint, {}).get("node", ""))
+			if skills.nodes.has(branch) and not skills.is_gated(branch):
+				_tutorial.first(hint)
+		if _tip_id in ["tree", "birds_branch", "drones_branch"]:
 			_hud.hide_tip()
 		if _tutorial.first("tree_help"):
 			_tree.show_help(_tutorial.text("tree_help"), _tutorial.show_sec("tree_help"))
@@ -689,6 +773,9 @@ func reset_game() -> void:
 	_end_wait = -1.0
 	_bees.set_count(0)
 	_birds.set_count(0)
+	_drones.set_count(0)
+	_drones.mist.clear()
+	_drones.blooms.clear()
 	_birds.seeds.clear()
 	_birds.blooms.clear()
 	_animals.clear()

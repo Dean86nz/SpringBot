@@ -2,7 +2,7 @@
 
 Kleines 2D-Incremental-Spiel: Ein Roboter macht eine graue, verfallene Welt wieder schön. Wo er fährt, wird der Boden grün. Godot 4.7.2, GDScript, Gamepad zuerst (ROG Ally X).
 
-Stand: **Phase 3, Meilenstein 4 mit Rückmeldung (neuer Name, dürre Stellen, Sonnenblumen der Samenvögel)**, Version 0.20.0. Plan und Stand in `PHASE3.md`. Plan der Phase 2 in `PHASE2.md`. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`, fremde Inhalte in `CREDITS.md`.
+Stand: **Phase 3, Meilenstein 5 (Großstadt, Gärtner-Drohnen)**, Version 0.21.0. Plan und Stand in `PHASE3.md`. Plan der Phase 2 in `PHASE2.md`. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`, fremde Inhalte in `CREDITS.md`.
 
 ## Steuerung
 
@@ -45,6 +45,11 @@ Stand: **Phase 3, Meilenstein 4 mit Rückmeldung (neuer Name, dürre Stellen, So
 - Dürre Stellen: `region.json` „dry“ (Flecken mit welligem Rand, `WorldMap.build_dry`) → `GroundGrid.dry`. Dort wächst nichts von allein
   (nie in der Grenze), Bienen begrünen sie nicht; der Boden-Shader zeigt rissige braune Erde (`drought_tex`).
   Sonnenblumen der Samenvögel: `GroundGrid.sown` (im Spielstand), vom Shader in der Zelle gezeichnet (`sown_tex`).
+- Großstadt: `tools/gen_city.py` erzeugt `data/regions/stadt/*.json` (Straßenraster, Fluss, Marktplatz mit Altstadt und Bewohnern, Parks,
+  Brachflächen, rund 770 Gebäude). `region.json` „structures“ sind feste Gebäude ohne Bewohner (`main.gd` `_structure_objects`), lange Gebäude haben
+  mehrere Hinderniskreise; „ground“: {„paved“: 1} macht Straßen zu Asphalt. Der Roboter prüft nur Hindernisse in seiner Nähe (Raster in `robot.gd`).
+- `src/sim/garden_drones.gd`: Gärtner-Drohnen (ab der Großstadt) fliegen von der Ladestation (`dock_cell`) Runden über ein graues Quadrat,
+  von außen nach innen, und sprühen Grün; `src/world/drone_view.gd` zeichnet Station, Drohnen und Sprühnebel.
 - `src/sim/seed_birds.gd`: Samenvögel (ab Felder und Vorort): Schwärme wählen den Streifen mit dem meisten Grau, säen ihn im Flug
   und rasten nach ein paar Streifen im Vogelhäuschen (`region.json` „nest_cell“). `src/world/bird_view.gd` zeichnet Häuschen, Schwärme in V-Form und fallende Samen.
 - `src/sim/ground_grid.gd`: Boden-Raster (1 Byte je Zelle), Begrünen im Kreis, Zähler, Schmutz-Rechteck,
@@ -79,4 +84,6 @@ Die Engine liegt in `Godot_v4.7.2-stable_win64.exe/` im Projektordner oder wird 
 # Grobe Spieldauer-Rechnung nach Preisänderungen im Skilltree (eine Karte, oder mit --reise alle Regionen nacheinander)
 python tools/balance_sim.py data/skilltree.json 0.4 640 480 1 0.005
 python tools/balance_sim.py data/skilltree.json 0.5 0 0 1 0.005 --reise
+# Großstadt neu erzeugen (überschreibt data/regions/stadt/)
+python tools/gen_city.py
 ```

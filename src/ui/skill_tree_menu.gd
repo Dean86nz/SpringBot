@@ -29,6 +29,7 @@ const BRANCH_COLORS := {
 	"growth": Color(0.52, 0.84, 0.40),
 	"bees": Color(1.0, 0.78, 0.30),
 	"birds": Color(0.62, 0.70, 1.0),
+	"drones": Color(0.55, 0.88, 0.82),
 }
 const GOLD := Color(1.0, 0.84, 0.35)
 const POOR := Color(1.0, 0.70, 0.66)
@@ -557,6 +558,11 @@ func _icon(id: String, p: Vector2, s: float, col: Color) -> void:
 		"bird_rest":
 			_layer.draw_colored_polygon(PackedVector2Array([p + Vector2(-0.6, -0.8) * s, p + Vector2(0.6, -0.8) * s, p]), col)
 			_layer.draw_colored_polygon(PackedVector2Array([p + Vector2(-0.6, 0.8) * s, p + Vector2(0.6, 0.8) * s, p]), col)
+		"drones", "drone_speed", "drone_area", "drone_spray", "drone_charge":   # Drohne: Kreuz mit vier Rotoren
+			for sd in [Vector2(1, 1), Vector2(1, -1), Vector2(-1, 1), Vector2(-1, -1)]:
+				_layer.draw_line(p, p + sd * s * 0.6, col, 3.0, true)
+				_layer.draw_arc(p + sd * s * 0.6, s * 0.28, 0.0, TAU, 16, col, 2.0, true)
+			_layer.draw_circle(p, s * 0.22, col)
 		"bee_rest":
 			_layer.draw_colored_polygon(PackedVector2Array([p + Vector2(-0.6, -0.8) * s, p + Vector2(0.6, -0.8) * s, p]), col)
 			_layer.draw_colored_polygon(PackedVector2Array([p + Vector2(-0.6, 0.8) * s, p + Vector2(0.6, 0.8) * s, p]), col)

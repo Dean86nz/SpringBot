@@ -20,7 +20,9 @@ lvl = {k: 0 for k in nodes}; lvl['root'] = 1
 drive_eff = float(args[2]) if len(args) > 2 else 0.6
 CM = float(args[5]) if len(args) > 5 else 1.0
 PR = float(args[6]) if len(args) > 6 else 0.01
-birds_cfg = json.load(open('data/balance.json', encoding='utf-8')).get('birds', {})
+_bal = json.load(open('data/balance.json', encoding='utf-8'))
+birds_cfg = _bal.get('birds', {})
+drones_cfg = _bal.get('drones', {})
 
 
 def stat(s): return sum(nodes[k]['effects'].get(s, 0) * lvl[k] for k in nodes)
@@ -38,7 +40,7 @@ def play(total, reached, bonus_cells, pollen, dry_share=0.0):
     green, t = 28.0, 0
     dry_total = total * dry_share
     green_dry = 0.0
-    src = {'robot': 0.0, 'spread': 0.0, 'bees': 0.0, 'birds': 0.0}
+    src = {'robot': 0.0, 'spread': 0.0, 'bees': 0.0, 'birds': 0.0, 'drones': 0.0}
     log = []
     while green < total and t < 6 * 3600:
         c = green / total
@@ -58,6 +60,14 @@ def play(total, reached, bonus_cells, pollen, dry_share=0.0):
         trips = birds_cfg.get('trips_home', 3)
         grey_hit = min(1.0, (1 - c) * 1.6)   # bester von mehreren Streifen: mehr Grau als der Schnitt
         birdcells = flocks * trips * strip * width * grey_hit / ((trips * (45 + strip) + 60) / bv + rest)
+        # Gärtner-Drohnen: ein Quadrat (2h)² je Flug, Runden im Abstand 1,7 × Sprühradius, An- und Rückflug ~80 Zellen, Laden
+        nd = stat('drones')
+        dv = drones_cfg.get('speed_px', 280) * (1 + stat('drone_speed') / 100) / 24
+        h = drones_cfg.get('area_cells', 8) + stat('drone_area')
+        spray = drones_cfg.get('spray_cells', 1.8) + stat('drone_spray')
+        charge = drones_cfg.get('charge_sec', 5.0) * max(0.1, 1 - stat('drone_charge') / 100)
+        dronecells = nd * (2 * h) ** 2 * grey_hit / (((2 * h) ** 2 / (1.7 * spray) + 80) / dv + charge)
+        birdcells += dronecells   # wirken wie die Vögel auch auf dürrem Boden
         green_wet = green - green_dry
         grey_dry = dry_total - green_dry
         grey_wet = max(total - dry_total - green_wet, 0.0)
@@ -73,7 +83,7 @@ def play(total, reached, bonus_cells, pollen, dry_share=0.0):
         to_wet = robot + birdcells - to_dry + spread + beecells
         green_dry = min(dry_total, green_dry + to_dry)
         green_wet = min(total - dry_total, green_wet + to_wet)
-        src['robot'] += robot; src['spread'] += spread; src['bees'] += beecells; src['birds'] += birdcells
+        src['robot'] += robot; src['spread'] += spread; src['bees'] += beecells; src['birds'] += birdcells - dronecells; src['drones'] += dronecells
         green = green_wet + green_dry
         if total - green < 0.5:
             green = total

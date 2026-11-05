@@ -11,6 +11,9 @@ var accel := 10.0
 var bounds := Rect2()
 var radius_px := 30.0
 var obstacles: Array[Dictionary] = []   # {"pos": Vector2, "radius": float}
+const OBSTACLE_BUCKET_PX := 512.0
+var _buckets: Dictionary = {}   # Rasterzelle → Hindernisse darin (Großstadt: Tausende), neu bei geänderter Liste
+var _bucket_n := -1
 var walkable := Callable()                # func(p: Vector2) -> bool, leer = überall befahrbar
 var water_radius_px := 24.0               # so weit um die Mitte muss der Boden befahrbar sein
 var velocity := Vector2.ZERO
@@ -52,7 +55,7 @@ func _process(delta: float) -> void:
 			next = position
 			velocity = Vector2.ZERO
 	position = next
-	for o in obstacles:
+	for o in _near_obstacles():
 		position = push_out(position, o["pos"], float(o["radius"]) + radius_px)
 	if bounds.has_area():
 		position = position.clamp(bounds.position, bounds.end)
@@ -60,6 +63,27 @@ func _process(delta: float) -> void:
 		rotation = lerp_angle(rotation, velocity.angle(), clampf(12.0 * delta, 0.0, 1.0))
 		_wobble += delta * velocity.length() * 0.05
 	queue_redraw()
+
+
+## Hindernisse in der Nähe (3 × 3 Rasterzellen); das Raster wird neu gebaut, wenn sich die Liste ändert.
+## Hindernisse sind kleiner als eine Rasterzelle, deshalb reicht die Nachbarschaft.
+func _near_obstacles() -> Array:
+	if _bucket_n != obstacles.size():
+		_bucket_n = obstacles.size()
+		_buckets.clear()
+		for o in obstacles:
+			var k := Vector2i((Vector2(o["pos"]) / OBSTACLE_BUCKET_PX).floor())
+			if not _buckets.has(k):
+				_buckets[k] = []
+			(_buckets[k] as Array).append(o)
+	var out := []
+	var c := Vector2i((position / OBSTACLE_BUCKET_PX).floor())
+	for y in range(c.y - 1, c.y + 2):
+		for x in range(c.x - 1, c.x + 2):
+			var list: Variant = _buckets.get(Vector2i(x, y))
+			if list != null:
+				out.append_array(list)
+	return out
 
 
 ## Mitte und 8 Punkte im Kreis water_radius_px befahrbar?

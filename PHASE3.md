@@ -75,6 +75,9 @@ Die Helfer sind eigene Ideen (nichts aus Unharvest oder Moon Sweepers). Größen
    Rückmeldung in 0.20.0: neuer Name „Regrowth“ (weg vom Frühlings-Thema, es geht ums Wieder-schön-Machen), Anzeige „Wiederhergestellt“;
    dürre Stellen in Felder und Vorort (nur Roboter und Samenvögel schaffen sie), Samenvögel hinterlassen Sonnenblumen-Reihen.
 5. **Großstadt** mit Gärtner-Drohnen.
+   (erledigt in 0.21.0: 1000 × 700 Zellen, Straßenraster aus Asphalt, Stadtfluss mit Brücken, Marktplatz mit Altstadt und 18 Bewohnern,
+   Stadtpark, Brachflächen, rund 770 Wohnblocks und Hochhäuser mit Dachgarten; Gärtner-Drohnen mit 13 Knoten, verdeckt bis zur Ankunft.
+   Modell: Großstadt rund 15 Minuten, weil die Helfer aus den ersten Regionen mitkommen.)
 6. **Die ganze Welt** mit Regenwolken, großer Abschluss und Abspann.
 
 Nach jedem Regions-Meilenstein: Balancing-Prüfung (Dauer je Region) und Leistungsmessung auf dem Ally.

@@ -40,7 +40,7 @@ var land_count := 0                  # Zellen, die grün werden können (= 100 %
 var hop_cells := 12                  # so weit springt die Ausbreitung über Wege und Wasser
 var green_count := 0
 var dry := PackedByteArray()         # 1 = dürre Stelle (bleibt wie das Gelände)
-var sown := PackedByteArray()        # 1 = hier wächst eine Sonnenblume der Samenvögel
+var sown := PackedByteArray()        # 255 = hier wächst eine Sonnenblume der Samenvögel (direkt als Textur nutzbar)
 var sown_dirty := false              # sown hat sich geändert (Darstellung lädt neu hoch)
 var frontier := PackedInt32Array()   # Zellindizes der Grenze
 var _slot := PackedInt32Array()      # Zellindex → Position in frontier, -1 = nicht in der Grenze
@@ -93,7 +93,7 @@ func is_dry(c: Vector2i) -> bool:
 ## Sonnenblume der Samenvögel in dieser Zelle (nur auf Land).
 func mark_sown(c: Vector2i) -> void:
 	if in_bounds(c) and terrain[c.y * width + c.x] == LAND and sown[c.y * width + c.x] == 0:
-		sown[c.y * width + c.x] = 1
+		sown[c.y * width + c.x] = 255
 		sown_dirty = true
 
 
@@ -259,6 +259,10 @@ func sown_to_bytes() -> PackedByteArray:
 func load_sown(packed: PackedByteArray) -> void:
 	var raw := packed.decompress(width * height, FileAccess.COMPRESSION_DEFLATE) if packed.size() > 0 else PackedByteArray()
 	if raw.size() == width * height:
+		if raw.has(1):   # Spielstand aus 0.20.0: 1 statt 255
+			for i in raw.size():
+				if raw[i] == 1:
+					raw[i] = 255
 		sown = raw
 		sown_dirty = true
 

@@ -32,6 +32,16 @@
 		"flock_size": 5,
 		"nest_radius_px": 26
 	},
+	"drones": {
+		"_info": "Gärtner-Drohnen: Tempo (Pixel/s), halbe Seite des Rechtecks und Radius des Sprühkreises in Zellen, Ladezeit an der Station (s), Abstand zum nächsten Rechteck (Zellen), Versuche je Planung, Hindernis-Radius der Station.",
+		"speed_px": 320.0,
+		"area_cells": 10,
+		"spray_cells": 2.2,
+		"charge_sec": 5.0,
+		"range_cells": [15, 60],
+		"target_tries": 12,
+		"dock_radius_px": 44
+	},
 	"camera": {
 		"zoom": 1.0,
 		"smoothing": 6.0,

@@ -3,7 +3,7 @@ extends SceneTree
 ## ein Bild. Nicht headless (Fenster öffnet kurz).
 ##   Godot_v4.7.2-stable_win64_console.exe --path . -s tools/object_gallery.gd -- <ausgabe.png>
 
-const KINDS := ["oak", "fir", "birch", "fruit", "willow", "sapling", "rock", "pond", "bush", "log", "fence", "stones", "house", "fountain", "church", "school", "library", "shop", "smithy", "farmhouse", "barn", "stand", "field", "laundry", "cemetery", "windmill", "silo", "garden"]
+const KINDS := ["oak", "fir", "birch", "fruit", "willow", "sapling", "rock", "pond", "bush", "log", "fence", "stones", "house", "fountain", "church", "school", "library", "shop", "smithy", "farmhouse", "barn", "stand", "field", "laundry", "cemetery", "windmill", "silo", "garden", "apartment", "tower"]
 const STEP := 170.0
 
 var _out := "user://gallery.png"

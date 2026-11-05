@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.21.0 – Phase 3, Meilenstein 5: Großstadt mit Gärtner-Drohnen
+
+- **Dritte Region: Großstadt** (1000 × 700 Zellen): Straßenraster aus Asphalt mit Gehwegen, ein Stadtfluss mit Brücken,
+  rund 770 Wohnblocks und Hochhäuser mit Innenhöfen, ein Stadtpark, Brachflächen (dürr) und in der Mitte die Altstadt
+  um einen Marktplatz mit Brunnen: Dom, Schule, Bücherei, Laden, Café, Wohnungen, Gemeinschaftsgärten.
+  18 Bewohner kehren zurück und reparieren die Altstadt. Gebiete: Altstadt, Innenstadt, Stadtpark, Flussufer, Wohnviertel, Gewerbegebiet.
+- **Wohnblocks und Hochhäuser:** kaputt mit Rissen, eingeschlagenen Oberlichtern und Schutt; wiederhergestellt mit Dachgarten
+  (Beete, Bäumchen, Holzdeck, Solarzellen, beim Hochhaus ein Wassertank).
+- **Gärtner-Drohnen**, der neue Helfer: Sie starten an einer Ladestation, suchen sich einen grauen Hof, ein Dach oder eine Brache
+  und fliegen darüber Runden von außen nach innen, wie beim Rasenmähen, mit grünem Sprühnebel. Über Straßen und Häuser fliegen sie
+  einfach hinweg. Danach laden sie an der Station. Sie helfen in jeder Region.
+- **Neuer Ast im Skilltree** (rechts unten, 13 Knoten, drei besondere): mehr Drohnen, größere Runden, breiterer Sprühkreis,
+  schneller fliegen und laden, mehr Pollen. Verdeckt, bis man die Großstadt erreicht; Hinweise bei der Ankunft und beim ersten Flug.
+- Leistung: Objekte werden über ein Raster platziert, der Roboter prüft nur Hindernisse in seiner Nähe, die Sonnenblumen-Maske
+  wird ohne Umrechnung und höchstens zweimal pro Sekunde hochgeladen (am PC mit allen Helfern auf Maximum über 350 FPS).
+
 ## 0.20.0 – Neuer Name, dürre Stellen, Sonnenblumen der Samenvögel
 
 - **Neuer Name: Regrowth.** Weg vom Frühlings-Thema: Es geht darum, die graue, verfallene Welt wieder schön zu machen.

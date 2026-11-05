@@ -55,7 +55,7 @@ func test_effect_text() -> void:
 
 func test_real_data_is_consistent() -> void:
 	var t := SkillTree.new(Game.load_json("res://data/skilltree.json"))
-	assert_true(t.order.size() >= 40 and t.order.size() <= 60, "40–60 Knoten, sind %d" % t.order.size())
+	assert_true(t.order.size() >= 40 and t.order.size() <= 90, "40–90 Knoten (jede Region bringt einen Ast), sind %d" % t.order.size())
 	for id in t.order:
 		for r in t.nodes[id].get("requires", []):
 			assert_true(t.nodes.has(str(r)), "%s verlangt unbekannten Knoten %s" % [id, r])

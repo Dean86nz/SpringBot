@@ -46,7 +46,7 @@ func test_birds_prefer_dry_and_plant_sunflowers() -> void:
 		if g.dry[i] != 0 and g.cells[i] == GroundGrid.GREEN:
 			dry_green += 1
 	assert_true(dry_green > 60, "Vögel begrünen dürren Boden (%d)" % dry_green)
-	assert_true(g.sown.count(1) > 5, "Sonnenblumen-Reihen (%d)" % g.sown.count(1))
+	assert_true(g.sown.count(255) > 5, "Sonnenblumen-Reihen (%d)" % g.sown.count(255))
 	var g2 := _grid()
 	g2.load_sown(g.sown_to_bytes())
 	assert_eq(g2.sown, g.sown, "Sonnenblumen im Spielstand")

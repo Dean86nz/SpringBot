@@ -7,7 +7,8 @@ extends Node2D
 ## Arten: Bäume oak (Laubbaum), fir (Tanne), birch (Birke), fruit (Obstbaum), willow (Weide),
 ## sapling (junger Baum); dazu rock, pond, bush; am Wegrand log, fence, stones; im Dorf house, fountain,
 ## church, school, library, shop, smithy, farmhouse, barn, stand (Honigstand), field, laundry (Wäscheleine), cemetery (Friedhof),
-## in Felder und Vorort auch windmill (Windmühle, die Flügel drehen sich als eigener Knoten), silo, garden (Gemüsegarten)
+## in Felder und Vorort auch windmill (Windmühle, die Flügel drehen sich als eigener Knoten), silo, garden (Gemüsegarten),
+## in der Großstadt apartment (Wohnblock) und tower (Hochhaus) mit Flachdach, erwacht mit Dachgarten
 ## (angle dreht Gebäude so, dass ihre Vorderseite, lokal +y, zum Dorfplatz zeigt).
 ## Was sich im Dorf bewegt (Menschen, Wäsche, Honiggläser, Funken), zeichnet VillagerView.
 ## Jedes Objekt hat eine eigene Größe (size, über die Skalierung des Knotens).
@@ -20,6 +21,8 @@ const SHADOW := Color(0, 0, 0, 0.16)
 const BLOSSOM := [Color(1.0, 0.72, 0.84), Color(1.0, 0.97, 0.98)]
 const FLOWERS := [Color(1.0, 0.56, 0.69), Color(1.0, 0.85, 0.30), Color(1.0, 1.0, 0.96), Color(0.72, 0.55, 0.95), Color(1.0, 0.45, 0.35), Color(0.55, 0.75, 1.0)]
 const ANIM_SEC := 0.7
+const APARTMENT := Vector2(190, 120)   # halbe Größe des Wohnblocks (Pixel, vor der Skalierung)
+const TOWER := Vector2(120, 120)
 
 var kind := "oak"
 var obj_seed := 0
@@ -199,6 +202,10 @@ func _draw() -> void:
 			_silo(alive)
 		"garden":
 			_garden(alive)
+		"apartment":
+			_flat_roof(APARTMENT, 1.0, alive)
+		"tower":
+			_flat_roof(TOWER, 1.8, alive)
 	draw_set_transform(Vector2.ZERO)
 
 
@@ -960,3 +967,60 @@ func _garden(alive: bool) -> void:
 			_dot(a.lerp(b, k / 5.0), 2.5, wood.darkened(0.15))
 	if not alive:
 		draw_line(Vector2(r.end.x + 4, -20), Vector2(r.end.x + 16, 26), wood, 3.0)   # umgefallenes Zaunstück
+
+
+## Flachdach von oben (Wohnblock, Hochhaus): Brüstung, Kies, Dachluke, Lüftung. height: Höhe (längerer Schatten).
+## Kaputt: Risse, dunkle Flecken, eingeschlagene Oberlichter, Schutt. Erwacht: Dachgarten mit Beeten,
+## kleinen Bäumen, Holzdeck und Solarzellen.
+func _flat_roof(e: Vector2, height: float, alive: bool) -> void:
+	draw_set_transform(Vector2(10, 14) * height, 0.0)   # Schatten fällt immer nach rechts unten
+	var sh := PackedVector2Array()
+	for c in [-e, Vector2(e.x, -e.y), e, Vector2(-e.x, e.y)]:
+		sh.append(c.rotated(angle))
+	_quad(PackedVector2Array([sh[0], sh[1], sh[2]]), SHADOW)
+	_quad(PackedVector2Array([sh[0], sh[2], sh[3]]), SHADOW)
+	_tf(Vector2.ZERO, angle)
+	var wall := Color(0.86, 0.80, 0.70) if alive else Color(0.66, 0.64, 0.61)
+	draw_rect(Rect2(-e, e * 2.0), wall)
+	var inner := Rect2(-e + Vector2(8, 8), e * 2.0 - Vector2(16, 16))
+	draw_rect(inner, Color(0.70, 0.70, 0.68) if alive else Color(0.58, 0.57, 0.55))
+	_outline(PackedVector2Array([-e, Vector2(e.x, -e.y), e, Vector2(-e.x, e.y)]), INK, 3.0)
+	_outline(PackedVector2Array([inner.position, Vector2(inner.end.x, inner.position.y), inner.end, Vector2(inner.position.x, inner.end.y)]), wall.darkened(0.25), 1.5)
+	_rng.seed = obj_seed
+	if not alive:
+		for k in int(e.x * e.y / 2500.0):   # Risse
+			var a := Vector2(_rng.randf_range(inner.position.x, inner.end.x), _rng.randf_range(inner.position.y, inner.end.y))
+			var b := a + Vector2.from_angle(_rng.randf() * TAU) * _rng.randf_range(14, 30)
+			draw_line(a, b, Color(0.40, 0.39, 0.38), 1.5)
+			draw_line(b, b + Vector2.from_angle(_rng.randf() * TAU) * 10.0, Color(0.40, 0.39, 0.38), 1.2)
+		for k in 3:   # dunkle Flecken
+			_dot(Vector2(_rng.randf_range(inner.position.x + 10, inner.end.x - 10), _rng.randf_range(inner.position.y + 10, inner.end.y - 10)), _rng.randf_range(7, 13), Color(0.44, 0.43, 0.42, 0.6))
+		for k in 3:   # eingeschlagene Oberlichter
+			var r := Rect2(Vector2(-e.x * 0.7 + k * e.x * 0.5, -e.y * 0.4), Vector2(26, 18))
+			draw_rect(r, Color(0.24, 0.22, 0.21))
+			draw_line(r.position, r.end, Color(0.62, 0.66, 0.70), 1.5)
+			draw_line(Vector2(r.end.x, r.position.y), Vector2(r.position.x + 6, r.end.y), Color(0.62, 0.66, 0.70), 1.5)
+		for k in 6:   # Schutt an der Kante
+			_ring(Vector2(e.x + 6 + _rng.randf_range(0, 10), _rng.randf_range(-e.y, e.y)), _rng.randf_range(3, 6), Color(0.62, 0.60, 0.57), INK, 1.0)
+		return
+	# Dachgarten: Holzdeck, Beete, kleine Bäume, Solarzellen, Lüftung
+	var deck := Rect2(inner.position + Vector2(6, inner.size.y * 0.55), Vector2(inner.size.x * 0.4, inner.size.y * 0.4))
+	draw_rect(deck, Color(0.74, 0.58, 0.40))
+	for k in int(deck.size.x / 8.0):
+		draw_line(deck.position + Vector2(k * 8.0, 0), deck.position + Vector2(k * 8.0, deck.size.y), Color(0.62, 0.47, 0.32), 1.0)
+	var beds := Rect2(inner.position + Vector2(inner.size.x * 0.48, 6), Vector2(inner.size.x * 0.48, inner.size.y - 12))
+	for row in 3:
+		var r := Rect2(beds.position + Vector2(0, row * beds.size.y / 3.0), Vector2(beds.size.x, beds.size.y / 3.0 - 4))
+		_rect_ink(r, Color(0.46, 0.34, 0.22), 1.5)
+		for j in int(r.size.x / 10.0):
+			_dot(r.position + Vector2(6 + j * 10, r.size.y * 0.5), 4.0, Color(0.42, 0.74, 0.32) if (j + row) % 3 else FLOWERS[(j + row + obj_seed) % FLOWERS.size()])
+	for k in int(inner.size.x / 70.0):   # kleine Bäume in Kübeln
+		var tp := inner.position + Vector2(16 + k * 30, 16)
+		_ring(tp, 9.0, Color(0.36, 0.64, 0.32), Color(0.26, 0.48, 0.24), 1.5)
+		_dot(tp + Vector2(-3, -3), 4.0, Color(0.50, 0.78, 0.40))
+	var solar := Rect2(Vector2(inner.position.x + 6, inner.position.y + inner.size.y * 0.32), Vector2(inner.size.x * 0.38, 12))
+	draw_rect(solar, Color(0.24, 0.36, 0.60))
+	for k in 4:
+		draw_line(solar.position + Vector2(k * solar.size.x / 4.0, 0), solar.position + Vector2(k * solar.size.x / 4.0, solar.size.y), Color(0.60, 0.70, 0.86), 1.0)
+	if height > 1.2:   # Hochhaus: Wassertank
+		_ring(Vector2(e.x * 0.6, -e.y * 0.6), 11.0, Color(0.70, 0.72, 0.76), INK, 2.0)

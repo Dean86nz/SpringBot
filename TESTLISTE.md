@@ -1,12 +1,14 @@
-# Testliste v0.20.0: neuer Name, dürre Stellen, Sonnenblumen der Samenvögel
+# Testliste v0.21.0: Phase 3, Meilenstein 5 (Großstadt, Gärtner-Drohnen)
 
-EXEs: `export/windows/SpringBot_v0.20.0.exe` (Release) und `SpringBot_v0.20.0_DEBUG.exe` (Debug mit Cheat-Menü).
-Cheat-Menü (nur Debug): L3 + R3 eine Sekunde halten, PC F12.
+EXEs: `export/windows/SpringBot_v0.21.0.exe` (Release) und `SpringBot_v0.21.0_DEBUG.exe` (Debug mit Cheat-Menü).
+Cheat-Menü (nur Debug): L3 + R3 eine Sekunde halten, PC F12. Schnell in die Großstadt: in Felder und Vorort im Cheat-Menü
+„Welt fast fertig“, letzten Fleck begrünen, nach dem Fest „Weiterreisen“.
 
-1. Start: Titel „Regrowth“, darunter „Mach die graue Welt wieder schön.“ Weiterspielen geht dort weiter, wo du warst (Spielstand übernommen).
-2. Oben steht „Wiederhergestellt: … %“. Nirgends mehr „Frühling“ (Einleitung, Karte, Reisekarte, Skilltree, Endbildschirm).
-3. Felder und Vorort: große braune, rissige Flecken. Beim ersten Befahren der Hinweis zum dürren Boden.
-4. Dürre Flecken bleiben braun, während ringsum das Grün von allein wächst und die Bienen blühen lassen.
-5. Samenvögel (Vogelhäuschen im Skilltree): Sie fliegen zu den dürren Flecken und säen dort grüne Streifen mit einer Reihe Sonnenblumen in der Mitte.
-6. Beenden und neu starten: Die Sonnenblumen sind noch da.
-7. Wie lange dauert Felder und Vorort jetzt? Fühlen sich die dürren Stellen gut an oder nervig?
+1. Reisekarte: Heimatdorf, Felder und Vorort, Großstadt und eine verhüllte Station („Die ganze Welt“).
+2. Ankunft in der Großstadt: Einleitung, Banner. Straßen sind grau asphaltiert mit Gehweg, Blocks mit Wohnblocks und Hochhäusern, in der Mitte der Marktplatz.
+3. Fährt der Roboter sauber um die langen Wohnblocks herum (nicht über die Dachecken)?
+4. Hinweis „Neu im Skilltree: die Gärtner-Drohnen!“; der Ast liegt rechts unten. Ladestation kaufen (15.000 Pollen): zwei Drohnen heben ab.
+5. Drohnen fliegen über einen grauen Block, Runde um Runde nach innen, mit grünem Nebel; danach zurück zur Station.
+6. Gebäude, unter denen es grün wird, bekommen einen Dachgarten. Die Altstadt reparieren die Bewohner.
+7. Brachflächen (braun, rissig) bleiben, bis Roboter, Samenvögel oder Drohnen sie begrünen.
+8. Läuft die Großstadt flüssig auf dem Ally, auch mit vielen Helfern? Wie lange hat sie gedauert?

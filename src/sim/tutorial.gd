@@ -17,7 +17,7 @@ func _init(cfg: Dictionary = {}) -> void:
 ## ctx: {can_buy: bool, bees: int, birds: int, birds_branch: bool, dry: bool (Roboter auf dürrem Grau), quiet: bool}. quiet = gerade nichts einblenden (Menü offen,
 ## anderer Hinweis sichtbar). Gibt die id des fälligen Hinweises zurück ("" = keiner) und merkt ihn.
 func due(ctx: Dictionary, delta: float) -> String:
-	for id: String in ["move", "tree", "bees", "birds_branch", "birds", "dry"]:
+	for id: String in ["move", "tree", "bees", "birds_branch", "birds", "dry", "drones_branch", "drones"]:
 		if seen.has(id) or not _condition(id, ctx):
 			_wait.erase(id)
 			continue
@@ -44,6 +44,10 @@ func _condition(id: String, ctx: Dictionary) -> bool:
 			return int(ctx.get("birds", 0)) > 0
 		"dry":
 			return bool(ctx.get("dry", false))
+		"drones_branch":
+			return bool(ctx.get("drones_branch", false))
+		"drones":
+			return int(ctx.get("drones", 0)) > 0
 	return false
 
 

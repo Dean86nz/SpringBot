@@ -20,7 +20,12 @@
 		"bird_speed": {"label": "% Flugtempo der Vögel", "format": "+%s"},
 		"strip": {"label": "Zellen längere Saatstreifen", "format": "+%s"},
 		"strip_width": {"label": "Zellen breitere Saatstreifen", "format": "+%s"},
-		"bird_rest": {"label": "% kürzere Rast", "format": "+%s"}
+		"bird_rest": {"label": "% kürzere Rast", "format": "+%s"},
+		"drones": {"label": "Gärtner-Drohnen", "format": "+%s"},
+		"drone_speed": {"label": "% Flugtempo der Drohnen", "format": "+%s"},
+		"drone_area": {"label": "Zellen größere Runden", "format": "+%s"},
+		"drone_spray": {"label": "Zellen breiterer Sprühkreis", "format": "+%s"},
+		"drone_charge": {"label": "% schneller geladen", "format": "+%s"}
 	},
 	"nodes": [
 		{"id": "root", "branch": "root", "name": "Lebensfunke", "desc": "Der kleine Roboter erwacht. Von hier aus wächst alles.", "pos": [0, 0], "requires": [], "max_level": 1, "base_cost": 0, "cost_growth": 1, "effects": {}},
@@ -84,6 +89,20 @@
 		{"id": "v10", "branch": "birds", "region": "felder", "name": "Großer Vogelzug", "desc": "Ein ganzer Himmel voller Samenvögel.", "pos": [-3.2, 4.9], "requires": ["v7"], "max_level": 1, "base_cost": 900000, "cost_growth": 1, "effects": {"birds": 3}, "special": true},
 		{"id": "v11", "branch": "birds", "region": "felder", "name": "Saatsturm", "desc": "Die Samen wirbeln breit über das Land.", "pos": [3.2, 4.9], "requires": ["v8"], "max_level": 1, "base_cost": 700000, "cost_growth": 1, "effects": {"strip_width": 1.5}, "special": true},
 		{"id": "v12", "branch": "birds", "region": "felder", "name": "Nimmermüde", "desc": "Die Vögel rasten kürzer im Häuschen.", "pos": [0, 5.0], "requires": ["v9"], "max_level": 3, "base_cost": 300000, "cost_growth": 1.9, "effects": {"bird_rest": 25}},
-		{"id": "v13", "branch": "birds", "region": "felder", "name": "Himmelsgarten", "desc": "Wo die Vögel fliegen, wird der Himmel zum Garten.", "pos": [0, 6.2], "requires": ["v10", "v11", "v12"], "max_level": 1, "base_cost": 2500000, "cost_growth": 1, "effects": {"birds": 3, "strip": 20}, "special": true}
+		{"id": "v13", "branch": "birds", "region": "felder", "name": "Himmelsgarten", "desc": "Wo die Vögel fliegen, wird der Himmel zum Garten.", "pos": [0, 6.2], "requires": ["v10", "v11", "v12"], "max_level": 1, "base_cost": 2500000, "cost_growth": 1, "effects": {"birds": 3, "strip": 20}, "special": true},
+
+		{"id": "d1", "branch": "drones", "region": "stadt", "name": "Ladestation", "desc": "Zwei Gärtner-Drohnen heben ab. Sie fliegen Runden über graue Höfe und Dächer.", "pos": [4.3, 3.4], "requires": ["root"], "max_level": 1, "base_cost": 15000, "cost_growth": 1, "effects": {"drones": 2}},
+		{"id": "d2", "branch": "drones", "region": "stadt", "name": "Schnelle Rotoren", "desc": "Die Drohnen fliegen schneller.", "pos": [5.3, 3.2], "requires": ["d1"], "max_level": 3, "base_cost": 30000, "cost_growth": 1.8, "effects": {"drone_speed": 12}},
+		{"id": "d3", "branch": "drones", "region": "stadt", "name": "Große Runden", "desc": "Die Drohnen nehmen sich größere Flächen vor.", "pos": [4.6, 4.4], "requires": ["d1"], "max_level": 3, "base_cost": 35000, "cost_growth": 1.8, "effects": {"drone_area": 2}},
+		{"id": "d4", "branch": "drones", "region": "stadt", "name": "Stadtgrün", "desc": "Grüne Höfe und Dächer bringen mehr Pollen.", "pos": [5.6, 4.3], "requires": ["d2", "d3"], "max_level": 3, "base_cost": 80000, "cost_growth": 1.8, "effects": {"pollen": 5}},
+		{"id": "d5", "branch": "drones", "region": "stadt", "name": "Zweite Drohne", "desc": "Noch eine Gärtner-Drohne hebt ab.", "pos": [6.3, 3.4], "requires": ["d2"], "max_level": 3, "base_cost": 90000, "cost_growth": 2.0, "effects": {"drones": 1}},
+		{"id": "d6", "branch": "drones", "region": "stadt", "name": "Feiner Nebel", "desc": "Die Drohnen sprühen breiter.", "pos": [4.9, 5.4], "requires": ["d3"], "max_level": 3, "base_cost": 70000, "cost_growth": 1.9, "effects": {"drone_spray": 0.4}},
+		{"id": "d7", "branch": "drones", "region": "stadt", "name": "Weite Runden", "desc": "Noch größere Flächen auf einen Flug.", "pos": [7.2, 3.9], "requires": ["d5"], "max_level": 3, "base_cost": 250000, "cost_growth": 1.9, "effects": {"drone_area": 3}},
+		{"id": "d8", "branch": "drones", "region": "stadt", "name": "Schnellladen", "desc": "Die Drohnen laden schneller.", "pos": [5.8, 5.5], "requires": ["d6"], "max_level": 3, "base_cost": 200000, "cost_growth": 1.9, "effects": {"drone_charge": 25}},
+		{"id": "d9", "branch": "drones", "region": "stadt", "name": "Dachwiesen", "desc": "Blühende Dächer bringen viele Pollen.", "pos": [6.5, 4.8], "requires": ["d4"], "max_level": 3, "base_cost": 350000, "cost_growth": 1.9, "effects": {"pollen": 5}},
+		{"id": "d10", "branch": "drones", "region": "stadt", "name": "Schwarm aus Drohnen", "desc": "Ein ganzer Schwarm Gärtner-Drohnen.", "pos": [8.0, 4.4], "requires": ["d7"], "max_level": 1, "base_cost": 1200000, "cost_growth": 1, "effects": {"drones": 3}, "special": true},
+		{"id": "d11", "branch": "drones", "region": "stadt", "name": "Regenmacher", "desc": "Die Drohnen sprühen wie ein Sommerregen.", "pos": [5.6, 6.5], "requires": ["d8"], "max_level": 1, "base_cost": 1000000, "cost_growth": 1, "effects": {"drone_spray": 1.5}, "special": true},
+		{"id": "d12", "branch": "drones", "region": "stadt", "name": "Turbo-Akkus", "desc": "Kaum noch Pausen an der Station.", "pos": [7.2, 5.6], "requires": ["d9"], "max_level": 3, "base_cost": 600000, "cost_growth": 1.9, "effects": {"drone_charge": 20}},
+		{"id": "d13", "branch": "drones", "region": "stadt", "name": "Grüne Stadt", "desc": "Die ganze Stadt wird zum Garten.", "pos": [7.6, 6.6], "requires": ["d10", "d11", "d12"], "max_level": 1, "base_cost": 3000000, "cost_growth": 1, "effects": {"drones": 3, "drone_area": 4}, "special": true}
 	]
 }
