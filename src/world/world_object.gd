@@ -6,7 +6,7 @@ extends Node2D
 ## wird nur einmal, beim Wechsel von tot zu lebendig (ein blühender Baum hat über 200 Kreise).
 ## Arten: Bäume oak (Laubbaum), fir (Tanne), birch (Birke), fruit (Obstbaum), willow (Weide),
 ## sapling (junger Baum); dazu rock, pond, bush; am Wegrand log, fence, stones; im Dorf house, fountain,
-## church, school, library, shop, smithy, farmhouse, barn, stand (Honigstand), field, laundry (Wäscheleine)
+## church, school, library, shop, smithy, farmhouse, barn, stand (Honigstand), field, laundry (Wäscheleine), cemetery (Friedhof)
 ## (angle dreht Gebäude so, dass ihre Vorderseite, lokal +y, zum Dorfplatz zeigt).
 ## Was sich im Dorf bewegt (Menschen, Wäsche, Honiggläser, Funken), zeichnet VillagerView.
 ## Jedes Objekt hat eine eigene Größe (size, über die Skalierung des Knotens).
@@ -24,6 +24,7 @@ var kind := "oak"
 var obj_seed := 0
 var angle := 0.0
 var quiet := false      # erwacht leise (ohne Klang, wenige Blätter)
+var vid := ""           # Gebäude des Dorfes: erwacht erst, wenn die Bewohner es repariert haben
 var _size := 1.0
 var awake := false
 var _anim := -1.0       # läuft beim Erwachen von 0 bis ANIM_SEC, sonst < 0
@@ -37,6 +38,7 @@ func setup(d: Dictionary) -> void:
 	obj_seed = int(d["seed"])
 	angle = float(d.get("angle", 0.0))
 	quiet = bool(d.get("quiet", false))
+	vid = str(d.get("id", ""))
 	_size = float(d.get("size", 1.0))
 	scale = Vector2.ONE * _size
 
@@ -142,6 +144,8 @@ func _draw() -> void:
 			_field(alive)
 		"laundry":
 			_laundry(alive)
+		"cemetery":
+			_cemetery(alive)
 	draw_set_transform(Vector2.ZERO)
 
 
@@ -760,3 +764,33 @@ func _laundry(alive: bool) -> void:
 	for x in [-64.0, 64.0]:
 		_ring(Vector2(x, 0), 4.5, Color(0.58, 0.44, 0.30) if alive else Color(0.52, 0.48, 0.44), INK, 1.5)
 	_ring(Vector2(-80, 16), 11.0, Color(0.80, 0.66, 0.42) if alive else Color(0.60, 0.56, 0.50), INK, 2.0)
+
+
+## Friedhof: niedrige Steinmauer, Reihen von Grabsteinen und Kreuzen, im Grün mit Blumen auf den Gräbern.
+## Tot: umgekippte Steine, kahle Erde.
+func _cemetery(alive: bool) -> void:
+	_tf()
+	var r := Rect2(-70, -52, 140, 104)
+	draw_rect(r, Color(0.50, 0.70, 0.36) if alive else Color(0.62, 0.59, 0.54))
+	var wall := Color(0.72, 0.70, 0.66) if alive else Color(0.58, 0.56, 0.53)
+	_outline(PackedVector2Array([r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x + 52, r.end.y)]), wall, 5.0, false)
+	_outline(PackedVector2Array([Vector2(r.position.x + 30, r.end.y), Vector2(r.position.x, r.end.y), r.position]), wall, 5.0, false)   # Lücke unten = Tor
+	_rng.seed = obj_seed
+	for row in 3:
+		for k in 5:
+			var p := Vector2(-52 + k * 26, -32 + row * 30)
+			var fallen := not alive and _rng.randf() < 0.4
+			draw_rect(Rect2(p + Vector2(-8, 4), Vector2(16, 12)), Color(0.46, 0.38, 0.30) if alive else Color(0.55, 0.51, 0.46))   # Grab
+			if (k + row) % 3 == 0:   # Kreuz
+				var c := Color(0.50, 0.40, 0.32) if alive else Color(0.48, 0.45, 0.42)
+				var rot := 0.0 if not fallen else 1.2
+				draw_line(p + Vector2(0, -8).rotated(rot), p + Vector2(0, 6).rotated(rot), c, 3.0)
+				draw_line(p + Vector2(-5, -3).rotated(rot), p + Vector2(5, -3).rotated(rot), c, 3.0)
+			else:   # Grabstein
+				var stone := PackedVector2Array([p + Vector2(-6, -4), p + Vector2(6, -4), p + Vector2(6, 4), p + Vector2(-6, 4)])
+				if fallen:
+					stone = PackedVector2Array([p + Vector2(-8, 0), p + Vector2(8, -2), p + Vector2(8, 5), p + Vector2(-8, 6)])
+				_quad(stone, Color(0.74, 0.74, 0.76) if alive else Color(0.60, 0.59, 0.58))
+				_outline(stone, INK, 1.5)
+			if alive and (k + row) % 2 == 0:
+				_flower(p + Vector2(0, 10), FLOWERS[(k + row * 2) % FLOWERS.size()], 2.8)

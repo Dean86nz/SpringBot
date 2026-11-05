@@ -49,7 +49,7 @@ func test_plaza_paved_and_buildings_on_land() -> void:
 		if blk > 0.0:
 			assert_true(p.distance_to(start) * 24.0 > float(t["block"]) + 90.0, "%s: Start bleibt frei" % b["id"])
 			assert_true(p.distance_to(hive) * 24.0 > float(t["block"]) + 32.0 + 64.0, "%s: Bienenstock bleibt erreichbar" % b["id"])
-	for k in ["church", "school", "library", "shop", "smithy", "farmhouse", "barn", "stand", "field", "laundry", "house"]:
+	for k in ["church", "school", "library", "shop", "smithy", "farmhouse", "barn", "stand", "field", "laundry", "cemetery", "house"]:
 		assert_true(kinds.has(k), "es gibt %s" % k)
 	var b_list: Array = v["buildings"]
 	for i in b_list.size():
@@ -134,3 +134,32 @@ func test_loaded_save_residents_already_home() -> void:
 	vil.update_return(1.0, func(_id: String) -> bool: return true, true)
 	for p in vil.people:
 		assert_false(p.arriving, "geladener Stand: niemand muss erst ankommen")
+
+
+func test_residents_repair_buildings() -> void:
+	var v: Dictionary = _region()["village"]
+	var vil := Villagers.new(v, 24.0, _places(), Vector2(314.5, 235.5) * 24.0, 5)
+	vil.ready = func(_id: String) -> bool: return true
+	vil.obstacles.append({"pos": vil.center, "r": 46.0})   # Brunnen
+	for id in vil.repair:
+		assert_false(vil.is_done(id), "am Anfang ist alles kaputt")
+	vil.update_return(1.0, func(_id: String) -> bool: return true)
+	var done := {}
+	var through_fountain := false
+	for i in 60 * 240:
+		vil.update(1.0 / 60.0)
+		for id in vil.repaired:
+			done[id] = true
+		vil.repaired.clear()
+		for p in vil.people:
+			if p.kind == Villagers.Kind.HUMAN and p.pos.distance_to(vil.center) < 40.0:
+				through_fountain = true
+	assert_false(through_fountain, "niemand läuft durch den Brunnen")
+	for id in vil.repair:
+		assert_true(vil.is_done(id), "%s wurde repariert" % id)
+	assert_eq(done.size(), vil.repair.size(), "jedes Gebäude meldet einmal „fertig“")
+	var saved := vil.done_ids()
+	var vil2 := Villagers.new(v, 24.0, _places(), Vector2.ZERO, 5)
+	vil2.set_done(saved)
+	for id in vil2.repair:
+		assert_true(vil2.is_done(id), "Spielstand: repariert bleibt repariert")

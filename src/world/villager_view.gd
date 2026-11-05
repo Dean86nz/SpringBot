@@ -4,13 +4,14 @@ extends Node2D
 ## Menschen mit Kleidung je Arbeit (Schmied mit Schürze und Hammer, Bauer mit Strohhut und Hacke,
 ## Imker im weißen Anzug mit Schleier, Kinder kleiner und bunt), Hunde und Katzen, die Wäsche an der Leine,
 ## Honiggläser auf dem Stand, den Ball der Kinder und Funken am Amboss. Beim Fest hüpfen alle.
+## Gebäude im Wiederaufbau bekommen ein Holzgerüst und einen Fortschrittsbalken; wer repariert, hämmert.
 
 const INK := Color(0.30, 0.36, 0.44)
 const SHADOW := Color(0, 0, 0, 0.16)
 const CLOTHES := [Color(0.86, 0.36, 0.34), Color(0.36, 0.56, 0.86), Color(0.98, 0.80, 0.30), Color(0.48, 0.74, 0.42), Color(0.72, 0.50, 0.86), Color(0.96, 0.62, 0.40)]
 const SKIN := [Color(0.98, 0.84, 0.70), Color(0.86, 0.66, 0.50), Color(0.62, 0.44, 0.32)]
 const HAIR := [Color(0.30, 0.22, 0.16), Color(0.86, 0.70, 0.36), Color(0.54, 0.30, 0.20), Color(0.18, 0.18, 0.20), Color(0.80, 0.80, 0.78)]
-const FUR := [Color(0.62, 0.44, 0.28), Color(0.92, 0.88, 0.80), Color(0.30, 0.26, 0.24), Color(0.86, 0.60, 0.30)]
+const FUR := [Color(0.66, 0.46, 0.28), Color(0.94, 0.90, 0.80), Color(0.62, 0.62, 0.64), Color(0.90, 0.62, 0.30)]   # braun, creme, grau, rotbraun (kein Schwarz: Details sonst unsichtbar)
 const WASH := [Color(0.98, 0.98, 0.96), Color(0.55, 0.72, 0.95), Color(0.98, 0.70, 0.76), Color(0.98, 0.88, 0.45), Color(0.70, 0.88, 0.62), Color(0.96, 0.96, 0.98)]
 const SCALE := 2.2
 
@@ -41,8 +42,12 @@ func _draw() -> void:
 	draw_set_transform(Vector2.ZERO)
 
 
-## Wäsche, Honiggläser, Ball.
+## Wäsche, Honiggläser, Ball, Gerüste.
 func _draw_things() -> void:
+	for id: String in _v.repair:
+		var r := float(_v.repair[id])
+		if r > 0.0 and r < 1.0:
+			_scaffold(_v.places[id], r)
 	for id: String in _v.laundry:
 		var base: Vector2 = _v.places[id]["pos"]
 		for k in int(_v.laundry[id]):
@@ -86,10 +91,11 @@ func _human(p: Villagers.Person) -> void:
 		"farmer": cloth = Color(0.40, 0.52, 0.72)
 	var swing := sin(p.phase) * 4.0 if walking else 0.0
 	var work := p.wait > 0.0 or p.sitting
+	var repairing := p.fix != "" and p.pos == p.target
 	# Arme: beim Gehen schwingen, bei der Arbeit nach vorne
 	for side in [-1.0, 1.0]:
 		var hand := Vector2(swing * side, side * 8.0)
-		if work and p.job in ["smith", "farmer", "read"]:
+		if repairing or (work and p.job in ["smith", "farmer", "read"]):
 			hand = Vector2(7, side * 5.0)
 		if p.carry:
 			hand = Vector2(8, side * 4.0)
@@ -111,14 +117,15 @@ func _human(p: Villagers.Person) -> void:
 		else:
 			Disc.dot(self, Vector2(-1.5, 0), 4.2, hair)
 	# Werkzeug und Getragenes
-	if p.job == "smith" and work:
+	if repairing or (p.job == "smith" and work):
 		var lift := absf(sin(p.act * 5.0))
 		var tip := Vector2(14 - lift * 4, 0)
 		draw_line(Vector2(8, 4), tip + Vector2(0, 4), Color(0.50, 0.36, 0.24), 2.0)
 		draw_rect(Rect2(tip + Vector2(-3, 1), Vector2(6, 6)), Color(0.32, 0.32, 0.36))
-		if lift < 0.15:   # Schlag: Funken
+		if lift < 0.15:   # Schlag: Funken am Amboss, Holzspäne am Bau
+			var chip := Color(0.82, 0.66, 0.40) if repairing else Color(1.0, 0.80, 0.30)
 			for s in 4:
-				Disc.dot(self, Vector2(20 + s * 2.5, -6 + s * 4) , 1.6, Color(1.0, 0.80, 0.30))
+				Disc.dot(self, Vector2(20 + s * 2.5, -6 + s * 4), 1.6, chip)
 	elif p.job == "farmer" and work:
 		var chop := sin(p.act * 6.0) * 3.0
 		draw_line(Vector2(6, 4), Vector2(18 + chop, 4), Color(0.55, 0.40, 0.26), 2.0)
@@ -139,39 +146,116 @@ func _human(p: Villagers.Person) -> void:
 			Disc.dot(self, p.pos + Vector2(cos(a), sin(a * 1.3)) * 22.0, 2.4, Color(1.0, 0.80, 0.25))
 
 
+## Hund von oben: kräftiger Körper, vier Beine (laufen), großer Kopf mit kurzer, breiter Schnauze,
+## große Schlappohren seitlich am Kopf, kurzer, dicker Ringelschwanz, der wedelt.
 func _dog(p: Villagers.Person) -> void:
-	var walking := p.pos != p.target
+	var walking := p.pos.distance_to(p.target) > 12.0
 	var fur: Color = FUR[p.look % FUR.size()]
-	var k := SCALE * 0.9
-	var hop := absf(sin(p.phase * 1.5)) * 2.0 if walking else 0.0
-	Disc.dot(self, p.pos + Vector2(3, 4), 8.0 * k, SHADOW)
-	draw_set_transform(p.pos - Vector2(0, hop), p.dir, Vector2.ONE * k)
-	var wag := sin(p.act * 14.0) * 0.6
-	draw_line(Vector2(-8, 0), Vector2(-8, 0) + Vector2.from_angle(PI + wag) * 7.0, fur.darkened(0.2), 2.5)   # Schwanz
-	draw_set_transform(p.pos - Vector2(0, hop), p.dir, Vector2(1.5, 1.0) * k)
-	Disc.ring_dot(self, Vector2.ZERO, 5.5, fur, INK, 1.5)
-	draw_set_transform(p.pos - Vector2(0, hop), p.dir, Vector2.ONE * k)
-	Disc.ring_dot(self, Vector2(9, 0), 4.5, fur, INK, 1.5)
-	for side in [-1.0, 1.0]:
-		Disc.dot(self, Vector2(8, side * 4.0), 2.4, fur.darkened(0.3))   # Schlappohren
-	Disc.dot(self, Vector2(13, 0), 1.6, Color(0.15, 0.15, 0.18))
-	draw_set_transform(Vector2.ZERO)
-
-
-func _cat(p: Villagers.Person) -> void:
-	var fur: Color = FUR[(p.look + 1) % FUR.size()]
-	var k := SCALE * 0.75
-	Disc.dot(self, p.pos + Vector2(2, 3), 6.0 * k, SHADOW)
+	var dark := fur.darkened(0.35)
+	var k := SCALE * 1.15
+	Disc.dot(self, p.pos + Vector2(4, 5), 11.0 * k, SHADOW)
 	draw_set_transform(p.pos, p.dir, Vector2.ONE * k)
-	var curl := sin(p.act * 1.5) * 0.4
-	for s in 4:   # geringelter Schwanz
-		var a := PI + curl + s * 0.35
-		Disc.dot(self, Vector2.from_angle(a) * (6.0 + s * 1.8) + Vector2(0, s * 1.2), 1.8, fur.darkened(0.1))
-	Disc.ring_dot(self, Vector2.ZERO, 5.0 if p.sitting else 4.5, fur, INK, 1.3)
-	Disc.ring_dot(self, Vector2(6, 0), 3.6, fur, INK, 1.2)
-	for side in [-1.0, 1.0]:   # spitze Ohren
-		_tri(Vector2(6, side * 2.0), Vector2(9, side * 5.5), Vector2(4, side * 4.5), fur.darkened(0.15))
+	var step := sin(p.phase * 2.0) * 3.0 if walking else 0.0
+	for leg: Vector2 in [Vector2(5.5, -5.5), Vector2(5.5, 5.5), Vector2(-5.5, -5.5), Vector2(-5.5, 5.5)]:   # Beine
+		var sw := step if (leg.x > 0) == (leg.y > 0) else -step
+		Disc.ring_dot(self, leg + Vector2(sw, signf(leg.y) * 1.5), 2.4, fur.darkened(0.15), INK, 1.0)
+	# kurzer Ringelschwanz, wedelt
+	var wag := sin(p.act * 14.0) * 3.0
+	var tail := PackedVector2Array([Vector2(-8, 0), Vector2(-12, wag * 0.6), Vector2(-14, wag + 2.5), Vector2(-12.5, wag + 5.0)])
+	_curve(tail, INK, 5.0)
+	_curve(tail, fur, 3.2)
+	_oval(Vector2(-1, 0), Vector2(11.0, 7.4), INK)          # Körper mit Rand
+	_oval(Vector2(-1, 0), Vector2(10.0, 6.4), fur)
+	Disc.dot(self, Vector2(-3, -1), 3.2, fur.lightened(0.15))   # heller Rückenfleck
+	Disc.ring_dot(self, Vector2(9, 0), 6.4, fur, INK, 1.4)   # Kopf
+	_oval(Vector2(14.5, 0), Vector2(4.4, 3.6), INK)
+	_oval(Vector2(14.5, 0), Vector2(3.7, 2.9), fur.lightened(0.12))   # Schnauze
+	Disc.dot(self, Vector2(18.2, 0), 1.9, Color(0.12, 0.12, 0.14))   # Nase
+	for side in [-1.0, 1.0]:
+		_oval(Vector2(7.5, side * 7.2), Vector2(4.6, 2.9), INK)   # Schlappohren hängen seitlich herab
+		_oval(Vector2(7.5, side * 7.2), Vector2(3.9, 2.2), dark)
+		Disc.dot(self, Vector2(11.5, side * 2.6), 1.2, Color(0.1, 0.1, 0.12))   # Augen
 	draw_set_transform(Vector2.ZERO)
+
+
+## Katze von oben: schlanker Körper mit Streifen, runder Kopf mit großen spitzen Ohren und Schnurrhaaren,
+## langer, glatter Schwanz in weitem Bogen. Sitzend rund, der Schwanz um den Körper gelegt.
+func _cat(p: Villagers.Person) -> void:
+	var fur: Color = FUR[(p.look + 3) % FUR.size()]
+	var stripe := fur.darkened(0.3)
+	var k := SCALE * 1.2
+	Disc.dot(self, p.pos + Vector2(3, 4), 8.0 * k, SHADOW)
+	draw_set_transform(p.pos, p.dir, Vector2.ONE * k)
+	var sway := sin(p.act * 2.0) * 0.25
+	var body := Vector2(6.0, 6.0) if p.sitting else Vector2(9.0, 4.6)
+	# Schwanz: glatte Linie; sitzend um den Körper gelegt, laufend in weitem Bogen nach hinten
+	var tail := PackedVector2Array()
+	for s in 9:
+		var t := float(s) / 8.0
+		if p.sitting:
+			tail.append(Vector2.from_angle(PI * 0.9 - t * (2.2 + sway)) * Vector2(body.x + 3.0, body.y + 3.0) - Vector2(1, 0))
+		else:
+			tail.append(Vector2(-body.x - t * 12.0, sin(t * 2.6 + sway) * 5.0 * t))
+	_curve(tail, INK, 4.4)
+	_curve(tail, fur, 3.0)
+	draw_line(tail[tail.size() - 2], tail[tail.size() - 1], stripe, 3.0)   # dunkle Schwanzspitze
+	_oval(Vector2(-1, 0), body + Vector2(1, 1), INK)
+	_oval(Vector2(-1, 0), body, fur)
+	for s in 3:   # Streifen über den Rücken
+		var x := -body.x * 0.55 + s * body.x * 0.4
+		draw_line(Vector2(x, -body.y + 1.5), Vector2(x + 1.0, body.y - 1.5), stripe, 1.5)
+	var head := Vector2(body.x - 0.5, 0)
+	for side in [-1.0, 1.0]:   # Schnurrhaare (unter dem Kopf)
+		for w in 2:
+			draw_line(head + Vector2(3.5, side * 1.5), head + Vector2(9.5, side * (3.0 + w * 2.8)), Color(0.98, 0.98, 0.98), 0.9)
+	for side in [-1.0, 1.0]:   # spitze Ohren: schräg nach vorn außen, hinter dem Kopf
+		var a := head + Vector2(-2.5, side * 1.8)
+		var tip := head + Vector2(3.8, side * 8.4)
+		var c := head + Vector2(2.2, side * 3.4)
+		_tri(a, tip, c, INK)
+		_tri(a + Vector2(0.7, side * 0.5), tip + Vector2(-0.6, -side * 1.3), c + Vector2(-0.5, 0), fur)
+		_tri(a + Vector2(1.6, side * 1.6), tip + Vector2(-1.2, -side * 2.6), c + Vector2(-0.9, side * 0.2), Color(0.95, 0.70, 0.72))   # Innenohr
+	Disc.ring_dot(self, head, 4.8, fur, INK, 1.3)
+	for side in [-1.0, 1.0]:
+		Disc.dot(self, head + Vector2(2.2, side * 1.9), 1.2, Color(0.30, 0.62, 0.30))   # grüne Augen
+	Disc.dot(self, head + Vector2(4.3, 0), 1.0, Color(0.92, 0.55, 0.60))   # Nase
+	draw_set_transform(Vector2.ZERO)
+
+
+## Linienzug aus einzelnen Linien (billig) mit runden Gelenken.
+func _curve(pts: PackedVector2Array, col: Color, w: float) -> void:
+	for i in pts.size() - 1:
+		draw_line(pts[i], pts[i + 1], col, w)
+	for i in range(1, pts.size() - 1):
+		Disc.dot(self, pts[i], w * 0.5, col)
+
+
+## Gefülltes Oval in den aktuellen Zeichen-Koordinaten (Disc-Textur gestreckt).
+func _oval(c: Vector2, r: Vector2, col: Color) -> void:
+	draw_texture_rect(Disc.TEX, Rect2(c - r, r * 2.0), false, col)
+
+
+## Holzgerüst um ein Gebäude im Wiederaufbau, dazu ein Fortschrittsbalken.
+func _scaffold(pl: Dictionary, progress: float) -> void:
+	var c: Vector2 = pl["pos"]
+	var rot := float(pl.get("angle", 0.0))
+	var s := maxf(float(pl.get("block", 0.0)), float(pl.get("radius", 60.0)) * 0.6) * 1.05
+	var wood := Color(0.70, 0.52, 0.32)
+	draw_set_transform(c, rot, Vector2.ONE)
+	var corners := [Vector2(-s, -s * 0.8), Vector2(s, -s * 0.8), Vector2(s, s * 0.8), Vector2(-s, s * 0.8)]
+	for i in 4:
+		var a: Vector2 = corners[i]
+		var b: Vector2 = corners[(i + 1) % 4]
+		draw_line(a, b, INK, 5.0)
+		draw_line(a, b, wood, 3.0)   # Bretter
+		draw_line(a, (a + b) * 0.5 + (b - a).orthogonal().normalized() * 6.0, wood.darkened(0.2), 2.0)   # Strebe
+	for a: Vector2 in corners:
+		Disc.ring_dot(self, a, 4.0, wood.darkened(0.15), INK, 1.5)   # Pfosten
+	draw_set_transform(Vector2.ZERO)
+	var bar := Rect2(c + Vector2(-34, -s - 26), Vector2(68, 9))
+	draw_rect(bar.grow(2.0), INK)
+	draw_rect(bar, Color(0.20, 0.24, 0.22))
+	draw_rect(Rect2(bar.position, Vector2(bar.size.x * progress, bar.size.y)), Color(0.55, 0.85, 0.40))
 
 
 func _tri(a: Vector2, b: Vector2, c: Vector2, col: Color) -> void:

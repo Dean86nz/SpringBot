@@ -10,9 +10,9 @@ extends Node2D
 ## ihnen Grün ist; um Bäume und Felsen fährt der Roboter herum.
 ## Gebiete (areas.json der Region) geben Boden und Objekten ihren Charakter; beim Betreten eines
 ## Gebiets blendet das HUD dezent seinen Namen ein.
-## Dorf (region.json "village"): Gebäude (Wohnhäuser, Kirche, Schule, Bücherei, Laden, Schmiede, Hof),
-## Felder, Wäscheleine und Brunnen stehen fest und erwachen wie Bäume. Die Bewohner (Villagers) kehren
-## nach und nach zurück, sobald ihr Haus erwacht und genug Frühling ist, und gehen ihrer Arbeit nach.
+## Dorf (region.json "village"): Gebäude (Wohnhäuser, Kirche mit Friedhof, Schule, Bücherei, Laden, Schmiede,
+## Hof), Felder, Wäscheleine und Brunnen stehen fest. Die Gebäude bleiben kaputt, bis die Bewohner (Villagers)
+## sie reparieren; die kehren nach und nach zurück, sobald um ihr Haus Grün und genug Frühling ist.
 ## Ist die Region fertig, gibt es ein Fest auf dem Dorfplatz; danach der Endbildschirm der Region.
 ## Tiere (data/animals.json) leben als Deko nahe der Kamera über dem Grün (Animals, AnimalView).
 ## Einführung (data/tutorial.json): beim Neuen Spiel eine kurze Einleitung (IntroScreen), im Spiel
@@ -156,6 +156,11 @@ func _ready() -> void:
 		_animals.ponds.append({"pos": o.position, "angle": o.angle, "size": o.scale.x, "awake": false})
 	_animals.avoid = avoid
 	_villagers = Villagers.new(_village, cell_px, places, hive_px)
+	_villagers.ready = _building_green
+	for d in fixed:
+		if float(d["block"]) > 0.0:
+			_villagers.obstacles.append({"pos": d["pos"], "r": float(d["block"])})
+	_villagers.obstacles.append({"pos": hive_px, "r": Game.num("bees/hive_radius_px", 32.0)})
 	_villager_view.process_mode = Node.PROCESS_MODE_PAUSABLE
 	_villager_view.bind(_villagers)
 	add_child(_villager_view)
@@ -264,6 +269,13 @@ func _process(delta: float) -> void:
 	_animals.update(delta, _view_rect(), _robot.position)
 	if not _villagers.people.is_empty():
 		_villagers.update(delta)
+		for id in _villagers.repaired:   # fertig repariert: Gebäude erwacht
+			var o: WorldObject = _village_by_id.get(id)
+			if o and not o.awake:
+				o.set_awake(true, true)
+				_petals.burst(o.position, int(_obj_cfg.get("awake_petals", 24)), Vector2(60, 220), Vector2(0.6, 1.2), Vector2(6, 10))
+				Sfx.play_grouped("awake")
+		_villagers.repaired.clear()
 	if _area_watch.update(_areas.at_px(_robot.position, cell_px), real):
 		_hud.show_area(_areas.name_of(_area_watch.current))
 	_update_tips(real)
@@ -328,7 +340,7 @@ func _village_objects(places: Dictionary) -> Array[Dictionary]:
 		var block := float(t.get("block", 50.0)) * f
 		out.append({"id": str(b["id"]), "kind": kind, "pos": pos, "angle": rot, "seed": rng.randi(),
 			"block": block, "radius": float(t.get("radius", 76.0)) * f, "size": f, "quiet": kind in ["field", "laundry", "stand"]})
-		places[str(b["id"])] = {"pos": pos, "type": kind, "angle": rot,
+		places[str(b["id"])] = {"pos": pos, "type": kind, "angle": rot, "block": block, "radius": float(t.get("radius", 76.0)) * f,
 			"door": pos + Vector2(0, block + 16.0).rotated(rot) if block > 0.0 else pos + Vector2(0, 30)}
 	var fo: Variant = _village.get("fountain")
 	if fo is Array:
@@ -389,7 +401,7 @@ func _green_under(pos: Vector2) -> bool:
 func _wake_objects(animate: bool) -> void:
 	var bursts := int(_obj_cfg.get("max_bursts_per_check", 6))   # erwachen viele auf einmal: nicht jedes mit Blättern
 	for o in _objects:
-		var green := _green_under(o.position)
+		var green := _villagers.is_done(o.vid) if o.vid != "" else _green_under(o.position)
 		if green == o.awake:
 			continue
 		o.set_awake(green, animate)
@@ -401,7 +413,7 @@ func _wake_objects(animate: bool) -> void:
 				Sfx.play_grouped("awake")
 	for k in _ponds.size():
 		_animals.ponds[k]["awake"] = _ponds[k].awake
-	_villagers.update_return(grid.coverage(), _building_awake, not animate)
+	_villagers.update_return(grid.coverage(), _building_green, not animate)
 	# Bienen ohne Arbeit besuchen erwachte Bäume und Büsche nahe dem Stock
 	_bees.trees.clear()
 	for o in _objects:
@@ -409,9 +421,10 @@ func _wake_objects(animate: bool) -> void:
 			_bees.trees.append(o.position)
 
 
-func _building_awake(id: String) -> bool:
+## Grün unter einem Gebäude des Dorfes: dann kann es repariert werden und seine Bewohner kommen.
+func _building_green(id: String) -> bool:
 	var o: WorldObject = _village_by_id.get(id)
-	return o != null and o.awake
+	return o != null and _green_under(o.position)
 
 
 func _open_map(from_pause: bool) -> void:
@@ -624,6 +637,7 @@ func save() -> void:
 		"finished": _finished or _end_wait >= 0.0,
 		"robot": [_robot.position.x, _robot.position.y],
 		"grid": {"w": grid.width, "h": grid.height},
+		"repaired": _villagers.done_ids(),
 	}
 	regions[region_id] = entry
 	data["regions"] = regions
@@ -669,6 +683,14 @@ func load_game(data: Dictionary) -> void:
 			_robot.position = _start_px   # alter Spielstand: Platz liegt jetzt im Wasser
 	_camera.reset_smoothing()
 	_milestone = floori(grid.coverage() * 10.0)
+	if entry.has("repaired"):
+		_villagers.set_done(entry["repaired"])
+	else:   # Stand von vor 0.17.2: was schon grün war, gilt als repariert (wie es aussah)
+		var done: Array[String] = []
+		for id: String in _village_by_id:
+			if _building_green(id):
+				done.append(id)
+		_villagers.set_done(done)
 	_paint()
 	_wake_objects(false)
 

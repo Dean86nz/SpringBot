@@ -60,6 +60,8 @@ Die Helfer sind eigene Ideen (nichts aus Unharvest oder Moon Sweepers). Größen
    Rückmeldung in 0.17.1: größeres Dorf mit verschiedenen Gebäuden (Kirche, Schule, Bücherei, Laden, Schmiede, Bauernhof, Honigstand),
    Bewohner mit Arbeit (Schmied, Bauern, Wäsche, Kinder, Imker …), Hunde und Katzen, Rückkehr nach und nach mit dem Fortschritt,
    Bienen ohne Arbeit besuchen Blüten und ruhen im Stock, keine Jingles mehr am Ende.
+   Rückmeldung in 0.17.2: Gebäude bleiben kaputt, bis die zurückkehrenden Bewohner sie reparieren; erkennbare Hunde und Katzen;
+   niemand läuft durch Brunnen oder Gebäude; Kirche etwas außerhalb mit Friedhof.
 3. **Regionenkarte und Reisen:** Reiseroute mit allen Regionen, Weiterreisen, Zurückkehren, Pollen-Regel für fertige Regionen,
    Einleitung je Region. (Die Übersichtskarte aus 0.15.0 ist dafür die Grundlage.)
 4. **Felder und Vorort** mit Samenvögeln (neuer Skilltree-Ast).

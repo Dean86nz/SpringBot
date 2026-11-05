@@ -10,7 +10,7 @@
 		"plaza_radius": 9.0,
 		"fountain": [322, 214],
 		"buildings": [
-			{"id": "kirche", "type": "church", "pos": [322, 194]},
+			{"id": "kirche", "type": "church", "pos": [306, 167]},
 			{"id": "schule", "type": "school", "pos": [303, 198]},
 			{"id": "buecherei", "type": "library", "pos": [300, 215]},
 			{"id": "laden", "type": "shop", "pos": [322, 233]},
@@ -22,6 +22,7 @@
 			{"id": "haus5", "type": "house", "pos": [284, 215]},
 			{"id": "haus6", "type": "house", "pos": [287, 231]},
 			{"id": "haus7", "type": "house", "pos": [326, 175]},
+			{"id": "haus8", "type": "house", "pos": [322, 194]},
 			{"id": "hof", "type": "farmhouse", "pos": [362, 224]},
 			{"id": "scheune", "type": "barn", "pos": [370, 205]},
 			{"id": "honig", "type": "stand", "pos": [305, 243]}
@@ -29,7 +30,8 @@
 		"props": [
 			{"id": "feld1", "type": "field", "pos": [392, 198]},
 			{"id": "feld2", "type": "field", "pos": [394, 226]},
-			{"id": "waesche", "type": "laundry", "pos": [276, 224]}
+			{"id": "waesche", "type": "laundry", "pos": [276, 224]},
+			{"id": "friedhof", "type": "cemetery", "pos": [290, 167]}
 		],
 		"types": {
 			"house": {"block": 50, "radius": 76, "size": [0.9, 1.1]},
@@ -42,7 +44,8 @@
 			"barn": {"block": 64, "radius": 104},
 			"stand": {"block": 24, "radius": 44},
 			"field": {"block": 0, "radius": 110},
-			"laundry": {"block": 0, "radius": 70}
+			"laundry": {"block": 0, "radius": 70},
+			"cemetery": {"block": 0, "radius": 96}
 		},
 		"_info_residents": "residents: Bewohner mit Arbeit (smith Schmied, farmer Bauer auf work-Feld, shop Ladenbesitzer, laundry Wäsche an work-Leine, beekeeper Imker zwischen Bienenstock und Honigstand, kid Kinder spielen auf dem Platz, read liest auf der Bank, stroll schlendert). Sie kehren zurück, sobald ihr Haus (home) erwacht ist und der Frühling mindestens from erreicht hat. dog/cat: Haustier kommt mit.",
 		"residents": [
@@ -53,7 +56,7 @@
 			{"job": "farmer", "home": "hof", "work": "feld2", "from": 0.38},
 			{"job": "beekeeper", "home": "honig", "from": 0.45},
 			{"job": "stroll", "home": "haus2", "from": 0.08, "cat": true},
-			{"job": "stroll", "home": "kirche", "from": 0.5},
+			{"job": "stroll", "home": "kirche", "work": "friedhof", "from": 0.5},
 			{"job": "kid", "home": "schule", "from": 0.55, "dog": true},
 			{"job": "kid", "home": "schule", "from": 0.6},
 			{"job": "kid", "home": "schule", "from": 0.65},
@@ -63,6 +66,8 @@
 			{"job": "stroll", "home": "haus7", "from": 0.93}
 		],
 		"people_speed_px": 85,
+		"repair_sec": 12.0,
+		"_info_repair": "Gebäude bleiben kaputt, bis Bewohner sie reparieren (repair_sec Sekunden für eine Person, zu zweit schneller): zuerst das eigene Haus, dann die Arbeitsstelle, dann helfen sie, wo noch etwas kaputt ist.",
 		"arrive_from_cells": 22,
 		"arrive_spread_sec": 3.0,
 		"wait_sec": [1.5, 5.0],

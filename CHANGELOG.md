@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.17.2 – Das Dorf wird wieder aufgebaut
+
+- **Wiederaufbau:** Die Gebäude des Dorfes bleiben kaputt, auch wenn ringsum alles grün ist. Erst die zurückkehrenden Bewohner reparieren sie:
+  zuerst das eigene Haus, dann ihre Arbeitsstelle (Bauern machen die Felder, die Wäscherin die Leine, der Kirchgänger den Friedhof),
+  danach helfen alle, wo noch etwas kaputt ist (höchstens zwei an einem Gebäude, zu zweit doppelt so schnell). Am Gebäude steht ein Holzgerüst
+  mit Fortschrittsbalken, die Bewohner hämmern (Holzspäne). Ist es fertig, erwacht das Gebäude mit Rascheln und Blüten.
+  Bewohner kommen zurück, sobald um ihr Haus Grün ist und der Frühling ihren Wert erreicht hat.
+- Was repariert ist, steht im Spielstand. Ältere Spielstände: Was dort schon grün und erwacht war, gilt als repariert, das Dorf sieht also gleich aus wie vorher.
+- **Hunde** neu gezeichnet: kräftiger Körper mit vier Beinen, großer Kopf mit breiter Schnauze und Nase, große Schlappohren, kurzer Ringelschwanz, der wedelt.
+  **Katzen** neu: schlanker gestreifter Körper, spitze Ohren mit rosa Innenseite, Schnurrhaare, grüne Augen, langer gebogener Schwanz, im Sitzen um den Körper gelegt.
+  Hellere Fellfarben (braun, creme, grau, rotbraun), damit man die Formen sieht.
+- **Niemand läuft mehr durch Brunnen, Gebäude oder den Bienenstock:** Die Bewohner gehen außen herum; Ziele in einem Hindernis (etwa der Ball am Brunnen) werden an dessen Rand gelegt.
+- **Kirche mit Friedhof** etwas außerhalb im Nordwesten (Steinmauer mit Tor, Gräber mit Steinen und Kreuzen, Blumen); an ihrem alten Platz steht ein Wohnhaus.
+- Bildschirmfotos (Entwicklung): `ZOOM=z` für Nahaufnahmen; neues Werkzeug `tools/villager_gallery.gd`.
+
 ## 0.17.1 – Ein belebtes Heimatdorf
 
 - **Größeres Dorf mit verschiedenen Gebäuden:** Kirche mit Turm und Kreuz, Schule mit Pausenhof (Zaun, Fahne, Hüpfkästchen), Bücherei mit Bank

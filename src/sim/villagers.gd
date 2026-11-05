@@ -4,8 +4,12 @@ extends RefCounted
 ## Schmied am Amboss, Bauern auf dem Feld, Ladenbesitzer, Wäsche an der Leine, Imker zwischen Bienenstock
 ## und Honigstand, Kinder, die auf dem Platz spielen, jemand liest auf der Bank, andere schlendern.
 ## Manche haben einen Hund oder eine Katze.
-## Sie kehren nach und nach zurück: sobald ihr Haus erwacht ist und der Frühling ihren Wert "from"
-## erreicht hat. Sie kommen zu Fuß von außerhalb des Dorfes. Beim Fest (100 %) treffen sich alle auf dem Platz.
+## Sie kehren nach und nach zurück: sobald um ihr Haus Grün ist (ready) und der Frühling ihren Wert "from"
+## erreicht hat. Sie kommen zu Fuß von außerhalb des Dorfes. Die Gebäude sind kaputt, bis die Bewohner sie
+## reparieren (repair): zuerst das eigene Haus, dann die Arbeitsstelle (Bauern das Feld), dann helfen sie
+## dort, wo noch etwas kaputt ist (höchstens zwei an einem Gebäude). Fertige Gebäude stehen in "repaired",
+## main.gd lässt sie erwachen. Beim Fest (100 %) treffen sich alle auf dem Platz.
+## Hindernisse (obstacles: Gebäude, Brunnen, Bienenstock) umgehen sie, statt hindurchzulaufen.
 ## Reine Deko und Logik in Weltpixeln; gezeichnet von VillagerView.
 
 enum Kind { HUMAN, DOG, CAT }
@@ -31,6 +35,8 @@ class Person:
 	var carry := false     # trägt etwas (Honigglas, Wäschekorb)
 	var sitting := false
 	var slot := 0
+	var fix := ""          # Gebäude, das die Person gerade repariert
+	var check := 0.0       # Sekunden bis zur nächsten Suche nach Arbeit am Bau
 
 
 var people: Array[Person] = []
@@ -45,6 +51,11 @@ var festive := false
 var laundry: Dictionary = {}   # Wäscheleinen-id → Zahl der hängenden Stücke (0..LINE_SLOTS)
 var jars := 0                  # Honiggläser auf dem Stand
 var ball := Vector2.ZERO       # Ball der Kinder
+var repair: Dictionary = {}    # Gebäude-id → Fortschritt 0..1 (1 = repariert)
+var repaired: Array[String] = []   # seit dem letzten Abholen fertig geworden (main.gd lässt sie erwachen)
+var ready := Callable()        # func(id) -> bool: Grün um das Gebäude, es kann repariert werden
+var repair_sec := 12.0
+var obstacles: Array[Dictionary] = []   # {pos, r}: Gebäude, Brunnen, Bienenstock
 var _ball_target := Vector2.ZERO
 var _rng := RandomNumberGenerator.new()
 
@@ -64,8 +75,9 @@ func _init(cfg: Dictionary = {}, cell_px: float = 24.0, p_places: Dictionary = {
 	var ws: Array = cfg.get("wait_sec", [1.5, 5.0])
 	wait_sec = Vector2(ws[0], ws[1])
 	arrive_from = float(cfg.get("arrive_from_cells", 22.0)) * cell_px
-	ball = center
-	_ball_target = center
+	repair_sec = float(cfg.get("repair_sec", 12.0))
+	ball = center + Vector2(0, plaza_r * 0.6)
+	_ball_target = ball
 	for r: Dictionary in cfg.get("residents", []):
 		var p := Person.new()
 		p.job = str(r.get("job", "stroll"))
@@ -89,6 +101,27 @@ func _init(cfg: Dictionary = {}, cell_px: float = 24.0, p_places: Dictionary = {
 	for id: String in places:
 		if places[id]["type"] == "laundry":
 			laundry[id] = 0
+		repair[id] = 0.0
+
+
+func is_done(id: String) -> bool:
+	return float(repair.get(id, 1.0)) >= 1.0
+
+
+## Gebäude, die schon repariert sind (für den Spielstand).
+func done_ids() -> Array[String]:
+	var out: Array[String] = []
+	for id: String in repair:
+		if float(repair[id]) >= 1.0:
+			out.append(id)
+	return out
+
+
+## Spielstand: diese Gebäude sind schon repariert.
+func set_done(ids: Array) -> void:
+	for id in ids:
+		if repair.has(str(id)):
+			repair[str(id)] = 1.0
 
 
 func clear() -> void:
@@ -102,11 +135,14 @@ func clear() -> void:
 	jars = 0
 	for id in laundry:
 		laundry[id] = 0
+	for id in repair:
+		repair[id] = 0.0
+	repaired.clear()
 
 
-## Wer jetzt zurückkommen darf, macht sich auf den Weg ins Dorf. awake(id) sagt, ob ein Gebäude erwacht ist.
+## Wer jetzt zurückkommen darf, macht sich auf den Weg ins Dorf. green(id) sagt, ob um das Haus Grün ist.
 ## instant: gleich an Ort und Stelle (Spielstand geladen). Gibt die Zahl der Neuankömmlinge zurück.
-func update_return(coverage: float, awake: Callable, instant: bool = false) -> int:
+func update_return(coverage: float, green: Callable, instant: bool = false) -> int:
 	var n := 0
 	for i in people.size():
 		var p := people[i]
@@ -115,7 +151,7 @@ func update_return(coverage: float, awake: Callable, instant: bool = false) -> i
 		if p.owner >= 0:
 			if not people[p.owner].back:
 				continue
-		elif coverage < p.from or not awake.call(p.home):
+		elif coverage < p.from or not green.call(p.home):
 			continue
 		p.back = true
 		n += 1
@@ -183,28 +219,121 @@ func update(delta: float) -> void:
 			_pet(p, delta)
 		elif festive:
 			_celebrate(p, delta)
+		elif _rebuild(p, delta):
+			pass
 		else:
 			match p.job:
 				"smith": _stay_and_work(p, delta, 22.0)
 				"shop": _stay_and_work(p, delta, 16.0)
 				"read": _read(p, delta)
-				"farmer": _farm(p, delta)
-				"laundry": _laundry(p, delta)
+				"farmer":
+					if is_done(p.work):
+						_farm(p, delta)
+					else:
+						_stroll(p, delta)
+				"laundry":
+					if is_done(p.work):
+						_laundry(p, delta)
+					else:
+						_stroll(p, delta)
 				"beekeeper": _beekeeper(p, delta)
 				"kid": _play(p, delta)
 				_: _stroll(p, delta)
 
 
+# --- Wiederaufbau ---
+
+## Repariert die Person gerade etwas (oder macht sich auf den Weg dahin)? Dann true, sonst ihre Arbeit.
+func _rebuild(p: Person, delta: float) -> bool:
+	if p.fix == "":
+		p.check -= delta
+		if p.check > 0.0:
+			return false
+		p.check = 1.0
+		p.fix = _pick_repair(p)
+		if p.fix == "":
+			return false
+		var pl: Dictionary = places[p.fix]
+		p.target = pl["pos"] + Vector2.from_angle(_rng.randf() * TAU) * (_size(p.fix) + 20.0)
+		p.state = 0
+	if is_done(p.fix):
+		p.fix = ""
+		p.state = 0
+		return false
+	if not _walk(p, delta, speed):
+		return true
+	p.dir = (places[p.fix]["pos"] - p.pos).angle()
+	p.wait = 0.0
+	repair[p.fix] = minf(float(repair[p.fix]) + delta / repair_sec, 1.0)
+	if float(repair[p.fix]) >= 1.0:
+		repaired.append(p.fix)
+		p.fix = ""
+	return true
+
+
+## Was soll die Person reparieren? Eigenes Haus, dann Arbeitsstelle, dann das nächste kaputte Gebäude
+## mit Grün drumherum, an dem noch keine zwei arbeiten. "" = nichts zu tun.
+func _pick_repair(p: Person) -> String:
+	for id in [p.home, p.work]:
+		if id != "" and repair.has(id) and not is_done(id) and _can_fix(id):
+			return id
+	var best := ""
+	var best_d := INF
+	for id: String in repair:
+		if is_done(id) or not _can_fix(id) or _workers(id) >= 2:
+			continue
+		var d := p.pos.distance_squared_to(places[id]["pos"])
+		if d < best_d:
+			best_d = d
+			best = id
+	return best
+
+
+func _can_fix(id: String) -> bool:
+	return not ready.is_valid() or ready.call(id)
+
+
+func _workers(id: String) -> int:
+	var n := 0
+	for p in people:
+		if p.fix == id:
+			n += 1
+	return n
+
+
+func _size(id: String) -> float:
+	return float(places[id].get("block", 40.0)) if float(places[id].get("block", 0.0)) > 0.0 else float(places[id].get("radius", 60.0)) * 0.7
+
+
 # --- Arbeiten ---
 
+## Ein Schritt zum Ziel; Hindernissen weicht die Person aus, indem sie an ihrem Rand entlanggeht.
 func _walk(p: Person, delta: float, spd: float) -> bool:
+	for o in obstacles:   # Ziel im Hindernis (Ball am Brunnen …): an seinen Rand legen
+		var oc: Vector2 = o["pos"]
+		var orr := float(o["r"]) + 10.0
+		if p.target.distance_to(oc) < orr:
+			var away := p.target - oc if p.target != oc else Vector2.DOWN
+			p.target = oc + away.normalized() * orr
 	var to := p.target - p.pos
 	var step := spd * delta
 	if to.length() <= step:
 		p.pos = p.target
 		return true
-	p.pos += to.normalized() * step
-	p.dir = to.angle()
+	var next := p.pos + to.normalized() * step
+	for o in obstacles:
+		var c: Vector2 = o["pos"]
+		var r := float(o["r"]) + 8.0
+		if next.distance_to(c) < r:
+			var t := (p.pos - c).normalized().orthogonal()
+			if t.dot(to) < 0.0:
+				t = -t
+			next = p.pos + t * step
+			if next.distance_to(c) < r:
+				next = c + (next - c).normalized() * r
+			break
+	p.dir = (next - p.pos).angle()
+	p.pos = next
 	p.phase += delta * spd / 9.0
 	return false
 

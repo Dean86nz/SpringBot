@@ -33,13 +33,15 @@ func test_bee_greens_after_hover() -> void:
 	assert_true(g.is_green(Vector2i(20, 20)), "am Zielort ist es grün")
 
 
-func test_full_map_falls_back_to_hive() -> void:
+func test_full_map_bees_visit_near_hive() -> void:
 	var g := GroundGrid.new(10, 10)
 	g.paint_circle(Vector2(5, 5), 100.0)
 	var rng := RandomNumberGenerator.new()
 	var s := _swarm()
-	var t := s.pick_target(Vector2(100, 100), g, rng)
-	assert_true(t.distance_to(s.hive) <= 5.0 * 24.0 + 0.1, "kreist um den Stock")
+	for i in 20:
+		var t := s.pick_target(Vector2(100, 100), g, rng)
+		assert_true(s.last_pick_idle, "nichts zu begrünen: nur ein Besuch")
+		assert_true(t.distance_to(s.hive) <= s.idle_radius * 24.0 + 0.1, "bleibt in der Nähe des Stocks")
 
 
 func test_set_count() -> void:
