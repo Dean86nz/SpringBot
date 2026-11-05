@@ -32,6 +32,7 @@ static var ACTIONS: Dictionary = {
 	"move_down": [_key(KEY_S), _key(KEY_DOWN), _axis(JOY_AXIS_LEFT_Y, 1.0)],
 	"upgrades": [_btn(JOY_BUTTON_Y), _key(KEY_TAB)],
 	"pause": [_btn(JOY_BUTTON_START), _key(KEY_ESCAPE)],
+	"map": [_btn(JOY_BUTTON_BACK), _key(KEY_M)],
 	"toggle_fullscreen": [_key(KEY_F11)],
 	# Skilltree: rechter Stick schiebt die Ansicht, Schultertasten zoomen
 	"tree_pan_left": [_key(KEY_J), _axis(JOY_AXIS_RIGHT_X, -1.0)],

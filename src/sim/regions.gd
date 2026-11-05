@@ -99,6 +99,35 @@ func max_object_weight(kind: String) -> float:
 	return m
 
 
+## Mitte jedes Gebiets in Zellen: Schwerpunkt seiner Blöcke; liegt der in einem anderen Gebiet
+## (Gebiet mit zwei Teilen), der nächste eigene Block. Für Namen auf der Übersichtskarte.
+func centers() -> Array[Vector2]:
+	var sum: Array[Vector2] = []
+	var n: Array[int] = []
+	for i in list.size():
+		sum.append(Vector2.ZERO)
+		n.append(0)
+	for by in rows:
+		for bx in cols:
+			var k := index[by * cols + bx]
+			sum[k] += Vector2(bx, by)
+			n[k] += 1
+	var out: Array[Vector2] = []
+	for i in list.size():
+		var target := sum[i] / maxf(n[i], 1.0)
+		var c := target
+		if index[clampi(int(c.y), 0, rows - 1) * cols + clampi(int(c.x), 0, cols - 1)] != i:
+			var best := INF
+			for by in rows:
+				for bx in cols:
+					var d := target.distance_squared_to(Vector2(bx, by))
+					if index[by * cols + bx] == i and d < best:
+						best = d
+						c = Vector2(bx, by)
+		out.append((c + Vector2(0.5, 0.5)) * STEP)
+	return out
+
+
 ## Anteil der Karte, der zu Gebiet i gehört (0..1).
 func share(i: int) -> float:
 	return index.count(i) / float(maxi(index.size(), 1))

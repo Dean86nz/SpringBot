@@ -59,6 +59,9 @@ var _pause := PauseMenu.new()
 var _title := TitleScreen.new()
 var _end := EndScreen.new()
 var _intro := IntroScreen.new()
+var _map := MapScreen.new()
+var _map_from_pause := false   # Karte aus dem Pause-Menü geöffnet: beim Schließen dorthin zurück
+var _hive_px := Vector2.ZERO
 var _tutorial: Tutorial
 var _tip_id := ""            # gerade sichtbarer Hinweis
 var _tip_from := Vector2.ZERO   # Roboterposition beim Einblenden (Fahr-Hinweis endet nach etwas Weg)
@@ -104,6 +107,7 @@ func _ready() -> void:
 	add_child(_bridge_view)
 	var hive: Variant = Game.dig(Game.balance, "bees/hive_cell")
 	var hive_px := (Vector2(hive[0], hive[1]) + Vector2(0.5, 0.5)) * cell_px if hive is Array else _start_px
+	_hive_px = hive_px
 	_bees.configure(Game.dig(Game.balance, "bees") if Game.dig(Game.balance, "bees") is Dictionary else {}, hive_px, cell_px)
 	_base_bloom = _bees.bloom_radius
 	_base_hover = _bees.hover_sec
@@ -169,6 +173,16 @@ func _ready() -> void:
 		if not _intro.skipped:   # „Los geht's!“: kleiner Blütenregen um den Roboter
 			_petals.burst(_robot.position, 70, Vector2(120, 420), Vector2(1.0, 1.8), Vector2(7, 12)))
 	add_child(_intro)
+	_map.setup(_ground, _regions, size_px, Vector2(w, h))
+	_map.closed.connect(func() -> void:
+		if _map_from_pause:
+			_pause.open()
+		else:
+			get_tree().paused = false)
+	add_child(_map)
+	_pause.map_requested.connect(func() -> void:
+		_pause.visible = false
+		_open_map(true))
 	_pause.title_requested.connect(show_title)
 	_pause.quit_requested.connect(quit)
 	add_child(_pause)
@@ -272,6 +286,12 @@ func _wake_objects(animate: bool) -> void:
 		_animals.ponds[k]["awake"] = _ponds[k].awake
 
 
+func _open_map(from_pause: bool) -> void:
+	_map_from_pause = from_pause
+	Sfx.play("open")
+	_map.open(_robot.position, _hive_px, grid.coverage())
+
+
 ## Hinweise der Einführung: der fällige wird eingeblendet; der Fahr-Hinweis verschwindet,
 ## sobald der Roboter ein Stück gefahren ist, der Skilltree-Hinweis beim Öffnen des Skilltrees.
 func _update_tips(delta: float) -> void:
@@ -355,6 +375,11 @@ func _unhandled_input(event: InputEvent) -> void:
 			_robot.input_enabled = true
 			save()
 		get_viewport().set_input_as_handled()
+	elif _map.visible:
+		if event.is_action_pressed("map") or event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause"):
+			Sfx.play("close")
+			_map.close()
+			get_viewport().set_input_as_handled()
 	elif _pause.visible:
 		if event.is_action_pressed("pause") or event.is_action_pressed("ui_cancel"):
 			if _pause.on_subpage() and not event.is_action_pressed("pause"):
@@ -374,6 +399,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			_hud.hide_tip()
 		if _tutorial.first("tree_help"):
 			_tree.show_help(_tutorial.text("tree_help"), _tutorial.show_sec("tree_help"))
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("map"):
+		_open_map(false)
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("pause"):
 		save()

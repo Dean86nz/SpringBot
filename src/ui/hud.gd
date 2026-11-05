@@ -96,7 +96,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if _keys_version != KeyHints.version:
 		_keys_version = KeyHints.version
-		_hint.text = KeyHints.fill("{tree}: Skilltree   ·   {pause}: Pause")
+		_hint.text = KeyHints.fill("{tree}: Skilltree   ·   {map}: Karte   ·   {pause}: Pause")
 		_set_tip_text()
 	if _tip_left > 0.0:
 		_tip_left -= delta

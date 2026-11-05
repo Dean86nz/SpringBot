@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.15.0 – Lautstärke-Regler und Übersichtskarte
+
+- Plan für Phase 3 „Regionen“ in `PHASE3.md`: vier Regionen mit je einem neuen Helfer, Ablauf, Vorschläge zu den offenen Fragen, sechs Meilensteine. Noch nichts davon umgesetzt.
+- Pause-Menü → **Lautstärke**: Regler für Musik und Klänge (0 bis 100 %, in 10er-Schritten), mit Stick / Steuerkreuz links und rechts.
+  Beim Klänge-Regler gibt es einen Probeklang. Der gewählte Regler leuchtet gelb. Gespeichert in einer eigenen Datei (bleibt auch bei „Neues Spiel“).
+- **Übersichtskarte**: Pause-Menü → „Karte“ oder direkt mit der View-Taste (Tastatur: M). Zeigt die ganze Welt: Grau (schraffiert) = hier fehlt noch der Frühling,
+  Grün in der Farbe des Gebiets, Wege, Wasser, Namen der Gebiete, Bienenstock und den Roboter (blinkt). B / Esc / View schließt.
+  Aus dem Pause-Menü geöffnet, geht es danach zurück ins Pause-Menü.
+- Unten links und auf der Seite „Steuerung“ steht jetzt auch die Karte-Taste.
+
 ## 0.14.2 – Aufblühen wieder hörbar
 
 - Das Rascheln beim Aufblühen von Bäumen und Büschen war zu leise: -15 statt -24 dB (der alte Jingle hatte -12 dB).

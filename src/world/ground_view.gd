@@ -81,6 +81,11 @@ func _bind_regions(mat: ShaderMaterial, regions: Regions, grid: GroundGrid) -> v
 	mat.set_shader_parameter("region_c", ImageTexture.create_from_image(imgs[2]))
 
 
+## Ein Wert des Boden-Shaders (z. B. die Masken für die Übersichtskarte).
+func shader_value(param: String) -> Variant:
+	return (material as ShaderMaterial).get_shader_parameter(param) if material else null
+
+
 func _draw() -> void:
 	if _grid == null:
 		return

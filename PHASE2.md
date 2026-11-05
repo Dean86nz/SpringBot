@@ -32,7 +32,7 @@ Reihenfolge: Wege und Wasser kommen vor den Objekten, weil Objekte (Wegrand-Deta
 
 # Ausblick: Phase 3 „Regionen“ (geplant, noch nicht freigegeben)
 
-Info vom 2026-11-05. **Nicht umsetzen**, bis Phase 3 ausdrücklich gestartet wird.
+Info vom 2026-11-05. **Nicht umsetzen**, bis Phase 3 ausdrücklich gestartet wird. Ausführlicher Plan: `PHASE3.md`.
 
 - Man startet im eigenen **Heimatdorf**. Ist die Region fertig (alles grün), kehren Menschen zurück und das Dorf lebt wieder auf.
 - Danach geht es in **größere Regionen** weiter, z. B. Felder oder Vorort, dann Großstadt, am Ende die ganze Welt.
