@@ -164,7 +164,10 @@ func _ready() -> void:
 	_tutorial = Tutorial.new(tut_data)
 	_pause.controls = tut_data.get("controls", [])
 	_intro.setup(tut_data.get("intro", []))
-	_intro.finished.connect(_start_playing)
+	_intro.finished.connect(func() -> void:
+		_start_playing()
+		if not _intro.skipped:   # „Los geht's!“: kleiner Blütenregen um den Roboter
+			_petals.burst(_robot.position, 70, Vector2(120, 420), Vector2(1.0, 1.8), Vector2(7, 12)))
 	add_child(_intro)
 	_pause.title_requested.connect(show_title)
 	_pause.quit_requested.connect(quit)

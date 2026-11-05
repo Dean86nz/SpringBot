@@ -1,9 +1,9 @@
 {
-	"_info": "Einführung und Hinweise. intro = Bilder der Einleitung beim Neuen Spiel (A weiter, B überspringen). hints = Hinweise im Spiel, jeder genau einmal je Spielstand; delay_sec = Wartezeit, show_sec = wie lange sichtbar. {name} wird durch die Taste aus keys ersetzt, passend zum Gerät (pad = Controller, keys = Tastatur). controls = Seite „Steuerung“ im Pause-Menü.",
+	"_info": "Einführung und Hinweise. intro = Seiten der Einleitung beim Neuen Spiel (A weiter, B überspringen); art = Bild der Seite (grey, robot, bloom). hints = Hinweise im Spiel, jeder genau einmal je Spielstand; delay_sec = Wartezeit, show_sec = wie lange sichtbar. {name} wird durch die Taste aus keys ersetzt, passend zum Gerät (pad = Controller, keys = Tastatur). controls = Seite „Steuerung“ im Pause-Menü.",
 	"intro": [
-		{"title": "Die graue Welt", "text": "Ein langer, kalter Winter hat alle Farben verschluckt.\nDie Wiesen sind grau, die Bäume kahl, die Teiche ausgetrocknet."},
-		{"title": "Ein kleiner Roboter", "text": "Ein kleiner Gärtner-Roboter hat den Winter überstanden.\nÜberall, wo er hinfährt, sprießt wieder Gras – und mit der Zeit Blumen."},
-		{"title": "Bring den Frühling zurück", "text": "Grünes Land bringt Pollen. Damit wird der Roboter besser,\nund bald helfen ihm Bienen. Ziel: Die ganze Welt soll blühen."}
+		{"art": "grey", "title": "Die graue Welt", "text": "Ein langer Winter hat alle Farben verschluckt.\nAlles ist grau und still."},
+		{"art": "robot", "title": "Ein kleiner Roboter erwacht", "text": "Doch ein kleiner Gärtner-Roboter hat durchgehalten.\nWo er fährt, wächst wieder Gras."},
+		{"art": "bloom", "title": "Bring den Frühling zurück", "text": "Grünes Land bringt Pollen. Damit wird der Roboter stärker,\nund bald helfen Bienen mit. Lass die ganze Welt erblühen!"}
 	],
 	"hints": {
 		"move": {"text": "{move}: fahren. Wo der Roboter fährt, wird es grün.", "delay_sec": 1.0, "show_sec": 9.0, "done_px": 400},

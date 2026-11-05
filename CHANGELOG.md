@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.14.1 – Schönere Einleitung
+
+- Jede Seite der Einleitung hat jetzt ein bewegtes Bild im Stil des Spiels:
+  - „Die graue Welt“: kahler Baum, trockener Teich, welker Busch, Staub weht vorbei.
+  - „Ein kleiner Roboter erwacht“: der Roboter fährt eine Schleife, hinter ihm wächst eine grüne Spur mit Grasbüscheln.
+  - „Bring den Frühling zurück“: Baum, Obstbaum, Teich und Busch erwachen nacheinander mit Blütenblättern, Blumen sprießen, Bienen und Schmetterlinge fliegen, Blüten fallen.
+- Seitenwechsel blenden weich über; wer schnell weiterdrückt, kürzt den Übergang ab.
+- Kürzere Texte, größere Schrift; nach „Los geht's!“ ein kleiner Blütenregen um den Roboter (nicht beim Überspringen).
+- Texte und Bild je Seite in `data/tutorial.json` („intro“, „art“).
+- Das Rascheln beim Aufblühen bleibt (Rückmeldung: „super“).
+
 ## 0.14.0 – Einführung am Spielstart und sanftere Klänge
 
 - Einleitung beim Neuen Spiel: drei Bilder (graue Welt, kleiner Roboter, Ziel), von Grau zu Grün. A / Enter: weiter, B / Esc: überspringen.

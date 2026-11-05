@@ -24,6 +24,7 @@ Arbeitsweise wie bisher: ein Meilenstein, dann anhalten, Release- und Debug-EXE,
 7. **Eingeschoben: Einführung am Spielstart und sanftere Klänge:** kurze Einleitung beim Neuen Spiel (A weiter, B überspringen),
    Hinweise genau einmal im richtigen Moment (fahren, Skilltree öffnen, im Skilltree wählen/kaufen/schließen, Bienen),
    Tasten passend zum Gerät, „Steuerung“ im Pause-Menü, Aufblüh-Klang sanft und zusammengefasst. (erledigt in 0.14.0)
+   Rückmeldung: Einleitung schöner, mit bewegten Bildern und weichen Übergängen. (0.14.1)
 
 Reihenfolge: Wege und Wasser kommen vor den Objekten, weil Objekte (Wegrand-Details, Teiche, Brücken) sich an ihnen ausrichten.
 

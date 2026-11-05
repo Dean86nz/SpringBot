@@ -1,21 +1,13 @@
-# Testliste v0.14.0: Einführung am Spielstart und sanftere Klänge
+# Testliste v0.14.1: Schönere Einleitung
 
-EXEs: `export/windows/SpringBot_v0.14.0.exe` (Release) und `SpringBot_v0.14.0_DEBUG.exe` (Debug mit Cheat-Menü).
+EXEs: `export/windows/SpringBot_v0.14.1.exe` (Release) und `SpringBot_v0.14.1_DEBUG.exe` (Debug mit Cheat-Menü).
 Cheat-Menü (nur Debug): L3 + R3 eine Sekunde halten, PC F12.
-Achtung: Punkt 1 braucht „Neues Spiel“ und löscht den Garten. Zum Ausprobieren am besten die Debug-EXE nehmen (eigener Spielstand).
+Achtung: Die Einleitung kommt nur bei „Neues Spiel“, das löscht den Garten. Am besten mit der Debug-EXE ausprobieren (eigener Spielstand).
 
-## Einführung
-1. Titel → „Neues Spiel“: Es kommen drei Bilder (grau → grün). A weiter, beim letzten „Los geht's!“. Nochmal neu beginnen und B drücken: überspringt alles.
-2. Kurz nach dem Start erscheint unten „Linker Stick: fahren …“. Nach ein paar Metern Fahrt blendet er aus.
-3. Sobald genug Pollen für den ersten Kauf da sind: Hinweis, wie man den Skilltree öffnet (Y).
-4. Beim ersten Öffnen des Skilltrees: heller Kasten oben mit wählen / kaufen / schließen. Beim zweiten Öffnen nicht mehr.
-5. Sobald die erste Biene da ist (nach dem Skilltree schließen): Hinweis, was Bienen tun.
-6. Jeder Hinweis kommt nur einmal, auch nach Beenden und Weiterspielen nicht nochmal.
-
-## Tasten je Gerät
-7. Mit Controller stehen überall Controller-Tasten (A, Y, Start, Linker Stick). Kurz eine Taste auf der Tastatur drücken: Die Anzeigen wechseln auf Tab, Esc, WASD. Wieder am Controller: zurück.
-8. Pause → „Steuerung“: alle Tasten zum Nachlesen, passend zum Gerät. B führt zurück ins Pause-Menü.
-
-## Klang
-9. Bäume und Büsche blühen jetzt mit einem leisen, weichen Rascheln auf. Blühen viele auf einmal (z. B. mit Bienen), wird es leiser statt lauter.
-10. Gefällt dir das Rascheln, oder lieber ein Glöckchen? Zum Anhören: `sound_kandidaten/aufbluehen/`.
+1. Titel → „Neues Spiel“: Seite 1 zeigt eine graue Landschaft mit kahlem Baum, trockenem Teich und welkem Busch, Staub weht langsam vorbei.
+2. A: Die Seite blendet weich über. Seite 2: Der Roboter fährt eine Schleife und hinterlässt eine grüne Spur.
+3. A: Seite 3: Alles grün, Bäume, Teich und Busch erwachen nacheinander, Blumen sprießen, Bienen und Schmetterlinge fliegen.
+4. „Los geht's!“: Das Spiel beginnt mit einem kleinen Blütenregen um den Roboter.
+5. Nochmal neu beginnen und schnell mehrmals A drücken: Es geht ohne Hänger weiter. B überspringt alles (ohne Blütenregen).
+6. Gefallen dir Bilder und Texte? Ist etwas zu langsam, zu schnell oder zu verspielt?
+7. Läuft die Einleitung auf dem Ally flüssig?
