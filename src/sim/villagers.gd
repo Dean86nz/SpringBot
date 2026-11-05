@@ -10,6 +10,8 @@ extends RefCounted
 ## dort, wo noch etwas kaputt ist (höchstens zwei an einem Gebäude). Fertige Gebäude stehen in "repaired",
 ## main.gd lässt sie erwachen. Beim Fest (100 %) treffen sich alle auf dem Platz.
 ## Hindernisse (obstacles: Gebäude, Brunnen, Bienenstock) umgehen sie, statt hindurchzulaufen.
+## Wanderer (job "hike") gehen ab und zu ein langes Stück die Wege (trails) entlang aus dem Dorf hinaus
+## und wieder zurück.
 ## Reine Deko und Logik in Weltpixeln; gezeichnet von VillagerView.
 
 enum Kind { HUMAN, DOG, CAT }
@@ -36,6 +38,11 @@ class Person:
 	var sitting := false
 	var slot := 0
 	var fix := ""          # Gebäude, das die Person gerade repariert
+	var trail := -1        # Wanderer: Weg, Punkt, Richtung, verbleibende Punkte, gegangene Punkte
+	var ti := 0
+	var tdir := 1
+	var tleft := 0
+	var tdone := 0
 	var check := 0.0       # Sekunden bis zur nächsten Suche nach Arbeit am Bau
 
 
@@ -56,6 +63,8 @@ var repaired: Array[String] = []   # seit dem letzten Abholen fertig geworden (m
 var ready := Callable()        # func(id) -> bool: Grün um das Gebäude, es kann repariert werden
 var repair_sec := 12.0
 var obstacles: Array[Dictionary] = []   # {pos, r}: Gebäude, Brunnen, Bienenstock
+var trails: Array[PackedVector2Array] = []   # Wege der Region in Pixeln (für Wanderer)
+var hike_points := Vector2i(14, 30)    # so viele Wegpunkte geht ein Wanderer hinaus
 var _ball_target := Vector2.ZERO
 var _rng := RandomNumberGenerator.new()
 
@@ -238,6 +247,7 @@ func update(delta: float) -> void:
 						_stroll(p, delta)
 				"beekeeper": _beekeeper(p, delta)
 				"kid": _play(p, delta)
+				"hike": _hike(p, delta)
 				_: _stroll(p, delta)
 
 
@@ -487,6 +497,64 @@ func _update_ball(delta: float) -> void:
 		_ball_target = kids[_rng.randi() % kids.size()].pos if not kids.is_empty() else center + Vector2(0, plaza_r * 0.5)
 	else:
 		ball += to.normalized() * step
+
+
+## Wanderer: zum nächsten Weg, ein langes Stück darauf hinaus, kurz die Aussicht genießen, zurück,
+## eine Weile im Dorf, dann wieder los.
+func _hike(p: Person, delta: float) -> void:
+	if trails.is_empty():
+		_stroll(p, delta)
+		return
+	if p.wait > 0.0:
+		p.wait -= delta
+		return
+	match p.state:
+		0:   # nächsten Wegpunkt suchen
+			var best := INF
+			for t in trails.size():
+				for i in trails[t].size():
+					var d := p.pos.distance_squared_to(trails[t][i])
+					if d < best:
+						best = d
+						p.trail = t
+						p.ti = i
+			var line := trails[p.trail]
+			p.tdir = 1 if p.ti < line.size() / 2 else -1
+			if _rng.randf() < 0.5 and p.ti > 0 and p.ti < line.size() - 1:
+				p.tdir = -p.tdir
+			p.tleft = _rng.randi_range(hike_points.x, hike_points.y)
+			p.tdone = 0
+			p.target = line[p.ti]
+			p.state = 1
+		1:   # hinaus
+			if _walk(p, delta, speed * 0.75):
+				var line := trails[p.trail]
+				var nxt := p.ti + p.tdir
+				if p.tleft <= 0 or nxt < 0 or nxt >= line.size():
+					p.state = 2
+					p.wait = _rng.randf_range(3.0, 6.0)   # Aussicht
+				else:
+					p.ti = nxt
+					p.tleft -= 1
+					p.tdone += 1
+					p.target = line[p.ti]
+		2:   # umkehren
+			p.tdir = -p.tdir
+			p.tleft = p.tdone
+			p.state = 3
+		3:   # zurück
+			if _walk(p, delta, speed * 0.75):
+				if p.tleft <= 0:
+					p.state = 4
+					p.target = _plaza_spot()
+				else:
+					p.ti += p.tdir
+					p.tleft -= 1
+					p.target = trails[p.trail][p.ti]
+		4:   # im Dorf ausruhen
+			if _walk(p, delta, speed * 0.8):
+				p.wait = _rng.randf_range(20.0, 45.0)
+				p.state = 0
 
 
 func _stroll(p: Person, delta: float) -> void:

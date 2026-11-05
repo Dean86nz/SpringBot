@@ -157,6 +157,13 @@ func _ready() -> void:
 	_animals.avoid = avoid
 	_villagers = Villagers.new(_village, cell_px, places, hive_px)
 	_villagers.ready = _building_green
+	for wp: Dictionary in world_data.get("paths", []):   # Wege für die Wanderer, ein Punkt etwa alle 3 Zellen
+		var line := WorldMap.curve(wp)
+		var px := PackedVector2Array()
+		for i in range(0, line.size(), 3):
+			px.append(line[i] * cell_px)
+		if px.size() > 4:
+			_villagers.trails.append(px)
 	for d in fixed:
 		if float(d["block"]) > 0.0:
 			_villagers.obstacles.append({"pos": d["pos"], "r": float(d["block"])})
@@ -340,7 +347,7 @@ func _village_objects(places: Dictionary) -> Array[Dictionary]:
 		var block := float(t.get("block", 50.0)) * f
 		out.append({"id": str(b["id"]), "kind": kind, "pos": pos, "angle": rot, "seed": rng.randi(),
 			"block": block, "radius": float(t.get("radius", 76.0)) * f, "size": f, "quiet": kind in ["field", "laundry", "stand"]})
-		places[str(b["id"])] = {"pos": pos, "type": kind, "angle": rot, "block": block, "radius": float(t.get("radius", 76.0)) * f,
+		places[str(b["id"])] = {"pos": pos, "type": kind, "angle": rot, "block": block, "radius": float(t.get("radius", 76.0)) * f, "size": f,
 			"door": pos + Vector2(0, block + 16.0).rotated(rot) if block > 0.0 else pos + Vector2(0, 30)}
 	var fo: Variant = _village.get("fountain")
 	if fo is Array:
@@ -566,6 +573,7 @@ func reset_game() -> void:
 	_bees.set_count(0)
 	_animals.clear()
 	_villagers.clear()
+	_villager_view.queue_redraw()   # auch in der Pause (Titel, Einleitung): altes Bild der Bewohner löschen
 	_region_saves.clear()   # Neues Spiel: alle Regionen von vorn
 	_tutorial.reset()
 	_tip_id = ""

@@ -47,7 +47,7 @@
 			"laundry": {"block": 0, "radius": 70},
 			"cemetery": {"block": 0, "radius": 96}
 		},
-		"_info_residents": "residents: Bewohner mit Arbeit (smith Schmied, farmer Bauer auf work-Feld, shop Ladenbesitzer, laundry Wäsche an work-Leine, beekeeper Imker zwischen Bienenstock und Honigstand, kid Kinder spielen auf dem Platz, read liest auf der Bank, stroll schlendert). Sie kehren zurück, sobald ihr Haus (home) erwacht ist und der Frühling mindestens from erreicht hat. dog/cat: Haustier kommt mit.",
+		"_info_residents": "residents: Bewohner mit Arbeit (smith Schmied, farmer Bauer auf work-Feld, shop Ladenbesitzer, laundry Wäsche an work-Leine, beekeeper Imker zwischen Bienenstock und Honigstand, kid Kinder spielen auf dem Platz, read liest auf der Bank, hike wandert die Wege entlang aus dem Dorf hinaus und zurück, stroll schlendert). Sie kehren zurück, sobald ihr Haus (home) erwacht ist und der Frühling mindestens from erreicht hat. dog/cat: Haustier kommt mit.",
 		"residents": [
 			{"job": "smith", "home": "schmiede", "from": 0.12},
 			{"job": "farmer", "home": "hof", "work": "feld1", "from": 0.18, "dog": true},
@@ -61,8 +61,8 @@
 			{"job": "kid", "home": "schule", "from": 0.6},
 			{"job": "kid", "home": "schule", "from": 0.65},
 			{"job": "read", "home": "buecherei", "from": 0.7},
-			{"job": "stroll", "home": "haus3", "from": 0.78},
-			{"job": "stroll", "home": "haus6", "from": 0.86},
+			{"job": "hike", "home": "haus3", "from": 0.78, "dog": true},
+			{"job": "hike", "home": "haus6", "from": 0.86},
 			{"job": "stroll", "home": "haus7", "from": 0.93}
 		],
 		"people_speed_px": 85,

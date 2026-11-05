@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.17.3 – Aufbau sichtbarer, Wanderer, sanftere Klänge
+
+- **Fehler behoben:** Beim Neuen Spiel standen die Bewohner des vorher geladenen Spielstands reglos im Dorf und verschwanden erst bei etwa 8 %.
+  Das war ein altes Bild, das unter Titel und Einleitung (Pause) nicht gelöscht wurde. Jetzt ist das Dorf beim Neuen Spiel leer.
+- **Klänge beim Kaufen und bei jedem Zehntel:** keine Jingles mehr. Kaufen: kurzes, weiches Zupfen (zwei Varianten); besondere Knoten und jedes volle Zehntel:
+  ein leises Glöckchen. Alles leiser (Kauf -12, Besonders -12, Zehntel -14 dB). Kenney Interface Sounds (CC0).
+  Bisherige Klänge und weitere Kandidaten zum Anhören in `sound_kandidaten/upgrade/`.
+- **Kaputtere Häuser:** große Löcher im Dach mit freiliegenden Sparren, eine eingestürzte Ecke, Schutt und ein umgestürzter Balken neben jedem Gebäude.
+- **Aufbau sichtbar in Abschnitten:** erst Gerüst und Schutt räumen, ab 35 % entsteht ein neuer Dachstuhl aus hellem Holz, ab 70 % decken neue Ziegel Reihe für Reihe das Dach.
+- **Hunde und Katzen kleiner** (etwa zwei Drittel).
+- **Wanderer:** Zwei Bewohner gehen ab und zu die Wege entlang weit aus dem Dorf hinaus (auch über die Brücken), schauen sich kurz um und kommen zurück;
+  einer nimmt seinen Hund mit. Danach ruhen sie eine Weile im Dorf.
+
 ## 0.17.2 – Das Dorf wird wieder aufgebaut
 
 - **Wiederaufbau:** Die Gebäude des Dorfes bleiben kaputt, auch wenn ringsum alles grün ist. Erst die zurückkehrenden Bewohner reparieren sie:

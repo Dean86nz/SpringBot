@@ -14,6 +14,10 @@ const HAIR := [Color(0.30, 0.22, 0.16), Color(0.86, 0.70, 0.36), Color(0.54, 0.3
 const FUR := [Color(0.66, 0.46, 0.28), Color(0.94, 0.90, 0.80), Color(0.62, 0.62, 0.64), Color(0.90, 0.62, 0.30)]   # braun, creme, grau, rotbraun (kein Schwarz: Details sonst unsichtbar)
 const WASH := [Color(0.98, 0.98, 0.96), Color(0.55, 0.72, 0.95), Color(0.98, 0.70, 0.76), Color(0.98, 0.88, 0.45), Color(0.70, 0.88, 0.62), Color(0.96, 0.96, 0.98)]
 const SCALE := 2.2
+## Halbe Größe des Daches je Gebäudeart (wie in world_object.gd), für Gerüst und Bauabschnitte.
+const EXTENTS := {"house": Vector2(58, 42), "church": Vector2(38, 62), "school": Vector2(66, 38), "library": Vector2(48, 38),
+	"shop": Vector2(48, 36), "smithy": Vector2(44, 36), "farmhouse": Vector2(54, 40), "barn": Vector2(72, 42),
+	"stand": Vector2(30, 16), "field": Vector2(104, 64), "laundry": Vector2(64, 8), "cemetery": Vector2(70, 52)}
 
 var _v: Villagers
 
@@ -23,9 +27,17 @@ func bind(v: Villagers) -> void:
 	z_index = 4
 
 
+var _last_back := 0
+
+
 func _process(_delta: float) -> void:
-	if _v and _v.count_back() > 0:
+	if _v == null:
+		return
+	var n := _v.count_back()
+	# auch einmal neu zeichnen, wenn niemand mehr da ist (Neues Spiel), sonst bleibt das alte Bild stehen
+	if n > 0 or n != _last_back:
 		queue_redraw()
+	_last_back = n
 
 
 func _draw() -> void:
@@ -152,7 +164,7 @@ func _dog(p: Villagers.Person) -> void:
 	var walking := p.pos.distance_to(p.target) > 12.0
 	var fur: Color = FUR[p.look % FUR.size()]
 	var dark := fur.darkened(0.35)
-	var k := SCALE * 1.15
+	var k := SCALE * 0.75
 	Disc.dot(self, p.pos + Vector2(4, 5), 11.0 * k, SHADOW)
 	draw_set_transform(p.pos, p.dir, Vector2.ONE * k)
 	var step := sin(p.phase * 2.0) * 3.0 if walking else 0.0
@@ -183,7 +195,7 @@ func _dog(p: Villagers.Person) -> void:
 func _cat(p: Villagers.Person) -> void:
 	var fur: Color = FUR[(p.look + 3) % FUR.size()]
 	var stripe := fur.darkened(0.3)
-	var k := SCALE * 1.2
+	var k := SCALE * 0.75
 	Disc.dot(self, p.pos + Vector2(3, 4), 8.0 * k, SHADOW)
 	draw_set_transform(p.pos, p.dir, Vector2.ONE * k)
 	var sway := sin(p.act * 2.0) * 0.25
@@ -235,14 +247,34 @@ func _oval(c: Vector2, r: Vector2, col: Color) -> void:
 	draw_texture_rect(Disc.TEX, Rect2(c - r, r * 2.0), false, col)
 
 
-## Holzgerüst um ein Gebäude im Wiederaufbau, dazu ein Fortschrittsbalken.
+## Gebäude im Wiederaufbau, sichtbar in Abschnitten: bis 35 % wird Schutt geräumt (nur Gerüst),
+## bis 70 % entsteht ein neuer Dachstuhl aus hellem Holz, danach decken neue Ziegel Reihe für Reihe das Dach.
+## Dazu Holzgerüst und Fortschrittsbalken.
 func _scaffold(pl: Dictionary, progress: float) -> void:
 	var c: Vector2 = pl["pos"]
 	var rot := float(pl.get("angle", 0.0))
-	var s := maxf(float(pl.get("block", 0.0)), float(pl.get("radius", 60.0)) * 0.6) * 1.05
+	var e: Vector2 = EXTENTS.get(pl.get("type", "house"), Vector2(50, 40)) * float(pl.get("size", 1.0))
 	var wood := Color(0.70, 0.52, 0.32)
+	var fresh := Color(0.90, 0.74, 0.50)
 	draw_set_transform(c, rot, Vector2.ONE)
-	var corners := [Vector2(-s, -s * 0.8), Vector2(s, -s * 0.8), Vector2(s, s * 0.8), Vector2(-s, s * 0.8)]
+	if progress > 0.35:   # neuer Dachstuhl
+		var beams := int(clampf((progress - 0.35) / 0.35, 0.0, 1.0) * (e.x * 2.0 / 12.0))
+		draw_rect(Rect2(-e, Vector2(e.x * 2.0, e.y * 2.0)), Color(0.24, 0.22, 0.21, 0.55))
+		for k in beams:
+			var x := -e.x + 6.0 + k * 12.0
+			draw_line(Vector2(x, -e.y), Vector2(x, e.y), INK, 4.5)
+			draw_line(Vector2(x, -e.y), Vector2(x, e.y), fresh, 3.0)
+		if beams > 0:
+			draw_line(Vector2(-e.x, 0), Vector2(-e.x + beams * 12.0, 0), fresh.darkened(0.15), 4.0)
+	if progress > 0.7:   # neue Ziegel, Reihe für Reihe von hinten nach vorn
+		var t := clampf((progress - 0.7) / 0.3, 0.0, 1.0)
+		var rows := int(t * e.y * 2.0 / 8.0)
+		for r in rows:
+			var y := -e.y + r * 8.0
+			draw_rect(Rect2(Vector2(-e.x, y), Vector2(e.x * 2.0, 8.0)), Color(0.86, 0.48, 0.32) if r % 2 == 0 else Color(0.80, 0.42, 0.28))
+			draw_line(Vector2(-e.x, y + 8.0), Vector2(e.x, y + 8.0), Color(0.62, 0.30, 0.22), 1.0)
+	var s := maxf(e.x, e.y) + 8.0
+	var corners := [Vector2(-e.x - 8, -e.y - 8), Vector2(e.x + 8, -e.y - 8), Vector2(e.x + 8, e.y + 8), Vector2(-e.x - 8, e.y + 8)]
 	for i in 4:
 		var a: Vector2 = corners[i]
 		var b: Vector2 = corners[(i + 1) % 4]
@@ -252,7 +284,7 @@ func _scaffold(pl: Dictionary, progress: float) -> void:
 	for a: Vector2 in corners:
 		Disc.ring_dot(self, a, 4.0, wood.darkened(0.15), INK, 1.5)   # Pfosten
 	draw_set_transform(Vector2.ZERO)
-	var bar := Rect2(c + Vector2(-34, -s - 26), Vector2(68, 9))
+	var bar := Rect2(c + Vector2(-34, -s - 30), Vector2(68, 9))
 	draw_rect(bar.grow(2.0), INK)
 	draw_rect(bar, Color(0.20, 0.24, 0.22))
 	draw_rect(Rect2(bar.position, Vector2(bar.size.x * progress, bar.size.y)), Color(0.55, 0.85, 0.40))

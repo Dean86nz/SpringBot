@@ -163,3 +163,28 @@ func test_residents_repair_buildings() -> void:
 	vil2.set_done(saved)
 	for id in vil2.repair:
 		assert_true(vil2.is_done(id), "Spielstand: repariert bleibt repariert")
+
+
+func test_hikers_walk_out_and_come_back() -> void:
+	var v: Dictionary = _region()["village"]
+	var vil := Villagers.new(v, 24.0, _places(), Vector2(314.5, 235.5) * 24.0, 6)
+	for wp: Dictionary in Game.load_json(DIR + "world.json")["paths"]:
+		var line := WorldMap.curve(wp)
+		var px := PackedVector2Array()
+		for i in range(0, line.size(), 3):
+			px.append(line[i] * 24.0)
+		vil.trails.append(px)
+	vil.set_done(vil.repair.keys())   # alles schon repariert: gleich an die Arbeit
+	vil.update_return(1.0, func(_id: String) -> bool: return true, true)
+	var far := 0.0
+	var back_home := false
+	for i in 60 * 180:
+		vil.update(1.0 / 60.0)
+		for p in vil.people:
+			if p.job == "hike":
+				var d := p.pos.distance_to(vil.center)
+				far = maxf(far, d)
+				if far > 30.0 * 24.0 and d < vil.plaza_r * 1.2:
+					back_home = true
+	assert_true(far > 30.0 * 24.0, "ein Wanderer kommt weit aus dem Dorf hinaus (%d Zellen)" % int(far / 24.0))
+	assert_true(back_home, "und kommt wieder zurück ins Dorf")

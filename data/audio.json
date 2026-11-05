@@ -9,10 +9,10 @@
 		{"file": "res://assets/audio/music/music_4_tournesol.ogg", "from_coverage": 0.60, "db": 0.0}
 	],
 	"sfx_level_db": {
-		"buy": -6.0,
-		"special": -4.0,
+		"buy": -12.0,
+		"special": -12.0,
 		"deny": -12.0,
-		"milestone": -4.0,
+		"milestone": -14.0,
 		"open": -16.0,
 		"close": -16.0,
 		"select": -20.0,

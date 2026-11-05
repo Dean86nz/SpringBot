@@ -18,9 +18,9 @@ Von **Kenney** (www.kenney.nl), Lizenz **CC0 1.0**, übernommen aus dem Projekt 
 
 | Datei | Original | Paket |
 |---|---|---|
-| buy_1, buy_2 | jingles_PIZZI01, jingles_PIZZI02 | Music Jingles |
-| special_1 | jingles_PIZZI12 | Music Jingles |
-| milestone_1 | jingles_STEEL13 | Music Jingles |
+| buy_1, buy_2 | pluck_001, pluck_002 | Interface Sounds (OpenGameArt: „Interface Sounds“) |
+| special_1 | glass_005 | Interface Sounds |
+| milestone_1 | glass_001 | Interface Sounds |
 | open_1, close_1, select_1 | open_001, close_001, switch_002 | Interface Sounds 1.0 |
 | deny_1 | impactSoft_heavy_000 | Impact Sounds 1.0 |
 | awake_1 bis awake_4 (Objekt erwacht, weiches Rascheln) | cloth1 bis cloth4 | RPG Audio (OpenGameArt: „50 RPG sound effects“) |

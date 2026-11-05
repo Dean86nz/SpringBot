@@ -62,6 +62,8 @@ Die Helfer sind eigene Ideen (nichts aus Unharvest oder Moon Sweepers). Größen
    Bienen ohne Arbeit besuchen Blüten und ruhen im Stock, keine Jingles mehr am Ende.
    Rückmeldung in 0.17.2: Gebäude bleiben kaputt, bis die zurückkehrenden Bewohner sie reparieren; erkennbare Hunde und Katzen;
    niemand läuft durch Brunnen oder Gebäude; Kirche etwas außerhalb mit Friedhof.
+   Rückmeldung in 0.17.3: keine stehenden Menschen beim Neuen Spiel, sanfte Klänge statt Jingles beim Kaufen, kaputtere Häuser
+   und sichtbarer Aufbau (Dachstuhl, neue Ziegel), kleinere Haustiere, Wanderer gehen aus dem Dorf hinaus.
 3. **Regionenkarte und Reisen:** Reiseroute mit allen Regionen, Weiterreisen, Zurückkehren, Pollen-Regel für fertige Regionen,
    Einleitung je Region. (Die Übersichtskarte aus 0.15.0 ist dafür die Grundlage.)
 4. **Felder und Vorort** mit Samenvögeln (neuer Skilltree-Ast).

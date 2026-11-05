@@ -527,10 +527,7 @@ func _house(alive: bool) -> void:
 	draw_rect(chim, Color(0.62, 0.40, 0.34) if alive else Color(0.50, 0.47, 0.44))
 	_outline(PackedVector2Array([chim.position, Vector2(chim.end.x, chim.position.y), chim.end, Vector2(chim.position.x, chim.end.y)]), INK, 2.0)
 	if not alive:
-		_rng.seed = obj_seed
-		for k in 4:   # Löcher und Flecken im Dach
-			var p := Vector2(_rng.randf_range(-w + 8, w - 16), _rng.randf_range(-h + 6, h - 12))
-			draw_rect(Rect2(p, Vector2(_rng.randf_range(8, 16), _rng.randf_range(5, 9))), Color(0.36, 0.33, 0.31))
+		_ruin(w, h, 4)
 		return
 	_dot(Vector2(cx, -h * 0.6 + 7), 4.0, Color(0.30, 0.26, 0.24))   # Kaminöffnung
 	# Blumenkästen vorne (zum Platz) und Büsche an den Ecken
@@ -583,10 +580,35 @@ func _gable(w: float, h: float, alive: bool, roof_alive: Color, holes: int = 4) 
 	draw_line(Vector2(-w, 0), Vector2(w, 0), INK, 3.0)
 	_outline(PackedVector2Array([Vector2(-w, -h), Vector2(w, -h), Vector2(w, h), Vector2(-w, h)]), INK, 3.0)
 	if not alive:
-		_rng.seed = obj_seed
-		for k in holes:
-			var p := Vector2(_rng.randf_range(-w + 8, w - 16), _rng.randf_range(-h + 6, h - 12))
-			draw_rect(Rect2(p, Vector2(_rng.randf_range(8, 16), _rng.randf_range(5, 9))), Color(0.36, 0.33, 0.31))
+		_ruin(w, h, holes)
+
+
+## Kaputtes Dach: große Löcher mit freiliegenden Sparren, eingestürzte Ecke, Schutt und ein umgestürzter
+## Balken neben dem Gebäude. Gilt für alle Gebäude des Dorfes (im aktuellen Zeichen-Rahmen).
+func _ruin(w: float, h: float, holes: int = 3) -> void:
+	_rng.seed = obj_seed
+	var dark := Color(0.24, 0.22, 0.21)
+	var beam := Color(0.42, 0.33, 0.26)
+	for k in clampi(holes / 2, 1, 3):
+		var hw := _rng.randf_range(w * 0.28, w * 0.45)
+		var hh := _rng.randf_range(h * 0.45, h * 0.75)
+		var p := Vector2(_rng.randf_range(-w + 4, w - hw - 4), _rng.randf_range(-h + 4, h - hh - 4))
+		draw_rect(Rect2(p, Vector2(hw, hh)), dark)
+		for r in int(hw / 9.0):   # Sparren über dem Loch
+			var x := p.x + 5.0 + r * 9.0
+			draw_line(Vector2(x, p.y - 2), Vector2(x, p.y + hh + 2), beam, 2.5)
+		draw_line(Vector2(p.x - 2, p.y + hh * 0.5), Vector2(p.x + hw + 2, p.y + hh * 0.5 + _rng.randf_range(-3, 3)), beam, 2.0)
+	# eingestürzte Ecke
+	var sx := -1.0 if obj_seed % 2 == 0 else 1.0
+	var corner := PackedVector2Array([Vector2(sx * w, h), Vector2(sx * (w - w * 0.55), h), Vector2(sx * w, h - h * 0.9)])
+	_quad(corner, Color(0.58, 0.55, 0.50))
+	_outline(PackedVector2Array([corner[1], corner[2]]), INK, 2.0, false)
+	for k in 6:   # Schutt
+		var q := Vector2(sx * (w + 8.0 + _rng.randf_range(0, 14)), _rng.randf_range(-h * 0.2, h * 0.9))
+		_ring(q, _rng.randf_range(3.0, 6.0), Color(0.62, 0.60, 0.57).lerp(Color(0.50, 0.40, 0.34), _rng.randf()), INK, 1.0)
+	var b0 := Vector2(-sx * (w + 6), -h * 0.6)   # umgestürzter Balken
+	draw_line(b0, b0 + Vector2(sx * 10, h * 1.1), INK, 6.0)
+	draw_line(b0, b0 + Vector2(sx * 10, h * 1.1), beam, 4.0)
 
 
 func _rect_ink(r: Rect2, col: Color, w: float = 2.0) -> void:
@@ -627,8 +649,8 @@ func _church(alive: bool) -> void:
 	draw_line(c + Vector2(0, -9), c + Vector2(0, 9), gold, 3.5)
 	draw_line(c + Vector2(-6, -3), c + Vector2(6, -3), gold, 3.5)
 	if not alive:
-		draw_rect(Rect2(Vector2(-20, -30), Vector2(14, 8)), Color(0.36, 0.33, 0.31))
-		draw_rect(Rect2(Vector2(8, 10), Vector2(12, 7)), Color(0.36, 0.33, 0.31))
+		_tf(Vector2.ZERO, angle)
+		_ruin(w, h, 4)
 
 
 ## Schule: breites Haus, davor ein Pausenhof mit Zaun, Fahnenmast und Hüpfkästchen.
