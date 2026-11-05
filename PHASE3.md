@@ -1,7 +1,6 @@
-# Phase 3: Regionen (Plan, wartet auf Freigabe)
+# Phase 3: Regionen
 
-Entwurf vom 2026-11-05 auf Grundlage der Info vom selben Tag (siehe `PHASE2.md`, „Ausblick“).
-**Noch nichts davon ist umgesetzt.** Bitte prüfen, ändern, freigeben; erst dann beginnt Meilenstein 1.
+Entwurf vom 2026-11-05 auf Grundlage der Info vom selben Tag (siehe `PHASE2.md`, „Ausblick“). **Freigegeben am 2026-11-05** („go“).
 Arbeitsweise wie bisher: ein Meilenstein, dann anhalten, Release- und Debug-EXE, Testliste, Feedback. 60 FPS auf dem Ally, alle Werte in JSON.
 
 ## Idee in einem Satz
@@ -54,6 +53,7 @@ Die Helfer sind eigene Ideen (nichts aus Unharvest oder Moon Sweepers). Größen
 
 1. **Gerüst für Regionen (Technik):** Daten je Region in Ordnern (`data/regions/<id>/…`), Liste der Regionen in `data/campaign.json`,
    Spielstand mit einem Raster je Region, alter Spielstand wird übernommen. `Regions` → `Areas` umbenennen. Sichtbar ändert sich fast nichts.
+   (erledigt in 0.16.0)
 2. **Heimatdorf:** Dorf in der Mitte der heutigen Karte (Häuser, Dorfplatz, Brunnen), Häuser erwachen mit dem Grün.
    Bei 100 % kehren die Menschen zurück, Dorffest statt Endbildschirm.
 3. **Regionenkarte und Reisen:** Reiseroute mit allen Regionen, Weiterreisen, Zurückkehren, Pollen-Regel für fertige Regionen,

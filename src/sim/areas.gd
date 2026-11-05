@@ -1,6 +1,6 @@
-class_name Regions
+class_name Areas
 extends RefCounted
-## Gebiete der Welt (data/regions.json): Jede Zelle gehört zum nächsten Mittelpunkt eines Gebiets,
+## Gebiete der Welt (data/regions/<region>/areas.json): Jede Zelle gehört zum nächsten Mittelpunkt eines Gebiets,
 ## gemessen an einer mit Rauschen verbogenen Position, damit die Grenzen natürlich verlaufen.
 ## Gespeichert in Blöcken zu STEP × STEP Zellen (für Grenzen, die ohnehin weich sind, reicht das).
 ## Jedes Gebiet hat eigene Farben, Blumen- und Büscheldichte und Objekt-Gewichte. Reine Logik, nie
@@ -20,7 +20,7 @@ func _init(map_w: int, map_h: int, data: Dictionary) -> void:
 	index.resize(cols * rows)
 	var points: Array[Vector2] = []
 	var owner: Array[int] = []
-	for r: Dictionary in data.get("regions", []):
+	for r: Dictionary in data.get("areas", []):
 		var k := list.size()
 		list.append({
 			"name": str(r.get("name", "")),
@@ -142,21 +142,21 @@ class Watch:
 	var _t := 0.0
 
 	## true, wenn das Gebiet gerade gewechselt hat (auch beim ersten Aufruf nach reset).
-	func update(region: int, delta: float) -> bool:
+	func update(area: int, delta: float) -> bool:
 		if current < 0:
-			current = region
+			current = area
 			_cand = -1
 			return true
-		if region == current:
+		if area == current:
 			_cand = -1
 			return false
-		if region != _cand:
-			_cand = region
+		if area != _cand:
+			_cand = area
 			_t = 0.0
 		_t += delta
 		if _t < confirm_sec:
 			return false
-		current = region
+		current = area
 		_cand = -1
 		return true
 

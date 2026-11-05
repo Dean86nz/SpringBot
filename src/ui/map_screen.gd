@@ -24,11 +24,11 @@ var _keys_version := -1
 
 
 ## ground: Boden mit seinen Masken; areas: Gebiete (für Farben und Namen); world_px: Kartengröße.
-func setup(ground: GroundView, areas: Regions, world_px: Vector2, map_cells: Vector2) -> void:
+func setup(ground: GroundView, areas: Areas, world_px: Vector2, map_cells: Vector2) -> void:
 	_world_px = world_px
 	var mat := ShaderMaterial.new()
 	mat.shader = SHADER
-	for k in ["mask", "terrain_tex", "region_a", "use_regions"]:
+	for k in ["mask", "terrain_tex", "area_a", "use_areas"]:
 		mat.set_shader_parameter(k, ground.shader_value(k))
 	mat.set_shader_parameter("px_size", MAP_SIZE)
 	_map.material = mat

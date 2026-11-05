@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.16.0 – Phase 3, Meilenstein 1: Gerüst für Regionen
+
+Technik für die Reise durch mehrere Regionen. Im Spiel ändert sich sichtbar nichts.
+- Neue Datei `data/campaign.json`: Liste der Regionen und Startregion (vorerst nur das Heimatdorf).
+- Die Daten der heutigen Karte liegen jetzt im Ordner `data/regions/heimatdorf/`: `region.json` (Name, Größe, Start, Bienenstock; vorher in `balance.json`),
+  `world.json`, `objects.json` und `areas.json` (die Gebiete, vorher `data/regions.json`).
+- Im Code heißen die Gebiete jetzt `Areas`, damit „Region“ für die Regionen frei ist.
+- Spielstand Version 2: Jede Region hat ihren eigenen Eintrag (Raster, Roboter, fertig); Skilltree, Pollen, Spielzeit und Einführung gelten für alle Regionen.
+  Ältere Spielstände werden beim Laden automatisch zum Heimatdorf (getestet mit einem echten alten Stand).
+- „Neues Spiel“ setzt alle Regionen zurück.
+
 ## 0.15.0 – Lautstärke-Regler und Übersichtskarte
 
 - Plan für Phase 3 „Regionen“ in `PHASE3.md`: vier Regionen mit je einem neuen Helfer, Ablauf, Vorschläge zu den offenen Fragen, sechs Meilensteine. Noch nichts davon umgesetzt.

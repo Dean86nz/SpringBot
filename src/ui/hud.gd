@@ -10,9 +10,9 @@ var _percent := Label.new()
 var _pollen := Label.new()
 var _hint := Label.new()
 var _version := Label.new()
-var _region := Label.new()
-var _region_tw: Tween
-var banner_cfg: Dictionary = {}   # Zeiten der Namenseinblendung (regions.json "banner")
+var _area := Label.new()
+var _area_tw: Tween
+var banner_cfg: Dictionary = {}   # Zeiten der Namenseinblendung (areas.json "banner")
 const TIP_WIDTH := 1000.0
 var _tip_panel := PanelContainer.new()
 var _tip := Label.new()
@@ -32,16 +32,16 @@ func _ready() -> void:
 	_percent.add_theme_color_override("font_outline_color", Color(0.25, 0.45, 0.25))
 	_percent.add_theme_constant_override("outline_size", 12)
 	add_child(_percent)
-	_region.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
-	_region.offset_top = 92
-	_region.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	_region.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_region.add_theme_font_size_override("font_size", 30)
-	_region.add_theme_color_override("font_color", Color(1, 1, 0.94, 0.9))
-	_region.add_theme_color_override("font_outline_color", Color(0.22, 0.36, 0.24, 0.6))
-	_region.add_theme_constant_override("outline_size", 8)
-	_region.modulate.a = 0.0
-	add_child(_region)
+	_area.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	_area.offset_top = 92
+	_area.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_area.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_area.add_theme_font_size_override("font_size", 30)
+	_area.add_theme_color_override("font_color", Color(1, 1, 0.94, 0.9))
+	_area.add_theme_color_override("font_outline_color", Color(0.22, 0.36, 0.24, 0.6))
+	_area.add_theme_constant_override("outline_size", 8)
+	_area.modulate.a = 0.0
+	add_child(_area)
 	_pollen.position = Vector2(32, 24)
 	_pollen.add_theme_font_size_override("font_size", 40)
 	_pollen.add_theme_color_override("font_color", Color(1.0, 0.92, 0.45))
@@ -146,16 +146,16 @@ func pulse() -> void:
 
 
 ## Name des Gebiets langsam ein- und wieder ausblenden.
-func show_region(region_name: String) -> void:
-	if region_name.is_empty():
+func show_area(area_name: String) -> void:
+	if area_name.is_empty():
 		return
-	if _region_tw:
-		_region_tw.kill()
-	_region.text = "~  %s  ~" % region_name
-	_region_tw = create_tween()
-	_region_tw.tween_property(_region, "modulate:a", 1.0, float(banner_cfg.get("fade_in_sec", 0.8)))
-	_region_tw.tween_interval(float(banner_cfg.get("hold_sec", 2.5)))
-	_region_tw.tween_property(_region, "modulate:a", 0.0, float(banner_cfg.get("fade_out_sec", 1.4)))
+	if _area_tw:
+		_area_tw.kill()
+	_area.text = "~  %s  ~" % area_name
+	_area_tw = create_tween()
+	_area_tw.tween_property(_area, "modulate:a", 1.0, float(banner_cfg.get("fade_in_sec", 0.8)))
+	_area_tw.tween_interval(float(banner_cfg.get("hold_sec", 2.5)))
+	_area_tw.tween_property(_area, "modulate:a", 0.0, float(banner_cfg.get("fade_out_sec", 1.4)))
 
 
 func set_pollen(amount: float, per_sec: float) -> void:

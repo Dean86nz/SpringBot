@@ -1,9 +1,9 @@
 {
-	"_info": "Gebiete der Welt. points = Mittelpunkte in Zellen (Karte 640 × 480), jede Zelle gehört zum nächsten Punkt; warp verbiegt die Grenzen (Zellen), damit sie natürlich wirken. grass / dry = Farbfaktor für grünen / grauen Boden (1 = unverändert). flowers / tufts = Faktor für Blumen- und Grasbüscheldichte. flower_color + flower_share = Lieblingsfarbe der Blumen und ihr Anteil. objects = Gewicht je Objektart (fehlt = 1): die Zahl aus objects.json verteilt sich danach. extra = zusätzliche Objekte, die nur in diesem Gebiet stehen. banner = dezente Namenseinblendung beim Betreten (Sekunden).",
+	"_info": "Gebiete der Region Heimatdorf. points = Mittelpunkte in Zellen (Karte 640 × 480), jede Zelle gehört zum nächsten Punkt; warp verbiegt die Grenzen (Zellen), damit sie natürlich wirken. grass / dry = Farbfaktor für grünen / grauen Boden (1 = unverändert). flowers / tufts = Faktor für Blumen- und Grasbüscheldichte. flower_color + flower_share = Lieblingsfarbe der Blumen und ihr Anteil. objects = Gewicht je Objektart (fehlt = 1): die Zahl aus objects.json (gleicher Ordner) verteilt sich danach. extra = zusätzliche Objekte, die nur in diesem Gebiet stehen. banner = dezente Namenseinblendung beim Betreten (Sekunden).",
 	"seed": 7,
 	"warp_cells": 45,
 	"warp_scale_cells": 140,
-	"regions": [
+	"areas": [
 		{
 			"name": "Blumental",
 			"points": [[320, 250], [300, 380]],

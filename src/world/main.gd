@@ -3,10 +3,12 @@ extends Node2D
 ## Jedes Bild begrünt der Roboter die Zellen in seinem Radius; grüne Zellen bringen Pollen.
 ## Mit den Wachstums-Knoten wächst die Grenze des Grüns von allein weiter,
 ## Bienen tragen das Grün zu neuen Stellen. Alle Werte kommen aus dem Skilltree.
-## Wege, Flüsse und Brücken kommen aus data/world.json (WorldMap); sie werden nie grün.
-## Objekte (Bäume, Teiche, Büsche, Felsen, Wegrand) aus data/objects.json erwachen, sobald unter
+## Regionen (Phase 3): data/campaign.json sagt, welche Regionen es gibt; die Daten der aktuellen Region
+## liegen in ihrem Ordner (Campaign). Der Spielstand hat je Region einen Eintrag, Skills gelten für alle.
+## Wege, Flüsse und Brücken kommen aus world.json der Region (WorldMap); sie werden nie grün.
+## Objekte (Bäume, Teiche, Büsche, Felsen, Wegrand) aus objects.json der Region erwachen, sobald unter
 ## ihnen Grün ist; um Bäume und Felsen fährt der Roboter herum.
-## Gebiete (data/regions.json) geben Boden und Objekten ihren Charakter; beim Betreten eines
+## Gebiete (areas.json der Region) geben Boden und Objekten ihren Charakter; beim Betreten eines
 ## Gebiets blendet das HUD dezent seinen Namen ein.
 ## Tiere (data/animals.json) leben als Deko nahe der Kamera über dem Grün (Animals, AnimalView).
 ## Einführung (data/tutorial.json): beim Neuen Spiel eine kurze Einleitung (IntroScreen), im Spiel
@@ -15,12 +17,13 @@ extends Node2D
 ## Rahmen: Start mit Titelbildschirm (dahinter der gespeicherte Garten), Speichern alle
 ## paar Sekunden und bei jedem Menü, Endbildschirm, sobald die ganze Welt blüht.
 
-const WORLD_PATH := "res://data/world.json"
-const OBJECTS_PATH := "res://data/objects.json"
+const CAMPAIGN_PATH := "res://data/campaign.json"
 const ANIMALS_PATH := "res://data/animals.json"
-const REGIONS_PATH := "res://data/regions.json"
 
 var grid: GroundGrid
+var campaign: Campaign
+var region_id := ""          # aktuelle Region
+var _region_saves: Dictionary = {}   # Spielstand-Einträge der übrigen Regionen, unverändert weitergereicht
 var skills: SkillTree
 var cell_px := 24.0
 var _base_radius := 3.0
@@ -43,8 +46,8 @@ var _bridge_view := BridgeView.new()
 var _objects: Array[WorldObject] = []
 var _obj_cfg: Dictionary = {}
 var _awake_timer := 0.0
-var _regions: Regions
-var _region_watch := Regions.Watch.new()
+var _areas: Areas
+var _area_watch := Areas.Watch.new()
 var _animals: Animals
 var _animal_view := AnimalView.new()
 var _ponds: Array[WorldObject] = []   # gleiche Reihenfolge wie _animals.ponds
@@ -76,45 +79,51 @@ var _save_task := -1         # WorkerThreadPool-Aufgabe, die gerade schreibt
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	var w := int(Game.num("map/width_cells", 320))
-	var h := int(Game.num("map/height_cells", 240))
+	campaign = Campaign.new(Game.load_json(CAMPAIGN_PATH))
+	var saved := SaveStore.migrate(_store.read(), campaign.start)
+	region_id = str(saved.get("region", campaign.start))
+	if not campaign.has(region_id):
+		push_warning("Region %s unbekannt, Start in %s" % [region_id, campaign.start])
+		region_id = campaign.start
+	var rdata := campaign.load_region(region_id)
+	var region: Dictionary = rdata["region"]
+	var w := int(region.get("width_cells", 640))
+	var h := int(region.get("height_cells", 480))
 	cell_px = Game.num("map/cell_px", 24)
 	_base_radius = Game.num("robot/green_radius_cells", 3.0)
 	_base_speed = Game.num("robot/speed_px", 380.0)
 	grid = GroundGrid.new(w, h)
 	grid.hop_cells = int(Game.num("map/spread_hop_cells", 12))
 	var t0 := Time.get_ticks_msec()
-	var world_data := Game.load_json(WORLD_PATH)
+	var world_data: Dictionary = rdata["world"]
 	var bridges := WorldMap.build(grid, world_data)
 	print("Wege und Wasser: %d Brücken, %d ms" % [bridges.size(), Time.get_ticks_msec() - t0])
-	var regions_data := Game.load_json(REGIONS_PATH)
-	_regions = Regions.new(w, h, regions_data)
-	var banner: Dictionary = regions_data.get("banner", {})
-	_region_watch.confirm_sec = float(banner.get("confirm_sec", 1.0))
+	var areas_data: Dictionary = rdata["areas"]
+	_areas = Areas.new(w, h, areas_data)
+	var banner: Dictionary = areas_data.get("banner", {})
+	_area_watch.confirm_sec = float(banner.get("confirm_sec", 1.0))
 	var tree_data := Game.load_json(Game.SKILLTREE_PATH)
 	skills = SkillTree.new(tree_data)
 	_spread_cap = int(tree_data.get("spread_max_events_per_frame", 3000))
 	skills.changed.connect(_apply_upgrades)
 	var size_px := Vector2(w, h) * cell_px
-	var start: Variant = Game.dig(Game.balance, "robot/start_cell")
-	_start_px = (Vector2(start[0], start[1]) + Vector2(0.5, 0.5)) * cell_px if start is Array else size_px * 0.5
+	_start_px = Campaign.cell_px(region, "start_cell", cell_px, size_px * 0.5)
 
 	_ground.process_mode = Node.PROCESS_MODE_ALWAYS   # zeigt den geladenen Garten auch hinter dem Titel
 	var ground_cfg: Variant = Game.dig(Game.balance, "ground")
-	_ground.bind(grid, cell_px, ground_cfg if ground_cfg is Dictionary else {}, _regions)
+	_ground.bind(grid, cell_px, ground_cfg if ground_cfg is Dictionary else {}, _areas)
 	add_child(_ground)
 	_bridge_view.bind(bridges, cell_px)
 	add_child(_bridge_view)
-	var hive: Variant = Game.dig(Game.balance, "bees/hive_cell")
-	var hive_px := (Vector2(hive[0], hive[1]) + Vector2(0.5, 0.5)) * cell_px if hive is Array else _start_px
+	var hive_px := Campaign.cell_px(region, "hive_cell", cell_px, _start_px)
 	_hive_px = hive_px
 	_bees.configure(Game.dig(Game.balance, "bees") if Game.dig(Game.balance, "bees") is Dictionary else {}, hive_px, cell_px)
 	_base_bloom = _bees.bloom_radius
 	_base_hover = _bees.hover_sec
-	_obj_cfg = Game.load_json(OBJECTS_PATH)
+	_obj_cfg = rdata["objects"]
 	var blockers: Array[Dictionary] = []
 	var avoid: Array[Dictionary] = []   # wo keine Hasen hoppeln
-	for d in WorldObjects.place(grid, cell_px, _obj_cfg, world_data, [_start_px, hive_px], _regions):
+	for d in WorldObjects.place(grid, cell_px, _obj_cfg, world_data, [_start_px, hive_px], _areas):
 		var o := WorldObject.new()
 		o.setup(d)
 		add_child(o)
@@ -173,7 +182,7 @@ func _ready() -> void:
 		if not _intro.skipped:   # „Los geht's!“: kleiner Blütenregen um den Roboter
 			_petals.burst(_robot.position, 70, Vector2(120, 420), Vector2(1.0, 1.8), Vector2(7, 12)))
 	add_child(_intro)
-	_map.setup(_ground, _regions, size_px, Vector2(w, h))
+	_map.setup(_ground, _areas, size_px, Vector2(w, h))
 	_map.closed.connect(func() -> void:
 		if _map_from_pause:
 			_pause.open()
@@ -207,7 +216,7 @@ func _ready() -> void:
 			_milestone = floori(grid.coverage() * 10.0))
 		add_child(cheats)
 	_apply_upgrades()
-	load_game(_store.read())
+	load_game(saved)
 	show_title()
 
 
@@ -231,8 +240,8 @@ func _process(delta: float) -> void:
 		_awake_timer = float(_obj_cfg.get("awake_check_sec", 0.2))
 		_wake_objects(true)
 	_animals.update(delta, _view_rect(), _robot.position)
-	if _region_watch.update(_regions.at_px(_robot.position, cell_px), real):
-		_hud.show_region(_regions.name_of(_region_watch.current))
+	if _area_watch.update(_areas.at_px(_robot.position, cell_px), real):
+		_hud.show_area(_areas.name_of(_area_watch.current))
 	_update_tips(real)
 	_autosave += real
 	if _autosave >= Game.num("save/autosave_sec", 30.0):
@@ -424,6 +433,7 @@ func reset_game() -> void:
 	_end_wait = -1.0
 	_bees.set_count(0)
 	_animals.clear()
+	_region_saves.clear()   # Neues Spiel: alle Regionen von vorn
 	_tutorial.reset()
 	_tip_id = ""
 	_hud.hide_tip()
@@ -461,7 +471,7 @@ func _start_playing() -> void:
 	_hud.visible = true
 	_robot.input_enabled = true
 	_autosave = 0.0
-	_region_watch.reset()   # Name des Gebiets nach dem Titel zeigen
+	_area_watch.reset()   # Name des Gebiets nach dem Titel zeigen
 	get_tree().paused = false
 	create_tween().tween_property(_camera, "offset", Vector2.ZERO, 0.8).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
@@ -485,17 +495,23 @@ func save() -> void:
 		"game_version": Game.version(),
 		"play_sec": _play_sec,
 		"world_sec": _world_sec,
+		"skills": skills.to_dict(),
+		"tutorial": _tutorial.to_list(),
+		"region": region_id,
+	}
+	var regions := _region_saves.duplicate()   # andere Regionen bleiben, wie sie geladen wurden
+	var entry := {
 		"finished": _finished or _end_wait >= 0.0,
 		"robot": [_robot.position.x, _robot.position.y],
 		"grid": {"w": grid.width, "h": grid.height},
-		"skills": skills.to_dict(),
-		"tutorial": _tutorial.to_list(),
 	}
+	regions[region_id] = entry
+	data["regions"] = regions
 	var cells := grid.cells.duplicate()
 	var since := grid.since.duplicate()
 	_save_task = WorkerThreadPool.add_task(func() -> void:
-		data["grid"]["cells"] = Marshalls.raw_to_base64(cells.compress(FileAccess.COMPRESSION_DEFLATE))
-		data["grid"]["since"] = Marshalls.raw_to_base64(since.compress(FileAccess.COMPRESSION_DEFLATE))
+		entry["grid"]["cells"] = Marshalls.raw_to_base64(cells.compress(FileAccess.COMPRESSION_DEFLATE))
+		entry["grid"]["since"] = Marshalls.raw_to_base64(since.compress(FileAccess.COMPRESSION_DEFLATE))
 		_store.write(data))
 
 
@@ -506,10 +522,12 @@ func finish_saving() -> void:
 		_save_task = -1
 
 
-## Übernimmt einen Spielstand. Leer oder unpassend = frisches Spiel.
+## Übernimmt einen Spielstand (alte Stände vorher mit SaveStore.migrate anheben). Leer oder unpassend = frisches Spiel.
 func load_game(data: Dictionary) -> void:
 	reset_game()
-	var g: Dictionary = data.get("grid", {})
+	_region_saves = (data.get("regions", {}) as Dictionary).duplicate()
+	var entry: Dictionary = _region_saves.get(region_id, {})
+	var g: Dictionary = entry.get("grid", {})
 	var fits := int(g.get("w", 0)) == grid.width and int(g.get("h", 0)) == grid.height
 	if not fits or not grid.load_bytes(Marshalls.base64_to_raw(str(g.get("cells", "")))):
 		if not data.is_empty():
@@ -523,8 +541,8 @@ func load_game(data: Dictionary) -> void:
 	_world_sec = float(data.get("world_sec", _play_sec))
 	grid.time_sec = _world_sec
 	_ground.set_time(_world_sec)
-	_finished = bool(data.get("finished", false))
-	var r: Array = data.get("robot", [])
+	_finished = bool(entry.get("finished", false))
+	var r: Array = entry.get("robot", [])
 	if r.size() == 2:
 		_robot.position = Vector2(float(r[0]), float(r[1])).clamp(_robot.bounds.position, _robot.bounds.end)
 		if not _robot.can_stand(_robot.position):

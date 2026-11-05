@@ -5,10 +5,10 @@ extends TestCase
 
 func _place() -> Array[Dictionary]:
 	var g := GroundGrid.new(640, 480)
-	var world := Game.load_json("res://data/world.json")
+	var world := Game.load_json("res://data/regions/heimatdorf/world.json")
 	WorldMap.build(g, world)
 	var start := Vector2(320.5, 240.5) * 24.0
-	return WorldObjects.place(g, 24.0, Game.load_json("res://data/objects.json"), world, [start])
+	return WorldObjects.place(g, 24.0, Game.load_json("res://data/regions/heimatdorf/objects.json"), world, [start])
 
 
 func test_objects_placed_deterministically_on_land_with_room() -> void:
@@ -32,7 +32,7 @@ func test_objects_placed_deterministically_on_land_with_room() -> void:
 
 func test_willows_stand_near_water_and_sizes_vary() -> void:
 	var g := GroundGrid.new(640, 480)
-	WorldMap.build(g, Game.load_json("res://data/world.json"))
+	WorldMap.build(g, Game.load_json("res://data/regions/heimatdorf/world.json"))
 	var sizes := {}
 	for o in _place():
 		sizes[snappedf(float(o["size"]), 0.01)] = true

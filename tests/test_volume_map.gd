@@ -30,7 +30,7 @@ func test_volume_settings_roundtrip() -> void:
 
 
 func test_area_names_sit_inside_their_area() -> void:
-	var r := Regions.new(640, 480, Game.load_json("res://data/regions.json"))
+	var r := Areas.new(640, 480, Game.load_json("res://data/regions/heimatdorf/areas.json"))
 	var c := r.centers()
 	assert_eq(c.size(), r.list.size())
 	for i in c.size():

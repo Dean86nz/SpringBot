@@ -9,7 +9,7 @@
 // liegen über dem Boden; sie werden lebendiger (warmes Braun, klares Blau), wenn daneben Grün ist.
 // Wege rein optisch: im Grau staubig mit Flecken und Rissen; je grüner daneben, desto mehr
 // Kiesel, Zweige und Laub liegen darauf (erscheinen Stück für Stück, nicht überblendet).
-// Gebiete (region_a/b/c, grob und weich gefiltert, damit Grenzen sanft verlaufen): Farbfaktor für
+// Gebiete (area_a/b/c, grob und weich gefiltert, damit Grenzen sanft verlaufen): Farbfaktor für
 // Grün (a.rgb × 2) und Grau (c.rgb × 2), Blumendichte (a.a × 2), Büscheldichte (c.a × 2),
 // Lieblingsfarbe der Blumen (b.rgb) mit Anteil (b.a). Einmal je Pixel gelesen, nicht je Kachel.
 // Weg- und Wasserzellen neben grünem Land sind in der Maske grün (GroundGrid), daher kein Grau am Rand.
@@ -46,10 +46,10 @@ uniform float stalk_density = 0.25;
 uniform float path_pebbles = 0.45;   // Anteil der Kachel-Plätze mit Kiesel, wenn ganz grün daneben
 uniform float path_twigs = 0.22;
 uniform float path_leaves = 0.35;
-uniform bool use_regions = false;
-uniform sampler2D region_a : filter_linear, repeat_disable;
-uniform sampler2D region_b : filter_linear, repeat_disable;
-uniform sampler2D region_c : filter_linear, repeat_disable;
+uniform bool use_areas = false;
+uniform sampler2D area_a : filter_linear, repeat_disable;
+uniform sampler2D area_b : filter_linear, repeat_disable;
+uniform sampler2D area_c : filter_linear, repeat_disable;
 
 const vec3 PAL[7] = vec3[7](
 	vec3(1.0, 1.0, 0.96), vec3(1.0, 0.85, 0.30), vec3(1.0, 0.56, 0.69), vec3(0.72, 0.55, 0.95),
@@ -338,11 +338,11 @@ void fragment() {
 	vec4 ra = vec4(0.5);
 	vec4 rb = vec4(0.0);
 	vec4 rc = vec4(0.5);
-	if (use_regions) {
+	if (use_areas) {
 		vec2 uv = p / map_size;
-		ra = texture(region_a, uv);
-		rb = texture(region_b, uv);
-		rc = texture(region_c, uv);
+		ra = texture(area_a, uv);
+		rb = texture(area_b, uv);
+		rc = texture(area_c, uv);
 	}
 	dry *= rc.rgb * 2.0;
 	if (g < 0.999) {

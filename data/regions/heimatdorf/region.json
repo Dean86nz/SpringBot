@@ -1,0 +1,8 @@
+{
+	"_info": "Region Heimatdorf (die erste Region). Größe in Zellen, Start des Roboters und Bienenstock in Zellen.",
+	"name": "Heimatdorf",
+	"width_cells": 640,
+	"height_cells": 480,
+	"start_cell": [320, 240],
+	"hive_cell": [314, 235]
+}

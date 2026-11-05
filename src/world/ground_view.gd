@@ -5,13 +5,13 @@ extends Node2D
 ## Prinzip aus Scrap Empire (DirtView). Die Maske wird höchstens 30× pro Sekunde hochgeladen,
 ## „seit wann grün“ (GroundGrid.since) seltener, weil sich das Üppigwerden langsam ändert.
 ## Deko-Werte aus data/balance.json ("ground"), als Uniforms an den Shader.
-## Gebiete (Regions) gehen als drei kleine Texturen mit je einem Pixel pro REGION_PX Zellen an den
+## Gebiete (Areas) gehen als drei kleine Texturen mit je einem Pixel pro AREA_PX Zellen an den
 ## Shader; jedes Pixel mittelt seine Blöcke, die weiche Filterung macht die Grenzen sanft.
 
 const SHADER := preload("res://src/world/ground.gdshader")
 const UPLOAD_SECONDS := 1.0 / 30.0
 const BORDER_COLOR := Color(0.50, 0.54, 0.60)
-const REGION_PX := 8
+const AREA_PX := 8
 
 var _grid: GroundGrid
 var _size_px := Vector2.ZERO
@@ -26,7 +26,7 @@ var _since_upload := 0.25
 
 
 ## cfg: Abschnitt "ground" aus balance.json (Shader-Werte), leer = Standardwerte des Shaders.
-func bind(grid: GroundGrid, cell_px: float, cfg: Dictionary = {}, regions: Regions = null) -> void:
+func bind(grid: GroundGrid, cell_px: float, cfg: Dictionary = {}, areas: Areas = null) -> void:
 	_grid = grid
 	_size_px = Vector2(grid.width, grid.height) * cell_px
 	_img = Image.create_from_data(grid.width, grid.height, false, Image.FORMAT_R8, grid.vis)
@@ -47,26 +47,26 @@ func bind(grid: GroundGrid, cell_px: float, cfg: Dictionary = {}, regions: Regio
 			_since_upload = float(cfg[k])
 		else:
 			mat.set_shader_parameter(k, float(cfg[k]))
-	if regions and not regions.list.is_empty():
-		_bind_regions(mat, regions, grid)
+	if areas and not areas.list.is_empty():
+		_bind_areas(mat, areas, grid)
 	material = mat
 	grid.take_dirty()
 	queue_redraw()
 
 
-func _bind_regions(mat: ShaderMaterial, regions: Regions, grid: GroundGrid) -> void:
-	var w := ceili(grid.width / float(REGION_PX))
-	var h := ceili(grid.height / float(REGION_PX))
+func _bind_areas(mat: ShaderMaterial, areas: Areas, grid: GroundGrid) -> void:
+	var w := ceili(grid.width / float(AREA_PX))
+	var h := ceili(grid.height / float(AREA_PX))
 	var imgs: Array[Image] = []
 	for k in 3:
 		imgs.append(Image.create(w, h, false, Image.FORMAT_RGBA8))
-	var sub := REGION_PX / Regions.STEP   # Blöcke je Pixel und Richtung
+	var sub := AREA_PX / Areas.STEP   # Blöcke je Pixel und Richtung
 	for y in h:
 		for x in w:
 			var acc: Array[Color] = [Color(0, 0, 0, 0), Color(0, 0, 0, 0), Color(0, 0, 0, 0)]
 			for sy in sub:
 				for sx in sub:
-					var r: Dictionary = regions.list[regions.at_cell(Vector2((x * sub + sx) * Regions.STEP, (y * sub + sy) * Regions.STEP))]
+					var r: Dictionary = areas.list[areas.at_cell(Vector2((x * sub + sx) * Areas.STEP, (y * sub + sy) * Areas.STEP))]
 					var g: Color = r["grass"]
 					var d: Color = r["dry"]
 					var f: Color = r["flower_color"]
@@ -75,10 +75,10 @@ func _bind_regions(mat: ShaderMaterial, regions: Regions, grid: GroundGrid) -> v
 					acc[2] += Color(d.r * 0.5, d.g * 0.5, d.b * 0.5, float(r["tufts"]) * 0.5)
 			for k in 3:
 				imgs[k].set_pixel(x, y, (acc[k] / float(sub * sub)).clamp())
-	mat.set_shader_parameter("use_regions", true)
-	mat.set_shader_parameter("region_a", ImageTexture.create_from_image(imgs[0]))
-	mat.set_shader_parameter("region_b", ImageTexture.create_from_image(imgs[1]))
-	mat.set_shader_parameter("region_c", ImageTexture.create_from_image(imgs[2]))
+	mat.set_shader_parameter("use_areas", true)
+	mat.set_shader_parameter("area_a", ImageTexture.create_from_image(imgs[0]))
+	mat.set_shader_parameter("area_b", ImageTexture.create_from_image(imgs[1]))
+	mat.set_shader_parameter("area_c", ImageTexture.create_from_image(imgs[2]))
 
 
 ## Ein Wert des Boden-Shaders (z. B. die Masken für die Übersichtskarte).

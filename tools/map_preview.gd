@@ -13,8 +13,9 @@ func _initialize() -> void:
 	_out = args[0]
 	var balance: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/balance.json"))
 	var cell := float(balance["map"]["cell_px"])
-	var grid := GroundGrid.new(int(balance["map"]["width_cells"]), int(balance["map"]["height_cells"]))
-	var world: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/world.json"))
+	var region: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/regions/heimatdorf/region.json"))
+	var grid := GroundGrid.new(int(region["width_cells"]), int(region["height_cells"]))
+	var world: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/regions/heimatdorf/world.json"))
 	var bridges := WorldMap.build(grid, world)
 	for i in grid.cells.size():
 		if i % grid.width >= grid.width / 2:
@@ -28,8 +29,8 @@ func _initialize() -> void:
 	var bv := BridgeView.new()
 	bv.bind(bridges, cell)
 	n.add_child(bv)
-	var start: Array = balance["robot"]["start_cell"]
-	var objs: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/objects.json"))
+	var start: Array = region["start_cell"]
+	var objs: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/regions/heimatdorf/objects.json"))
 	for d in WorldObjects.place(grid, cell, objs, world, [(Vector2(start[0], start[1]) + Vector2(0.5, 0.5)) * cell]):
 		var o := WorldObject.new()
 		o.setup(d)

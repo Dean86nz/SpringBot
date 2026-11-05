@@ -2,7 +2,7 @@
 
 Kleines 2D-Incremental-Spiel: Ein Roboter bringt einer grauen Welt den Frühling zurück. Wo er fährt, wird der Boden grün. Godot 4.7.2, GDScript, Gamepad zuerst (ROG Ally X).
 
-Stand: **Phase 2 vollständig, Einführung, Lautstärke-Regler und Übersichtskarte**, Version 0.15.0. Plan für Phase 3 in `PHASE3.md` (wartet auf Freigabe). Plan der Phase 2 in `PHASE2.md`. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`, fremde Inhalte in `CREDITS.md`.
+Stand: **Phase 3, Meilenstein 1 (Gerüst für Regionen)**, Version 0.16.0. Plan und Stand in `PHASE3.md`. Plan der Phase 2 in `PHASE2.md`. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`, fremde Inhalte in `CREDITS.md`.
 
 ## Steuerung
 
@@ -22,16 +22,17 @@ Stand: **Phase 2 vollständig, Einführung, Lautstärke-Regler und Übersichtska
 - `data/balance.json`: Kartengröße, Zellgröße, Grundtempo, Begrünungsradius, Bienen (Stock, Flugtempo, Blütengröße, Schwebezeit, Sprungweite), Kamera.
 - `data/skilltree.json`: Pollen je grüner Zelle und Sekunde, Grundwerte, Texte der Werte und alle 45 Knoten
   (Position, Voraussetzungen, Stufen, Kosten, Wirkung, besondere Knoten).
-- `data/world.json` + `src/sim/world_map.gd`: Flüsse und Wege als Kurven, daraus je Zelle Land, Weg, Wasser oder Brücke (GroundGrid.terrain).
+- `data/regions/heimatdorf/world.json` + `src/sim/world_map.gd`: Flüsse und Wege als Kurven, daraus je Zelle Land, Weg, Wasser oder Brücke (GroundGrid.terrain).
   Nur Land wird grün und zählt zur Fläche; Wasser ist ohne Brücke nicht befahrbar. `src/world/bridge_view.gd` zeichnet die Brücken.
-- `data/objects.json` + `src/sim/world_objects.gd`: Verteilung der Objekte (fester Startwert). `src/world/world_object.gd` zeichnet ein Objekt tot oder erwacht;
+- `data/regions/heimatdorf/objects.json` + `src/sim/world_objects.gd`: Verteilung der Objekte (fester Startwert). `src/world/world_object.gd` zeichnet ein Objekt tot oder erwacht;
   main.gd lässt Objekte erwachen, sobald unter ihnen Grün ist, und gibt Bäume und Felsen dem Roboter als Hindernisse.
 - `data/animals.json` + `src/sim/animals.gd`: Tiere als Deko (Schmetterlinge, Vögel, Hasen, Frösche), nur nahe der Kamera und über Grün; `src/world/animal_view.gd` zeichnet sie.
 - `src/world/disc.gd`: Kreise als Textur statt draw_circle (in Godot 4.7 rund 80-mal billiger). Gilt auch für Objekte: Godot zeichnet sie jedes Bild neu, auch wenn sie nur einmal aufgezeichnet werden.
 - `data/tutorial.json`: Einleitung, Hinweise, Tastennamen je Gerät und die Seite „Steuerung“. `src/sim/tutorial.gd` entscheidet, wann welcher Hinweis kommt (je Spielstand einmal, gespeichert); `src/ui/key_hints.gd` merkt sich das zuletzt benutzte Gerät; `src/ui/intro_screen.gd` zeigt die Einleitung, `src/ui/intro_art.gd` malt ihre bewegten Bilder (mit Roboter und Objekten aus dem Spiel).
 - `src/ui/map_screen.gd` + `map.gdshader`: Übersichtskarte (Pause-Menü oder View-Taste / M), nutzt die Masken des Bodens.
 - Lautstärke: `Sfx.set_volume`, Regler im Pause-Menü, gespeichert in `user://settings.json` (nicht im Spielstand).
-- `data/regions.json` + `src/sim/regions.gd`: Gebiete mit eigenen Farben, Blumen, Objekten; ground_view.gd gibt sie als kleine Texturen an den Shader, das HUD blendet den Namen beim Betreten ein.
+- `data/campaign.json` + `src/sim/campaign.gd`: die Regionen der Reise (Phase 3). Jede Region hat einen Ordner `data/regions/<id>/` mit `region.json` (Name, Größe, Start, Bienenstock), `world.json`, `objects.json` und `areas.json`. Der Spielstand (Version 2) hat je Region einen Eintrag, Skills und Pollen gelten für alle; ältere Stände hebt `SaveStore.migrate` an.
+- `areas.json` + `src/sim/areas.gd` (Klasse `Areas`): Gebiete mit eigenen Farben, Blumen, Objekten; ground_view.gd gibt sie als kleine Texturen an den Shader, das HUD blendet den Namen beim Betreten ein.
 - `src/sim/skill_tree.gd`: Pollen, Knoten-Stufen, Sichtbarkeit (gekauft / kaufbar / „?“ / verdeckt), Summen der Werte (reine Logik, getestet).
 - `src/sim/bee_swarm.gd`: Bienen-Logik (Zielwahl, Schweben, Begrünen), `src/world/bee_view.gd` zeichnet Stock und Bienen.
 - `src/sim/ground_grid.gd`: Boden-Raster (1 Byte je Zelle), Begrünen im Kreis, Zähler, Schmutz-Rechteck,

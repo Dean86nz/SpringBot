@@ -5,16 +5,16 @@ shader_type canvas_item;
 
 uniform sampler2D mask : filter_linear, repeat_disable;
 uniform sampler2D terrain_tex : filter_linear, repeat_disable;
-uniform sampler2D region_a : filter_linear, repeat_disable;
-uniform bool use_regions = false;
+uniform sampler2D area_a : filter_linear, repeat_disable;
+uniform bool use_areas = false;
 uniform vec2 px_size = vec2(1120.0, 840.0);   // Größe der Karte auf dem Bildschirm
 
 void fragment() {
 	float m = smoothstep(0.42, 0.58, texture(mask, UV).r);
 	vec2 tr = texture(terrain_tex, UV).rg;
 	vec3 green = vec3(0.46, 0.76, 0.33);
-	if (use_regions) {
-		green *= texture(region_a, UV).rgb * 2.0;
+	if (use_areas) {
+		green *= texture(area_a, UV).rgb * 2.0;
 	}
 	vec2 p = UV * px_size;
 	float hatch = step(0.5, fract((p.x + p.y) / 10.0));

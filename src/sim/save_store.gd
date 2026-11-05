@@ -4,8 +4,10 @@ extends RefCounted
 ## (Ansatz aus Scrap Empire). Die Meta-Datei zeigt erst auf die neue Datei, wenn diese
 ## vollständig geschrieben ist; ein Absturz beim Schreiben kostet also höchstens den letzten Stand.
 ## Die Debug-EXE speichert in einen eigenen Ordner, damit Cheats nie den echten Stand berühren.
+## Ab Version 2 hat jede Region ihren eigenen Eintrag („regions“: Raster, Roboter, fertig);
+## Skilltree, Pollen, Spielzeit und Einführung gelten für alle Regionen. migrate() hebt alte Stände an.
 
-const VERSION := 1
+const VERSION := 2
 const SLOTS := ["save_a.json", "save_b.json"]
 const META := "save_meta.json"
 
@@ -15,6 +17,22 @@ var dir := ""
 func _init(p_dir: String = "") -> void:
 	dir = p_dir if p_dir != "" else ("user://saves_debug/" if OS.is_debug_build() else "user://saves/")
 	DirAccess.make_dir_recursive_absolute(dir)
+
+
+## Alter Stand (Version 1: ein Raster unter "grid") → Version 2: dieses Raster gehört der Startregion.
+static func migrate(data: Dictionary, start_region: String) -> Dictionary:
+	if data.is_empty() or data.has("regions") or not data.has("grid"):
+		return data
+	var out := data.duplicate()
+	out["regions"] = {start_region: {
+		"grid": data["grid"],
+		"robot": data.get("robot", []),
+		"finished": data.get("finished", false),
+	}}
+	out["region"] = start_region
+	for k in ["grid", "robot", "finished"]:
+		out.erase(k)
+	return out
 
 
 func has_save() -> bool:
@@ -38,7 +56,7 @@ func write(data: Dictionary) -> bool:
 	return true
 
 
-## Der neueste lesbare Stand, sonst der ältere, sonst {}.
+## Der neueste lesbare Stand (auch aus älteren Versionen), sonst der ältere, sonst {}.
 func read() -> Dictionary:
 	var latest := _latest()
 	var order: Array[String] = []
@@ -49,7 +67,8 @@ func read() -> Dictionary:
 			order.append(s)
 	for s in order:
 		var data := _read_file(dir + s)
-		if int(data.get("version", 0)) == VERSION:
+		var v := int(data.get("version", 0))
+		if v >= 1 and v <= VERSION:   # ältere Stände lesen, migrate() hebt sie an
 			return data
 	return {}
 

@@ -7,7 +7,7 @@ extends RefCounted
 ## Jedes Objekt bekommt eine eigene Größe aus "size" [min, max]; Radius und Hindernis wachsen mit.
 ## Reine Logik. Ergebnis: Liste von {kind, pos (Pixel), angle, seed, block (Pixel), radius, size, quiet}.
 ## quiet: erwacht leise (ohne Klang, wenige Blätter), z. B. Wegrand und junge Bäume.
-## Mit Gebieten (Regions) steht jede Art bevorzugt dort, wo ihr Gewicht hoch ist (z. B. Obstbäume
+## Mit Gebieten (Areas) steht jede Art bevorzugt dort, wo ihr Gewicht hoch ist (z. B. Obstbäume
 ## im Obstgarten); dazu kommen je Gebiet "extra" Objekte, die nur dort stehen (dichter Wald).
 ## Ob ein Objekt erwacht ist, steht nicht hier: das ergibt sich aus dem Grün unter ihm.
 
@@ -15,7 +15,7 @@ extends RefCounted
 const KINDS := ["pond", "willow", "oak", "fir", "rock", "fruit", "birch", "bush", "sapling"]
 
 
-static func place(grid: GroundGrid, cell_px: float, data: Dictionary, world: Dictionary, keep_free: Array[Vector2], regions: Regions = null) -> Array[Dictionary]:
+static func place(grid: GroundGrid, cell_px: float, data: Dictionary, world: Dictionary, keep_free: Array[Vector2], areas: Areas = null) -> Array[Dictionary]:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = int(data.get("seed", 1))
 	var out: Array[Dictionary] = []
@@ -52,13 +52,13 @@ static func place(grid: GroundGrid, cell_px: float, data: Dictionary, world: Dic
 		var t: Dictionary = types.get(kind, {})
 		var sz: Array = t.get("size", [1.0, 1.0])
 		var water := float(t.get("near_water_cells", 0.0))
-		var max_w := regions.max_object_weight(kind) if regions else 0.0
+		var max_w := areas.max_object_weight(kind) if areas else 0.0
 		var only: Array[int] = []   # je Objekt: -1 = überall (nach Gewicht), sonst nur in diesem Gebiet
 		for n in int(t.get("count", 0)):
 			only.append(-1)
-		if regions:
-			for i in regions.list.size():
-				for n in regions.extra_count(i, kind):
+		if areas:
+			for i in areas.list.size():
+				for n in areas.extra_count(i, kind):
 					only.append(i)
 		for home in only:
 			var f := rng.randf_range(float(sz[0]), float(sz[1]))
@@ -67,9 +67,9 @@ static func place(grid: GroundGrid, cell_px: float, data: Dictionary, world: Dic
 			for k in n_tries:
 				var pos := Vector2(rng.randf_range(r, size.x - r), rng.randf_range(r, size.y - r))
 				if home >= 0:
-					if regions.at_px(pos, cell_px) != home:
+					if areas.at_px(pos, cell_px) != home:
 						continue
-				elif max_w > 0.0 and rng.randf() * max_w >= regions.object_weight(regions.at_px(pos, cell_px), kind):
+				elif max_w > 0.0 and rng.randf() * max_w >= areas.object_weight(areas.at_px(pos, cell_px), kind):
 					continue
 				if water > 0.0 and not _near_water(grid, cell_px, pos, r + water * cell_px):
 					continue

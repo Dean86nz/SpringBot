@@ -1,7 +1,5 @@
 {
 	"map": {
-		"width_cells": 640,
-		"height_cells": 480,
 		"cell_px": 24,
 		"spread_hop_cells": 12
 	},
@@ -11,11 +9,9 @@
 		"green_radius_cells": 3.0,
 		"radius_px": 30,
 		"edge_margin_px": 46,
-		"water_radius_px": 24,
-		"start_cell": [320, 240]
+		"water_radius_px": 24
 	},
 	"bees": {
-		"hive_cell": [314, 235],
 		"hive_radius_px": 32,
 		"speed_px": 260.0,
 		"bloom_radius_cells": 2.3,

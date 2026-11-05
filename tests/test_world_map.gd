@@ -4,15 +4,15 @@ extends TestCase
 
 func _real_grid() -> GroundGrid:
 	var g := GroundGrid.new(640, 480)
-	WorldMap.build(g, Game.load_json("res://data/world.json"))
+	WorldMap.build(g, Game.load_json("res://data/regions/heimatdorf/world.json"))
 	return g
 
 
 func test_real_map_every_land_cell_reachable_over_bridges() -> void:
 	var g := _real_grid()
-	var balance := Game.load_json(Game.BALANCE_PATH)
-	var start: Array = Game.dig(balance, "robot/start_cell")
-	var hive: Array = Game.dig(balance, "bees/hive_cell")
+	var region := Game.load_json("res://data/regions/heimatdorf/region.json")
+	var start: Array = region["start_cell"]
+	var hive: Array = region["hive_cell"]
 	assert_eq(g.terrain[int(start[1]) * g.width + int(start[0])], GroundGrid.LAND, "Start liegt auf Land")
 	assert_eq(g.terrain[int(hive[1]) * g.width + int(hive[0])], GroundGrid.LAND, "Bienenstock liegt auf Land")
 	assert_true(g.terrain.count(GroundGrid.WATER) > 1000, "es gibt Wasser")
