@@ -1,8 +1,28 @@
 {
-	"_info": "Region Heimatdorf (die erste Region). Größe in Zellen, Start des Roboters und Bienenstock in Zellen.",
+	"_info": "Region Heimatdorf (die erste Region). Größe in Zellen, Start des Roboters und Bienenstock in Zellen. village: Dorfplatz (Mitte, in world.json als Platz), Brunnen, Häuser (Zellen; die Vorderseite zeigt zum Platz), Menschen, die bei 100 % zurückkehren, und das Fest (Sekunden). finished_title/text: Endbildschirm der Region.",
 	"name": "Heimatdorf",
 	"width_cells": 640,
 	"height_cells": 480,
 	"start_cell": [320, 240],
-	"hive_cell": [314, 235]
+	"hive_cell": [314, 235],
+	"village": {
+		"center": [322, 214],
+		"plaza_radius": 9.0,
+		"fountain": [322, 214],
+		"houses": [
+			[322.0, 199.0], [313.4, 201.7], [308.4, 207.7], [307.1, 215.3], [309.7, 222.6], [315.7, 227.6],
+			[319.8, 189.1], [309.5, 192.3], [301.5, 199.7], [297.4, 209.7], [297.9, 220.5], [302.8, 230.1]
+		],
+		"house_size": [0.9, 1.1],
+		"people": 16,
+		"people_speed_px": 95,
+		"arrive_from_cells": 18,
+		"arrive_spread_sec": 3.0,
+		"wait_sec": [1.5, 5.0],
+		"fest_sec": 10.0,
+		"fest_petals_per_sec": 40
+	},
+	"finished_title": "Das Heimatdorf lebt wieder!",
+	"finished_text": "Kein grauer Fleck mehr im Heimatdorf: Die Häuser leuchten bunt,\nund die Menschen sind zurückgekehrt.",
+	"finished_banner": "Das Heimatdorf lebt wieder auf!"
 }

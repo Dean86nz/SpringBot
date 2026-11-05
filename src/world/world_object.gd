@@ -5,7 +5,8 @@ extends Node2D
 ## Objekte zeichnet. Die Erwach-Animation läuft über die Skalierung des Knotens; neu gezeichnet
 ## wird nur einmal, beim Wechsel von tot zu lebendig (ein blühender Baum hat über 200 Kreise).
 ## Arten: Bäume oak (Laubbaum), fir (Tanne), birch (Birke), fruit (Obstbaum), willow (Weide),
-## sapling (junger Baum); dazu rock, pond, bush; am Wegrand log, fence, stones.
+## sapling (junger Baum); dazu rock, pond, bush; am Wegrand log, fence, stones; im Dorf house und fountain
+## (angle dreht das Haus so, dass seine Vorderseite, lokal +y, zum Dorfplatz zeigt).
 ## Jedes Objekt hat eine eigene Größe (size, über die Skalierung des Knotens).
 ## Godot zeichnet auch einmal aufgezeichnete Objekte jedes Bild neu; Kreise, Polygone und
 ## Linienzüge kosten dabei je Aufruf ein Vielfaches von Textur-Rechtecken, Dreiecken und Linien.
@@ -115,6 +116,10 @@ func _draw() -> void:
 			_fence(alive)
 		"stones":
 			_stones(alive)
+		"house":
+			_house(alive)
+		"fountain":
+			_fountain(alive)
 	draw_set_transform(Vector2.ZERO)
 
 
@@ -466,3 +471,70 @@ func _stones(moss: bool) -> void:
 			_dot(q + Vector2(-r * 0.3, -r * 0.3), r * 0.5, Color(0.44, 0.72, 0.30))
 	if moss:
 		_flower(Vector2(_rng.randf_range(-10, 10), 14), FLOWERS[_rng.randi() % FLOWERS.size()], 3.5)
+
+
+# --- Dorf ---
+
+const ROOFS := [Color(0.84, 0.36, 0.28), Color(0.80, 0.52, 0.30), Color(0.40, 0.52, 0.72), Color(0.66, 0.40, 0.56), Color(0.88, 0.62, 0.30)]
+
+## Haus von oben: Satteldach (zwei Dachhälften, First quer), Kamin, vorne Blumenkästen.
+## Tot: verblichenes, fleckiges Dach mit Löchern, schiefer Kamin. Lebendig: bunte Ziegel, Blumen, Büsche.
+func _house(alive: bool) -> void:
+	var w := 58.0
+	var h := 42.0
+	_tf(Vector2(8, 10), angle)   # Schatten fällt immer nach rechts unten
+	draw_rect(Rect2(-w, -h, w * 2, h * 2), SHADOW)
+	_tf(Vector2.ZERO, angle)
+	var roof: Color = ROOFS[obj_seed % ROOFS.size()] if alive else Color(0.56, 0.52, 0.48)
+	draw_rect(Rect2(-w, -h, w * 2, h), roof.lightened(0.08))   # hintere Dachhälfte im Licht
+	draw_rect(Rect2(-w, 0, w * 2, h), roof.darkened(0.12))
+	# Ziegelreihen parallel zum First
+	for k in 5:
+		var y := -h + 7.0 + k * 7.0
+		draw_line(Vector2(-w + 2, y), Vector2(w - 2, y), roof.darkened(0.22), 1.5)
+		draw_line(Vector2(-w + 2, -y), Vector2(w - 2, -y), roof.darkened(0.3), 1.5)
+	draw_line(Vector2(-w, 0), Vector2(w, 0), INK, 3.0)   # First
+	_outline(PackedVector2Array([Vector2(-w, -h), Vector2(w, -h), Vector2(w, h), Vector2(-w, h)]), INK, 3.0)
+	# Kamin
+	var cx := -w * 0.45 + float(obj_seed % 3) * w * 0.3
+	var chim := Rect2(cx - 7, -h * 0.6, 14, 14)
+	draw_rect(chim, Color(0.62, 0.40, 0.34) if alive else Color(0.50, 0.47, 0.44))
+	_outline(PackedVector2Array([chim.position, Vector2(chim.end.x, chim.position.y), chim.end, Vector2(chim.position.x, chim.end.y)]), INK, 2.0)
+	if not alive:
+		_rng.seed = obj_seed
+		for k in 4:   # Löcher und Flecken im Dach
+			var p := Vector2(_rng.randf_range(-w + 8, w - 16), _rng.randf_range(-h + 6, h - 12))
+			draw_rect(Rect2(p, Vector2(_rng.randf_range(8, 16), _rng.randf_range(5, 9))), Color(0.36, 0.33, 0.31))
+		return
+	_dot(Vector2(cx, -h * 0.6 + 7), 4.0, Color(0.30, 0.26, 0.24))   # Kaminöffnung
+	# Blumenkästen vorne (zum Platz) und Büsche an den Ecken
+	for side in [-1.0, 1.0]:
+		var bx: float = side * w * 0.55
+		draw_rect(Rect2(bx - 16, h + 1, 32, 7), Color(0.58, 0.40, 0.26))
+		for k in 4:
+			_flower(Vector2(bx - 12 + k * 8, h + 3), FLOWERS[(obj_seed + k) % FLOWERS.size()], 3.0)
+		_dot(Vector2(side * (w + 6), -h + 4), 11.0, Color(0.32, 0.60, 0.30))
+		_dot(Vector2(side * (w + 4), -h + 1), 6.0, Color(0.44, 0.72, 0.36))
+	# Tür in der Mitte vorne
+	draw_rect(Rect2(-8, h - 2, 16, 10), Color(0.48, 0.32, 0.22))
+
+
+## Dorfbrunnen: runder Steinrand, Säule in der Mitte. Tot: trocken mit Rissen. Lebendig: Wasser, Spritzer, Blumenring.
+func _fountain(alive: bool) -> void:
+	_shadow(46.0, Vector2(1.0, 0.9))
+	_tf()
+	_ring(Vector2.ZERO, 42.0, Color(0.70, 0.70, 0.72), INK, 3.0)
+	_dot(Vector2.ZERO, 32.0, Color(0.40, 0.66, 0.88) if alive else Color(0.62, 0.58, 0.52))
+	if alive:
+		_dot(Vector2(-8, -8), 20.0, Color(0.55, 0.78, 0.95))
+		for k in 10:   # Spritzer rund um die Säule
+			_dot(Vector2.from_angle(k * TAU / 10.0) * 16.0, 2.5, Color(0.92, 0.97, 1.0))
+		for k in 12:   # Blumenring außen
+			_flower(Vector2.from_angle(k * TAU / 12.0 + 0.2) * 50.0, FLOWERS[k % FLOWERS.size()], 3.5)
+	else:
+		for k in 5:
+			var a := k * TAU / 5.0 + 0.4
+			draw_line(Vector2.from_angle(a) * 8.0, Vector2.from_angle(a + 0.3) * 26.0, Color(0.50, 0.46, 0.40), 2.0)
+	_ring(Vector2.ZERO, 9.0, Color(0.78, 0.78, 0.80), INK, 2.5)
+	if alive:
+		_dot(Vector2.ZERO, 4.0, Color(0.92, 0.97, 1.0))

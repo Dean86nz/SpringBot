@@ -9,16 +9,18 @@ extends RefCounted
 ## quiet: erwacht leise (ohne Klang, wenige Blätter), z. B. Wegrand und junge Bäume.
 ## Mit Gebieten (Areas) steht jede Art bevorzugt dort, wo ihr Gewicht hoch ist (z. B. Obstbäume
 ## im Obstgarten); dazu kommen je Gebiet "extra" Objekte, die nur dort stehen (dichter Wald).
+## fixed: Objekte mit fester Lage (Häuser, Brunnen des Dorfes), schon im Ergebnis-Format; sie kommen
+## zuerst und ohne Prüfung, alle anderen halten Abstand zu ihnen.
 ## Ob ein Objekt erwacht ist, steht nicht hier: das ergibt sich aus dem Grün unter ihm.
 
 ## Reihenfolge = Platzierung: Große und wählerische zuerst, damit sie noch Platz finden.
 const KINDS := ["pond", "willow", "oak", "fir", "rock", "fruit", "birch", "bush", "sapling"]
 
 
-static func place(grid: GroundGrid, cell_px: float, data: Dictionary, world: Dictionary, keep_free: Array[Vector2], areas: Areas = null) -> Array[Dictionary]:
+static func place(grid: GroundGrid, cell_px: float, data: Dictionary, world: Dictionary, keep_free: Array[Vector2], areas: Areas = null, fixed: Array[Dictionary] = []) -> Array[Dictionary]:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = int(data.get("seed", 1))
-	var out: Array[Dictionary] = []
+	var out: Array[Dictionary] = fixed.duplicate()
 	var gap := float(data.get("min_gap_px", 24.0))
 	var free_px := float((data.get("keep_free", {}) as Dictionary).get("radius_cells", 10.0)) * cell_px
 	var tries := int(data.get("tries", 60))

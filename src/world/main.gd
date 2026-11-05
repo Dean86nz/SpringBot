@@ -10,6 +10,9 @@ extends Node2D
 ## ihnen Grün ist; um Bäume und Felsen fährt der Roboter herum.
 ## Gebiete (areas.json der Region) geben Boden und Objekten ihren Charakter; beim Betreten eines
 ## Gebiets blendet das HUD dezent seinen Namen ein.
+## Dorf (region.json "village"): Häuser und Brunnen stehen fest um den Dorfplatz und erwachen wie
+## Bäume. Ist die Region fertig, gibt es ein Fest: Die Kamera schwenkt zum Dorf, die Menschen kehren
+## zurück (Villagers), Blüten fliegen; danach der Endbildschirm der Region.
 ## Tiere (data/animals.json) leben als Deko nahe der Kamera über dem Grün (Animals, AnimalView).
 ## Einführung (data/tutorial.json): beim Neuen Spiel eine kurze Einleitung (IntroScreen), im Spiel
 ## Hinweise genau einmal im richtigen Moment (Tutorial), Tasten passend zum Gerät (KeyHints).
@@ -72,6 +75,11 @@ var _store := SaveStore.new()
 var _play_sec := 0.0         # Spielzeit in echten Sekunden (ohne Pause und Menüs)
 var _world_sec := 0.0        # Spielzeit der Welt (läuft mit Zeit ×10 schneller), für „seit wann grün“
 var _finished := false       # Ende schon erreicht (Endbildschirm kommt nur einmal)
+var _region_info: Dictionary = {}   # region.json der aktuellen Region
+var _village: Dictionary = {}       # region.json "village", leer = Region ohne Dorf
+var _villagers: Villagers
+var _villager_view := VillagerView.new()
+var _fest_petals := 0.0
 var _end_wait := -1.0        # Sekunden bis zum Endbildschirm, < 0 = keiner geplant
 var _autosave := 0.0
 var _save_task := -1         # WorkerThreadPool-Aufgabe, die gerade schreibt
@@ -87,6 +95,8 @@ func _ready() -> void:
 		region_id = campaign.start
 	var rdata := campaign.load_region(region_id)
 	var region: Dictionary = rdata["region"]
+	_region_info = region
+	_village = region.get("village", {})
 	var w := int(region.get("width_cells", 640))
 	var h := int(region.get("height_cells", 480))
 	cell_px = Game.num("map/cell_px", 24)
@@ -123,7 +133,9 @@ func _ready() -> void:
 	_obj_cfg = rdata["objects"]
 	var blockers: Array[Dictionary] = []
 	var avoid: Array[Dictionary] = []   # wo keine Hasen hoppeln
-	for d in WorldObjects.place(grid, cell_px, _obj_cfg, world_data, [_start_px, hive_px], _areas):
+	var doors: Array[Vector2] = []
+	var fixed := _village_objects(doors)
+	for d in WorldObjects.place(grid, cell_px, _obj_cfg, world_data, [_start_px, hive_px], _areas, fixed):
 		var o := WorldObject.new()
 		o.setup(d)
 		add_child(o)
@@ -139,6 +151,10 @@ func _ready() -> void:
 	for o in _ponds:
 		_animals.ponds.append({"pos": o.position, "angle": o.angle, "size": o.scale.x, "awake": false})
 	_animals.avoid = avoid
+	_villagers = Villagers.new(_village, cell_px, doors)
+	_villager_view.process_mode = Node.PROCESS_MODE_PAUSABLE
+	_villager_view.bind(_villagers)
+	add_child(_villager_view)
 	_animal_view.process_mode = Node.PROCESS_MODE_PAUSABLE
 	_animal_view.bind(_animals)
 	add_child(_animal_view)
@@ -196,6 +212,8 @@ func _ready() -> void:
 	_pause.quit_requested.connect(quit)
 	add_child(_pause)
 	_end.title_requested.connect(show_title)
+	_end.closed.connect(_end_fest)
+	_end.set_texts(str(region.get("finished_title", "Die Welt blüht wieder!")), str(region.get("finished_text", "")))
 	add_child(_end)
 	_title.continue_requested.connect(_start_playing)
 	_title.new_game_requested.connect(func() -> void:
@@ -240,6 +258,8 @@ func _process(delta: float) -> void:
 		_awake_timer = float(_obj_cfg.get("awake_check_sec", 0.2))
 		_wake_objects(true)
 	_animals.update(delta, _view_rect(), _robot.position)
+	if not _villagers.people.is_empty():
+		_villagers.update(delta)
 	if _area_watch.update(_areas.at_px(_robot.position, cell_px), real):
 		_hud.show_area(_areas.name_of(_area_watch.current))
 	_update_tips(real)
@@ -266,6 +286,8 @@ func _paint() -> void:
 func _check_end(delta: float) -> void:
 	if _end_wait >= 0.0:
 		_end_wait -= delta
+		if not _village.is_empty():
+			_fest_burst(delta)
 		if _end_wait < 0.0:
 			Sfx.play("special", 1.0, 0.0)
 			save()
@@ -274,6 +296,79 @@ func _check_end(delta: float) -> void:
 		_finished = true
 		_end_wait = Game.num("end/delay_sec", 2.5)
 		_petals.burst(_robot.position, 200, Vector2(200, 700), Vector2(1.5, 2.5), Vector2(8, 14))
+		if not _village.is_empty():
+			_start_fest()
+
+
+## Häuser und Brunnen des Dorfes als feste Objekte (Format wie WorldObjects.place). Die Vorderseite
+## jedes Hauses zeigt zum Platz; vor ihr liegt die Tür (doors), zu der die Menschen gehen.
+func _village_objects(doors: Array[Vector2]) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	if _village.is_empty():
+		return out
+	var c: Array = _village.get("center", [0, 0])
+	var center := (Vector2(c[0], c[1]) + Vector2(0.5, 0.5)) * cell_px
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 77
+	var sz: Array = _village.get("house_size", [1.0, 1.0])
+	for h: Array in _village.get("houses", []):
+		var pos := (Vector2(h[0], h[1]) + Vector2(0.5, 0.5)) * cell_px
+		var f := rng.randf_range(float(sz[0]), float(sz[1]))
+		var to_plaza := (center - pos).normalized()
+		out.append({"kind": "house", "pos": pos, "angle": to_plaza.angle() - PI / 2.0, "seed": rng.randi(),
+			"block": 50.0 * f, "radius": 76.0 * f, "size": f, "quiet": false})
+		doors.append(pos + to_plaza * 64.0 * f)
+	var fo: Variant = _village.get("fountain")
+	if fo is Array:
+		out.append({"kind": "fountain", "pos": (Vector2(fo[0], fo[1]) + Vector2(0.5, 0.5)) * cell_px, "angle": 0.0,
+			"seed": 5, "block": 46.0, "radius": 60.0, "size": 1.0, "quiet": false})
+	return out
+
+
+## Region fertig: Kamera schwenkt zum Dorf, die Menschen kehren zurück, Glocke und Banner.
+func _start_fest() -> void:
+	_end_wait = float(_village.get("fest_sec", 9.0))
+	_villagers.arrive(int(_village.get("people", 12)))
+	_robot.input_enabled = false
+	_hud.hide_tip()
+	var to := _villagers.center - _robot.position
+	create_tween().tween_property(_camera, "offset", to, 1.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	Sfx.play("special", 1.0, 0.0)
+	_hud.show_banner(str(_region_info.get("finished_banner", "")), float(_village.get("fest_sec", 9.0)) - 1.0)
+
+
+## Während des Festes fliegen über dem Dorfplatz Blüten.
+func _fest_burst(delta: float) -> void:
+	_fest_petals += float(_village.get("fest_petals_per_sec", 40.0)) * delta
+	while _fest_petals >= 1.0:
+		_fest_petals -= 1.0
+		var p := _villagers.center + Vector2.from_angle(randf() * TAU) * randf() * _villagers.plaza_r * 1.6
+		_petals.burst(p, 1, Vector2(60, 220), Vector2(1.0, 1.8), Vector2(7, 12))
+
+
+## Endbildschirm zu: Kamera zurück zum Roboter, weiterfahren.
+func _end_fest() -> void:
+	_robot.input_enabled = true
+	create_tween().tween_property(_camera, "offset", Vector2.ZERO, 1.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+
+## Grün unter dem Objekt? Steht es nicht auf Land (Brunnen auf dem Dorfplatz), zählt das nächste Land
+## in acht Richtungen: Ist dort irgendwo Grün, erwacht es.
+func _green_under(pos: Vector2) -> bool:
+	var c := Vector2i(pos / cell_px)
+	if not grid.in_bounds(c) or grid.terrain[c.y * grid.width + c.x] == GroundGrid.LAND:
+		return grid.is_green(c)
+	for k in 8:
+		var d := Vector2.from_angle(k * TAU / 8.0)
+		for s in range(1, 16):
+			var q := c + Vector2i((d * s).round())
+			if not grid.in_bounds(q):
+				break
+			if grid.terrain[q.y * grid.width + q.x] == GroundGrid.LAND:
+				if grid.is_green(q):
+					return true
+				break
+	return false
 
 
 ## Objekte, unter denen es grün geworden ist, erwachen (mit Klang und Blättern, wenn animate).
@@ -281,7 +376,7 @@ func _check_end(delta: float) -> void:
 func _wake_objects(animate: bool) -> void:
 	var bursts := int(_obj_cfg.get("max_bursts_per_check", 6))   # erwachen viele auf einmal: nicht jedes mit Blättern
 	for o in _objects:
-		var green := grid.is_green(Vector2i(o.position / cell_px))
+		var green := _green_under(o.position)
 		if green == o.awake:
 			continue
 		o.set_awake(green, animate)
@@ -309,7 +404,7 @@ func _update_tips(delta: float) -> void:
 	if not _hud.tip_visible():
 		_tip_id = ""
 	var ctx := {"can_buy": not _tutorial.seen.has("tree") and _first_buy_possible(), "bees": _bees.bees.size(),
-		"quiet": _tip_id != "" or not _hud.visible or MenuKit.any_open(get_tree())}
+		"quiet": _tip_id != "" or not _hud.visible or MenuKit.any_open(get_tree()) or _end_wait >= 0.0}
 	var id := _tutorial.due(ctx, delta)
 	if id != "":
 		_tip_id = id
@@ -433,6 +528,7 @@ func reset_game() -> void:
 	_end_wait = -1.0
 	_bees.set_count(0)
 	_animals.clear()
+	_villagers.clear()
 	_region_saves.clear()   # Neues Spiel: alle Regionen von vorn
 	_tutorial.reset()
 	_tip_id = ""
@@ -480,7 +576,7 @@ func _start_playing() -> void:
 func _save_info() -> String:
 	if _play_sec <= 0.0:
 		return ""
-	var state := "Die Welt blüht!" if _finished else "Frühling: %s %%" % Hud.format_percent(grid.coverage())
+	var state := "%s blüht!" % str(_region_info.get("name", "Die Welt")) if _finished else "Frühling: %s %%" % Hud.format_percent(grid.coverage())
 	return "%s   ·   Spielzeit %s" % [state, EndScreen.format_time(_play_sec)]
 
 
@@ -549,6 +645,8 @@ func load_game(data: Dictionary) -> void:
 			_robot.position = _start_px   # alter Spielstand: Platz liegt jetzt im Wasser
 	_camera.reset_smoothing()
 	_milestone = floori(grid.coverage() * 10.0)
+	if _finished and not _village.is_empty():
+		_villagers.settle(int(_village.get("people", 12)))   # schon zurückgekehrt
 	_paint()
 	_wake_objects(false)
 

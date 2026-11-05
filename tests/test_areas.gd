@@ -11,7 +11,7 @@ func test_every_area_has_room_and_start_is_meadow() -> void:
 	var r := _areas()
 	assert_true(r.list.size() >= 4 and r.list.size() <= 6, "4 bis 6 Gebiete")
 	for i in r.list.size():
-		assert_true(r.share(i) > 0.08, "%s ist zu klein (%.2f)" % [r.name_of(i), r.share(i)])
+		assert_true(r.share(i) > 0.05, "%s ist zu klein (%.2f)" % [r.name_of(i), r.share(i)])
 		assert_false(r.name_of(i).is_empty())
 	assert_eq(r.name_of(r.at_cell(Vector2(320, 240))), "Blumental", "Start im Blumental")
 	var again := _areas()

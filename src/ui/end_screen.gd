@@ -4,6 +4,10 @@ extends CanvasLayer
 ## oder zum Titelbildschirm zurückkehren. Erscheint nur einmal je Spielstand.
 
 signal title_requested
+signal closed
+
+var _title_l := Label.new()
+var _text_l := Label.new()
 
 var _box: VBoxContainer
 var _stats := Label.new()
@@ -27,12 +31,17 @@ func _ready() -> void:
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(center)
 	_box = MenuKit.panel(center, 36, 16)
-	MenuKit.title(_box, "Die Welt blüht wieder!").add_theme_font_size_override("font_size", 56)
-	var text := Label.new()
-	text.text = "Kein grauer Fleck mehr: Der kleine Roboter, seine Bienen\nund der Wind haben den Frühling überall hingebracht."
-	text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	text.add_theme_font_size_override("font_size", 26)
-	_box.add_child(text)
+	# Texte der Region können schon vor _ready gesetzt sein (set_texts), sonst die allgemeinen
+	if _title_l.text.is_empty():
+		_title_l.text = "Die Welt blüht wieder!"
+	_title_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_title_l.add_theme_font_size_override("font_size", 56)
+	_box.add_child(_title_l)
+	if _text_l.text.is_empty():
+		_text_l.text = "Kein grauer Fleck mehr: Der kleine Roboter, seine Bienen\nund der Wind haben den Frühling überall hingebracht."
+	_text_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_text_l.add_theme_font_size_override("font_size", 26)
+	_box.add_child(_text_l)
 	_stats.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_stats.add_theme_font_size_override("font_size", 28)
 	_stats.add_theme_color_override("font_color", Color(1.0, 0.92, 0.55))
@@ -41,6 +50,13 @@ func _ready() -> void:
 	MenuKit.button(_box, "Zum Titelbildschirm").pressed.connect(func() -> void:
 		close()
 		title_requested.emit())
+
+
+## Überschrift und Text der Region (region.json "finished_title" / "finished_text"); auch vor _ready.
+func set_texts(title: String, text: String) -> void:
+	_title_l.text = title
+	if not text.is_empty():
+		_text_l.text = text
 
 
 func open(play_sec: float, earned: float, bought: int, nodes: int, bees: int) -> void:
@@ -55,6 +71,7 @@ func open(play_sec: float, earned: float, bought: int, nodes: int, bees: int) ->
 func close() -> void:
 	visible = false
 	get_tree().paused = false
+	closed.emit()
 
 
 func _process(delta: float) -> void:

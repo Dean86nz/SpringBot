@@ -2,7 +2,7 @@
 
 Kleines 2D-Incremental-Spiel: Ein Roboter bringt einer grauen Welt den Frühling zurück. Wo er fährt, wird der Boden grün. Godot 4.7.2, GDScript, Gamepad zuerst (ROG Ally X).
 
-Stand: **Phase 3, Meilenstein 1 (Gerüst für Regionen)**, Version 0.16.0. Plan und Stand in `PHASE3.md`. Plan der Phase 2 in `PHASE2.md`. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`, fremde Inhalte in `CREDITS.md`.
+Stand: **Phase 3, Meilenstein 2 (Heimatdorf)**, Version 0.17.0. Plan und Stand in `PHASE3.md`. Plan der Phase 2 in `PHASE2.md`. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`, fremde Inhalte in `CREDITS.md`.
 
 ## Steuerung
 
@@ -32,6 +32,8 @@ Stand: **Phase 3, Meilenstein 1 (Gerüst für Regionen)**, Version 0.16.0. Plan 
 - `src/ui/map_screen.gd` + `map.gdshader`: Übersichtskarte (Pause-Menü oder View-Taste / M), nutzt die Masken des Bodens.
 - Lautstärke: `Sfx.set_volume`, Regler im Pause-Menü, gespeichert in `user://settings.json` (nicht im Spielstand).
 - `data/campaign.json` + `src/sim/campaign.gd`: die Regionen der Reise (Phase 3). Jede Region hat einen Ordner `data/regions/<id>/` mit `region.json` (Name, Größe, Start, Bienenstock), `world.json`, `objects.json` und `areas.json`. Der Spielstand (Version 2) hat je Region einen Eintrag, Skills und Pollen gelten für alle; ältere Stände hebt `SaveStore.migrate` an.
+- Dorf: `region.json` → „village“ (Platz, Brunnen, Häuser, Menschen, Fest). Häuser und Brunnen sind feste Objekte (`WorldObjects.place(..., fixed)`), der Platz ist in `world.json` („plazas“) befestigt.
+  `src/sim/villagers.gd` + `src/world/villager_view.gd`: die Menschen, die bei 100 % zurückkehren.
 - `areas.json` + `src/sim/areas.gd` (Klasse `Areas`): Gebiete mit eigenen Farben, Blumen, Objekten; ground_view.gd gibt sie als kleine Texturen an den Shader, das HUD blendet den Namen beim Betreten ein.
 - `src/sim/skill_tree.gd`: Pollen, Knoten-Stufen, Sichtbarkeit (gekauft / kaufbar / „?“ / verdeckt), Summen der Werte (reine Logik, getestet).
 - `src/sim/bee_swarm.gd`: Bienen-Logik (Zielwahl, Schweben, Begrünen), `src/world/bee_view.gd` zeichnet Stock und Bienen.

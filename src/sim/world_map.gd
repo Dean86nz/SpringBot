@@ -6,6 +6,7 @@ extends RefCounted
 ## ist die Zelle Wasser bzw. Weg (Wasser hat Vorrang). Die weichen Masken (0,5 genau auf dem
 ## Rand) gehen an die Darstellung, damit Ufer und Wegränder rund statt treppig aussehen.
 ## Wo ein Weg Wasser kreuzt, entsteht eine Brücke; ihre Wasserzellen werden befahrbar.
+## Plätze ("plazas": Mitte und Radius in Zellen) sind runde, befestigte Flächen wie Wege (z. B. Dorfplatz).
 ## Alles in Zellen, reine Logik. Gibt die Brücken zurück: {center, dir, length, width}.
 
 const FAR := 1.0e9
@@ -26,6 +27,9 @@ static func build(grid: GroundGrid, data: Dictionary) -> Array[Dictionary]:
 		var line := curve(p)
 		path_lines.append(line)
 		_raster(grid, line, float(p.get("width", 4.0)) * 0.5, path)
+	for pl: Dictionary in data.get("plazas", []):
+		var c: Array = pl.get("center", [0, 0])
+		_raster(grid, PackedVector2Array([Vector2(c[0], c[1]), Vector2(c[0], c[1]) + Vector2(0.01, 0)]), float(pl.get("radius", 6.0)), path)
 	var t := PackedByteArray()
 	t.resize(n)
 	var soft := PackedByteArray()

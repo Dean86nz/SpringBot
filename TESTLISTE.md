@@ -1,11 +1,20 @@
-# Testliste v0.16.0: Phase 3, Meilenstein 1 (Gerüst für Regionen)
+# Testliste v0.17.0: Phase 3, Meilenstein 2 (Heimatdorf)
 
-EXEs: `export/windows/SpringBot_v0.16.0.exe` (Release) und `SpringBot_v0.16.0_DEBUG.exe` (Debug mit Cheat-Menü).
-Cheat-Menü (nur Debug): L3 + R3 eine Sekunde halten, PC F12.
+EXEs: `export/windows/SpringBot_v0.17.0.exe` (Release) und `SpringBot_v0.17.0_DEBUG.exe` (Debug mit Cheat-Menü).
+Cheat-Menü (nur Debug): L3 + R3 eine Sekunde halten, PC F12. Dort „Welt fast fertig (Ende testen)“ zum Testen des Festes.
 
-Dieser Meilenstein ist reine Technik: Es soll alles genau so aussehen und laufen wie in 0.15.0.
+## Dorf
+1. Gleich nördlich vom Start liegt das Dorf: Dorfplatz mit Brunnen, zwölf graue Häuser mit kaputten Dächern.
+2. Grün um ein Haus: Es erwacht mit buntem Dach, Blumenkästen und Büschen (Rascheln wie bei Bäumen).
+3. Ist rund um den Platz Grün, füllt sich der Brunnen mit Wasser und Blumen.
+4. Der Roboter kommt zwischen allen Häusern durch und fährt um sie herum.
+5. Beim Betreten erscheint „~ Dorfmitte ~“. Auf der Karte (View / M) steht „Dorfmitte“.
 
-1. **Wichtig, mit der Release-EXE:** Titelbildschirm zeigt „Weiterspielen“ mit deinem Fortschritt und deiner Spielzeit. Weiterspielen: Dein Garten ist da, der Roboter steht, wo er war, Pollen und Skilltree stimmen.
-2. Ein paar Minuten spielen, beenden, wieder starten: Alles ist noch da (der Stand wird jetzt im neuen Format gespeichert).
-3. Karte, Gebiete, Wege, Bäume, Tiere, Bienen wie bisher.
-4. Debug-EXE: „Neues Spiel“ beginnt wie gewohnt mit der Einleitung.
+## Fest (am schnellsten mit der Debug-EXE: Neues Spiel, Cheat-Menü → „Welt fast fertig“, dann den letzten Fleck rechts vom Roboter begrünen)
+6. Bei 100 %: Die Kamera schwenkt zum Dorf, Menschen kommen von allen Seiten zum Platz, Blüten fliegen, Banner „Das Heimatdorf lebt wieder auf!“.
+7. Danach der Endbildschirm „Das Heimatdorf lebt wieder!“. „Weiterfahren“: Kamera zurück zum Roboter, man kann weiterfahren.
+8. Die Menschen bleiben im Dorf und schlendern herum, auch nach Beenden und Weiterspielen.
+
+## Allgemein
+9. Dein Spielstand wird übernommen. War er schon fertig, sind die Menschen gleich da.
+10. Gefallen dir Dorf, Häuser und Menschen? Zu klein, zu groß, zu viele, zu wenige?

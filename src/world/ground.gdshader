@@ -210,15 +210,24 @@ vec4 stalk(vec2 p) {
 
 // Wie grün ist es rund um p (Mittel aus 8 Richtungen, 4 Zellen weit)? Für Wege und Wasser,
 // die selbst nie grün werden; das Mittel gibt weiche Übergänge statt harter Kanten.
-float green_near(vec2 p) {
-	vec2 uv = p / map_size;
-	vec2 d = vec2(4.0 * cell_px) / map_size;
+// Ein zweiter Ring 11 Zellen weit erreicht auch die Mitte breiter Flächen (Dorfplatz).
+float green_ring(vec2 uv, float cells) {
+	vec2 d = vec2(cells * cell_px) / map_size;
 	float sum = 0.0;
 	for (int k = 0; k < 8; k++) {
-		float a = float(k) * 0.7854;
+		float a = float(k) * 0.7854 + (cells > 5.0 ? 0.39 : 0.0);   // äußerer Ring versetzt
 		sum += texture(mask, uv + vec2(cos(a), sin(a)) * d).r;
 	}
-	return smoothstep(0.08, 0.45, sum / 8.0);
+	return sum / 8.0;
+}
+
+float green_near(vec2 p) {
+	vec2 uv = p / map_size;
+	float g = green_ring(uv, 4.0);
+	if (g < 0.45) {
+		g = max(g, green_ring(uv, 11.0));
+	}
+	return smoothstep(0.08, 0.45, g);
 }
 
 // Kieselsteinchen auf dem Weg: erscheint, wenn hash < amount (amount wächst mit dem Grün daneben)

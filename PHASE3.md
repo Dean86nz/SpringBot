@@ -56,6 +56,7 @@ Die Helfer sind eigene Ideen (nichts aus Unharvest oder Moon Sweepers). Größen
    (erledigt in 0.16.0)
 2. **Heimatdorf:** Dorf in der Mitte der heutigen Karte (Häuser, Dorfplatz, Brunnen), Häuser erwachen mit dem Grün.
    Bei 100 % kehren die Menschen zurück, Dorffest statt Endbildschirm.
+   (erledigt in 0.17.0: Fest mit Rückkehr der Menschen, danach der Endbildschirm der Region; „Weiterreisen“ kommt mit Meilenstein 3)
 3. **Regionenkarte und Reisen:** Reiseroute mit allen Regionen, Weiterreisen, Zurückkehren, Pollen-Regel für fertige Regionen,
    Einleitung je Region. (Die Übersichtskarte aus 0.15.0 ist dafür die Grundlage.)
 4. **Felder und Vorort** mit Samenvögeln (neuer Skilltree-Ast).

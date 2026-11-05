@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.17.0 – Phase 3, Meilenstein 2: Heimatdorf
+
+- In der Mitte der Karte, gleich nördlich vom Start, liegt jetzt das **Heimatdorf**: ein runder, befestigter Dorfplatz mit Brunnen,
+  zwölf Häuser in zwei Ringen darum, ein kurzer Weg verbindet den Platz mit dem Weg nach Norden.
+- **Häuser erwachen** wie Bäume: grau, mit Löchern im Dach und schiefem Kamin, im Grün dann bunte Ziegeldächer (fünf Farben), Blumenkästen, Büsche und Tür.
+  Der **Brunnen** ist trocken und rissig und füllt sich mit Wasser und einem Blumenring, sobald rund um den Platz Grün ist.
+  Häuser und Brunnen sind Hindernisse; zwischen den Häusern passt der Roboter überall durch (Test).
+- Neues Gebiet **Dorfmitte** mit wenig Bäumen, vielen Büschen und Obstbäumen, roten Blumen; Name erscheint beim Betreten.
+- **Dorffest bei 100 %:** Die Kamera schwenkt zum Dorf, 16 Menschen kehren zurück und gehen zum Platz, Blüten fliegen, Glocke,
+  großes Banner „Das Heimatdorf lebt wieder auf!“. Danach der Endbildschirm mit eigenem Text („Das Heimatdorf lebt wieder!“);
+  „Weiterfahren“ schwenkt die Kamera zurück. Die Menschen bleiben danach im Dorf und schlendern zwischen Platz und Haustüren.
+- Ein fertiger Spielstand (100 %) hat die Menschen beim Laden gleich im Dorf.
+- Wege und Plätze werden jetzt auch in der Mitte warm und bunt, wenn das Grün weiter weg ist (zweiter, weiterer Ring im Boden-Shader).
+- Alle Werte in `data/regions/heimatdorf/region.json` („village“) und `world.json` („plazas“).
+
 ## 0.16.0 – Phase 3, Meilenstein 1: Gerüst für Regionen
 
 Technik für die Reise durch mehrere Regionen. Im Spiel ändert sich sichtbar nichts.

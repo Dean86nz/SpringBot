@@ -11,6 +11,7 @@ var _pollen := Label.new()
 var _hint := Label.new()
 var _version := Label.new()
 var _area := Label.new()
+var _banner := Label.new()   # großes Banner (Fest, Region fertig)
 var _area_tw: Tween
 var banner_cfg: Dictionary = {}   # Zeiten der Namenseinblendung (areas.json "banner")
 const TIP_WIDTH := 1000.0
@@ -42,6 +43,16 @@ func _ready() -> void:
 	_area.add_theme_constant_override("outline_size", 8)
 	_area.modulate.a = 0.0
 	add_child(_area)
+	_banner.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	_banner.offset_top = 170
+	_banner.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_banner.add_theme_font_size_override("font_size", 64)
+	_banner.add_theme_color_override("font_color", Color(1.0, 0.97, 0.86))
+	_banner.add_theme_color_override("font_outline_color", Color(0.30, 0.55, 0.28))
+	_banner.add_theme_constant_override("outline_size", 18)
+	_banner.modulate.a = 0.0
+	add_child(_banner)
 	_pollen.position = Vector2(32, 24)
 	_pollen.add_theme_font_size_override("font_size", 40)
 	_pollen.add_theme_color_override("font_color", Color(1.0, 0.92, 0.45))
@@ -143,6 +154,20 @@ func pulse() -> void:
 	_percent.modulate = Color(1.0, 0.95, 0.6)
 	tw.tween_property(_percent, "scale", Vector2.ONE, 0.7).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
 	tw.parallel().tween_property(_percent, "modulate", Color.WHITE, 0.9)
+
+
+## Großes Banner: springt auf, bleibt sec Sekunden, blendet aus.
+func show_banner(text: String, sec: float) -> void:
+	if text.is_empty():
+		return
+	_banner.text = text
+	_banner.pivot_offset = Vector2(_banner.get_minimum_size().x * 0.5, 40)
+	_banner.scale = Vector2.ONE * 0.6
+	var tw := create_tween()
+	tw.tween_property(_banner, "modulate:a", 1.0, 0.4)
+	tw.parallel().tween_property(_banner, "scale", Vector2.ONE, 0.7).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+	tw.tween_interval(maxf(sec - 1.6, 0.5))
+	tw.tween_property(_banner, "modulate:a", 0.0, 1.2)
 
 
 ## Name des Gebiets langsam ein- und wieder ausblenden.
