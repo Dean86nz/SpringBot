@@ -47,11 +47,11 @@ village_blocks = {(ci, cj), (ci - 1, cj), (ci + 1, cj), (ci, cj - 1), (ci, cj + 
 
 # --- Dorf (Altstadt um den Marktplatz) ---
 buildings = [
-    {"id": "dom", "type": "church", "pos": [center[0], center[1] - 19]},
-    {"id": "schule", "type": "school", "pos": [center[0] - 18, center[1] - 15]},
-    {"id": "buecherei", "type": "library", "pos": [center[0] + 18, center[1] - 15]},
-    {"id": "laden", "type": "shop", "pos": [center[0] - 19, center[1] + 6]},
-    {"id": "cafe", "type": "shop", "pos": [center[0] + 19, center[1] + 6]},
+    {"id": "dom", "type": "cathedral", "pos": [center[0], center[1] - 19]},
+    {"id": "schule", "type": "school_city", "pos": [center[0] - 19, center[1] - 14], "rot": 0},
+    {"id": "buecherei", "type": "museum", "pos": [center[0] + 19, center[1] - 15]},
+    {"id": "laden", "type": "cafe", "pos": [center[0] - 19, center[1] + 7], "rot": 0},
+    {"id": "cafe", "type": "cafe", "pos": [center[0] + 19, center[1] + 7], "rot": 0},
 ]
 props = []
 homes = []
@@ -65,9 +65,9 @@ for k, (bi, bj) in enumerate([(ci - 1, cj), (ci + 1, cj), (ci, cj - 1), (ci, cj 
         buildings.append({"id": hid, "type": "apartment", "pos": [round(x), round(y)], "rot": facing(x, y, r)})
     mid = [round((x0 + x1) / 2), round((y0 + y1) / 2)]
     if k < 3:
-        props.append({"id": "garten%d" % (k + 1), "type": "garden", "pos": mid})
+        props.append({"id": "garten%d" % (k + 1), "type": "raised_beds", "pos": mid})
     else:
-        props.append({"id": "waesche", "type": "laundry", "pos": mid})
+        props.append({"id": "spielplatz", "type": "playground", "pos": mid})
 
 residents = [
     {"job": "shop", "home": "laden", "from": 0.08},
@@ -76,7 +76,7 @@ residents = [
     {"job": "shop", "home": "cafe", "from": 0.18},
     {"job": "stroll", "home": "dom", "from": 0.22},
     {"job": "farmer", "home": "w5", "work": "garten2", "from": 0.26, "dog": True},
-    {"job": "laundry", "home": "w14", "work": "waesche", "from": 0.3},
+    {"job": "stroll", "home": "w14", "from": 0.3, "dog": True},
     {"job": "kid", "home": "schule", "from": 0.35, "dog": True},
     {"job": "read", "home": "buecherei", "from": 0.4},
     {"job": "kid", "home": "schule", "from": 0.45},
@@ -136,16 +136,17 @@ region = {
         "center": center,
         "plaza_radius": 10.0,
         "fountain": center,
+        "fountain_type": "fountain_city",
         "buildings": buildings,
         "props": props,
         "types": {
-            "church": {"block": 66, "radius": 110},
-            "school": {"block": 62, "radius": 104},
-            "library": {"block": 52, "radius": 82},
-            "shop": {"block": 50, "radius": 80},
+            "cathedral": {"block": 76, "radius": 130},
+            "school_city": {"block": 66, "radius": 120},
+            "museum": {"block": 62, "radius": 100},
+            "cafe": {"block": 52, "radius": 90},
             "apartment": {"block": 120, "radius": 230},
-            "garden": {"block": 0, "radius": 64},
-            "laundry": {"block": 0, "radius": 70},
+            "raised_beds": {"block": 0, "radius": 64},
+            "playground": {"block": 0, "radius": 72},
         },
         "residents": residents,
         "people_speed_px": 85,

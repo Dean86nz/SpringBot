@@ -1,14 +1,12 @@
-# Testliste v0.21.0: Phase 3, Meilenstein 5 (Großstadt, Gärtner-Drohnen)
+# Testliste v0.22.0: Jede Region sieht anders aus
 
-EXEs: `export/windows/SpringBot_v0.21.0.exe` (Release) und `SpringBot_v0.21.0_DEBUG.exe` (Debug mit Cheat-Menü).
-Cheat-Menü (nur Debug): L3 + R3 eine Sekunde halten, PC F12. Schnell in die Großstadt: in Felder und Vorort im Cheat-Menü
-„Welt fast fertig“, letzten Fleck begrünen, nach dem Fest „Weiterreisen“.
+EXEs: `export/windows/SpringBot_v0.22.0.exe` (Release) und `SpringBot_v0.22.0_DEBUG.exe` (Debug mit Cheat-Menü).
+Cheat-Menü (nur Debug): L3 + R3 eine Sekunde halten, PC F12.
 
-1. Reisekarte: Heimatdorf, Felder und Vorort, Großstadt und eine verhüllte Station („Die ganze Welt“).
-2. Ankunft in der Großstadt: Einleitung, Banner. Straßen sind grau asphaltiert mit Gehweg, Blocks mit Wohnblocks und Hochhäusern, in der Mitte der Marktplatz.
-3. Fährt der Roboter sauber um die langen Wohnblocks herum (nicht über die Dachecken)?
-4. Hinweis „Neu im Skilltree: die Gärtner-Drohnen!“; der Ast liegt rechts unten. Ladestation kaufen (15.000 Pollen): zwei Drohnen heben ab.
-5. Drohnen fliegen über einen grauen Block, Runde um Runde nach innen, mit grünem Nebel; danach zurück zur Station.
-6. Gebäude, unter denen es grün wird, bekommen einen Dachgarten. Die Altstadt reparieren die Bewohner.
-7. Brachflächen (braun, rissig) bleiben, bis Roboter, Samenvögel oder Drohnen sie begrünen.
-8. Läuft die Großstadt flüssig auf dem Ally, auch mit vielen Helfern? Wie lange hat sie gedauert?
+1. Großstadt: Sehen Wohnblocks und Hochhäuser jetzt wie Häuser aus (Dach, darunter die Vorderseite mit Fenstern)? Hochhäuser deutlich höher?
+2. Großstadt wiederhergestellt: bunte Fassaden, erleuchtete Fenster, Markisen, Dachgärten.
+3. Altstadt: Dom, Museum, Cafés, Stadtschule mit Sportplatz, Hochbeete, Spielplatz, Stadtbrunnen, nichts mehr wie im Heimatdorf.
+4. Vorort: Einfamilienhäuser mit Garage, Garten, Pool / Trampolin / Terrasse; Kita mit Spielplatz; Bäckerei; Pavillon auf dem Platz.
+5. Felder: Gutshof, Maschinenhalle mit Traktor, goldene Weizenfelder.
+6. Heimatdorf unverändert.
+7. Läuft alles flüssig auf dem Ally?

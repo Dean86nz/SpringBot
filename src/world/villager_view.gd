@@ -18,7 +18,10 @@ const SCALE := 2.2
 const EXTENTS := {"house": Vector2(58, 42), "church": Vector2(38, 62), "school": Vector2(66, 38), "library": Vector2(48, 38),
 	"shop": Vector2(48, 36), "smithy": Vector2(44, 36), "farmhouse": Vector2(54, 40), "barn": Vector2(72, 42),
 	"stand": Vector2(30, 16), "field": Vector2(104, 64), "laundry": Vector2(64, 8), "cemetery": Vector2(70, 52),
-	"windmill": Vector2(40, 40), "silo": Vector2(30, 30), "garden": Vector2(46, 32), "apartment": Vector2(190, 120), "tower": Vector2(120, 120)}
+	"windmill": Vector2(40, 40), "silo": Vector2(30, 30), "garden": Vector2(46, 32), "apartment": Vector2(190, 120), "tower": Vector2(120, 120),
+	"suburb": Vector2(54, 40), "kita": Vector2(64, 36), "bakery": Vector2(42, 32), "pavilion": Vector2(42, 42), "manor": Vector2(72, 42),
+	"machine_hall": Vector2(84, 48), "wheat": Vector2(104, 64), "cathedral": Vector2(40, 84), "museum": Vector2(62, 46), "cafe": Vector2(52, 30),
+	"school_city": Vector2(64, 30), "raised_beds": Vector2(48, 30), "playground": Vector2(56, 40), "fountain_city": Vector2(48, 48)}
 
 var _v: Villagers
 

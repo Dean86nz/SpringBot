@@ -422,19 +422,19 @@ func _village_objects(places: Dictionary) -> Array[Dictionary]:
 		if b.get("face") is Array:   # eigene Blickrichtung (z. B. zum Hof statt zum fernen Dorfplatz)
 			face = (Vector2(b["face"][0], b["face"][1]) + Vector2(0.5, 0.5)) * cell_px
 		var to_plaza := (face - pos).normalized()
-		var rot := 0.0 if kind in ["field", "laundry", "garden", "windmill", "silo"] else to_plaza.angle() - PI / 2.0
+		var rot := 0.0 if kind in ["field", "wheat", "laundry", "garden", "raised_beds", "playground", "windmill", "silo"] else to_plaza.angle() - PI / 2.0
 		if b.has("rot"):   # feste Drehung in Grad (z. B. zur Straße in der Großstadt)
 			rot = deg_to_rad(float(b["rot"]))
 		var block := float(t.get("block", 50.0)) * f
 		out.append({"id": str(b["id"]), "kind": kind, "pos": pos, "angle": rot, "seed": rng.randi(),
-			"block": block, "radius": float(t.get("radius", 76.0)) * f, "size": f, "quiet": kind in ["field", "laundry", "stand", "garden"]})
+			"block": block, "radius": float(t.get("radius", 76.0)) * f, "size": f, "quiet": kind in ["field", "wheat", "laundry", "stand", "garden", "raised_beds", "playground"]})
 		if kind == "apartment":
 			out[out.size() - 1]["blockers"] = _building_blockers(kind, pos, rot, f, block)
 		places[str(b["id"])] = {"pos": pos, "type": kind, "angle": rot, "block": block, "radius": float(t.get("radius", 76.0)) * f, "size": f,
 			"door": pos + Vector2(0, block + 16.0).rotated(rot) if block > 0.0 else pos + Vector2(0, 30)}
 	var fo: Variant = _village.get("fountain")
 	if fo is Array:
-		out.append({"kind": "fountain", "pos": (Vector2(fo[0], fo[1]) + Vector2(0.5, 0.5)) * cell_px, "angle": 0.0,
+		out.append({"kind": str(_village.get("fountain_type", "fountain")), "pos": (Vector2(fo[0], fo[1]) + Vector2(0.5, 0.5)) * cell_px, "angle": 0.0,
 			"seed": 5, "block": 46.0, "radius": 60.0, "size": 1.0, "quiet": false})
 	return out
 

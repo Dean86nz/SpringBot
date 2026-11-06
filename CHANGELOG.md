@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.22.0 – Jede Region sieht anders aus
+
+- **Großstadt:** Wohnblocks und Hochhäuser sind jetzt schräg von oben gezeichnet: oben das Dach, darunter die Vorderseite mit
+  Stockwerken und Fensterreihen, unten Läden mit Markisen. Wohnblocks haben 4 bis 6 Stockwerke und farbigen Putz oder Backstein,
+  Hochhäuser 9 bis 13 Stockwerke mit Glas- oder Betonfassade, Antenne und Wassertank, und werfen lange Schatten.
+  Kaputt: graue Fassaden, dunkle und eingeschlagene Fenster, Schmutzstreifen. Wiederhergestellt: Farbe, helle und erleuchtete
+  Fenster, Blumenkästen, Dachgarten.
+- **Altstadt der Großstadt** mit eigenen Gebäuden: Dom mit Querhaus, Kuppel und zwei Türmen, Museum mit Kuppel und Säulen,
+  zwei Cafés mit Sonnenschirmen, Stadtschule mit Sportplatz, Hochbeete, Spielplatz, Stadtbrunnen mit Statue.
+- **Vorort** mit eigenen Gebäuden: Einfamilienhäuser mit Walmdach, Garage und Einfahrt, hinten Garten mit Hecke und Pool,
+  Trampolin oder Terrasse; Kita mit bunten Dächern und Spielplatz; Bäckerei mit Brezel-Schild; Pavillon statt Brunnen.
+- **Felder:** Gutshof (L-Form mit dunklem Dach und Gauben), Maschinenhalle mit Wellblechdach und Traktor, goldene Weizenfelder mit Mohn.
+- Das Heimatdorf bleibt, wie es war; kein Gebäude teilt sich mehr das Aussehen mit einer anderen Region (außer Silo und Windmühle,
+  die es nur auf den Feldern gibt).
+
 ## 0.21.0 – Phase 3, Meilenstein 5: Großstadt mit Gärtner-Drohnen
 
 - **Dritte Region: Großstadt** (1000 × 700 Zellen): Straßenraster aus Asphalt mit Gehwegen, ein Stadtfluss mit Brücken,

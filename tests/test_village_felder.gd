@@ -47,7 +47,7 @@ func test_layout() -> void:
 		if blk > 0.0:
 			for k in keep:
 				assert_true(p.distance_to(k) * 24.0 > blk + 100.0, "%s: Start, Bienenstock und Häuschen bleiben frei" % b["id"])
-	for k in ["house", "shop", "school", "farmhouse", "barn", "silo", "windmill", "field", "garden", "laundry"]:
+	for k in ["suburb", "bakery", "kita", "manor", "machine_hall", "silo", "windmill", "wheat", "garden", "laundry"]:
 		assert_true(kinds.has(k), "es gibt %s" % k)
 	var bl: Array = v["buildings"]
 	for i in bl.size():

@@ -78,6 +78,9 @@ Die Helfer sind eigene Ideen (nichts aus Unharvest oder Moon Sweepers). Größen
    (erledigt in 0.21.0: 1000 × 700 Zellen, Straßenraster aus Asphalt, Stadtfluss mit Brücken, Marktplatz mit Altstadt und 18 Bewohnern,
    Stadtpark, Brachflächen, rund 770 Wohnblocks und Hochhäuser mit Dachgarten; Gärtner-Drohnen mit 13 Knoten, verdeckt bis zur Ankunft.
    Modell: Großstadt rund 15 Minuten, weil die Helfer aus den ersten Regionen mitkommen.)
+   Rückmeldung in 0.22.0: Jede Region hat eigene Gebäude (Vorort: Einfamilienhäuser, Kita, Bäckerei, Pavillon; Felder: Gutshof,
+   Maschinenhalle, Weizenfelder; Großstadt: Wohnblocks und Hochhäuser schräg von oben mit Fassaden, Dom, Museum, Café, Stadtschule,
+   Hochbeete, Spielplatz, Stadtbrunnen).
 6. **Die ganze Welt** mit Regenwolken, großer Abschluss und Abspann.
 
 Nach jedem Regions-Meilenstein: Balancing-Prüfung (Dauer je Region) und Leistungsmessung auf dem Ally.

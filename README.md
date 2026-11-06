@@ -2,7 +2,7 @@
 
 Kleines 2D-Incremental-Spiel: Ein Roboter macht eine graue, verfallene Welt wieder schön. Wo er fährt, wird der Boden grün. Godot 4.7.2, GDScript, Gamepad zuerst (ROG Ally X).
 
-Stand: **Phase 3, Meilenstein 5 (Großstadt, Gärtner-Drohnen)**, Version 0.21.0. Plan und Stand in `PHASE3.md`. Plan der Phase 2 in `PHASE2.md`. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`, fremde Inhalte in `CREDITS.md`.
+Stand: **Phase 3, Meilenstein 5 mit Rückmeldung (eigene Gebäude je Region, Stadt schräg von oben)**, Version 0.22.0. Plan und Stand in `PHASE3.md`. Plan der Phase 2 in `PHASE2.md`. Siehe `CHANGELOG.md`, Testliste in `TESTLISTE.md`, Ideen außerhalb des Umfangs in `IDEEN.md`, fremde Inhalte in `CREDITS.md`.
 
 ## Steuerung
 
@@ -48,6 +48,10 @@ Stand: **Phase 3, Meilenstein 5 (Großstadt, Gärtner-Drohnen)**, Version 0.21.0
 - Großstadt: `tools/gen_city.py` erzeugt `data/regions/stadt/*.json` (Straßenraster, Fluss, Marktplatz mit Altstadt und Bewohnern, Parks,
   Brachflächen, rund 770 Gebäude). `region.json` „structures“ sind feste Gebäude ohne Bewohner (`main.gd` `_structure_objects`), lange Gebäude haben
   mehrere Hinderniskreise; „ground“: {„paved“: 1} macht Straßen zu Asphalt. Der Roboter prüft nur Hindernisse in seiner Nähe (Raster in `robot.gd`).
+- Gebäude je Region (`world_object.gd`): Heimatdorf mit Satteldach-Häusern; Vorort mit `suburb`, `kita`, `bakery`, `pavilion`;
+  Felder mit `manor`, `machine_hall`, `wheat`; Großstadt mit `apartment` und `tower` schräg von oben (Dach um die Fassadenhöhe versetzt,
+  darunter die Vorderseite mit Stockwerken), dazu `cathedral`, `museum`, `cafe`, `school_city`, `raised_beds`, `playground`, `fountain_city`.
+  Der Brunnen des Dorfplatzes kommt aus `village.fountain_type`. `tools/object_gallery.gd -- bild.png "suburb,kita"` zeigt ausgewählte Arten groß.
 - `src/sim/garden_drones.gd`: Gärtner-Drohnen (ab der Großstadt) fliegen von der Ladestation (`dock_cell`) Runden über ein graues Quadrat,
   von außen nach innen, und sprühen Grün; `src/world/drone_view.gd` zeichnet Station, Drohnen und Sprühnebel.
 - `src/sim/seed_birds.gd`: Samenvögel (ab Felder und Vorort): Schwärme wählen den Streifen mit dem meisten Grau, säen ihn im Flug

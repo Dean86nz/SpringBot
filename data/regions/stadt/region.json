@@ -81,10 +81,11 @@
 			523,
 			171
 		],
+		"fountain_type": "fountain_city",
 		"buildings": [
 			{
 				"id": "dom",
-				"type": "church",
+				"type": "cathedral",
 				"pos": [
 					523,
 					152
@@ -92,35 +93,38 @@
 			},
 			{
 				"id": "schule",
-				"type": "school",
+				"type": "school_city",
 				"pos": [
-					505,
-					156
-				]
+					504,
+					157
+				],
+				"rot": 0
 			},
 			{
 				"id": "buecherei",
-				"type": "library",
+				"type": "museum",
 				"pos": [
-					541,
+					542,
 					156
 				]
 			},
 			{
 				"id": "laden",
-				"type": "shop",
+				"type": "cafe",
 				"pos": [
 					504,
-					177
-				]
+					178
+				],
+				"rot": 0
 			},
 			{
 				"id": "cafe",
-				"type": "shop",
+				"type": "cafe",
 				"pos": [
 					542,
-					177
-				]
+					178
+				],
+				"rot": 0
 			},
 			{
 				"id": "w1",
@@ -270,7 +274,7 @@
 		"props": [
 			{
 				"id": "garten1",
-				"type": "garden",
+				"type": "raised_beds",
 				"pos": [
 					465,
 					175
@@ -278,7 +282,7 @@
 			},
 			{
 				"id": "garten2",
-				"type": "garden",
+				"type": "raised_beds",
 				"pos": [
 					581,
 					175
@@ -286,15 +290,15 @@
 			},
 			{
 				"id": "garten3",
-				"type": "garden",
+				"type": "raised_beds",
 				"pos": [
 					523,
 					117
 				]
 			},
 			{
-				"id": "waesche",
-				"type": "laundry",
+				"id": "spielplatz",
+				"type": "playground",
 				"pos": [
 					523,
 					233
@@ -302,33 +306,33 @@
 			}
 		],
 		"types": {
-			"church": {
+			"cathedral": {
+				"block": 76,
+				"radius": 130
+			},
+			"school_city": {
 				"block": 66,
-				"radius": 110
+				"radius": 120
 			},
-			"school": {
+			"museum": {
 				"block": 62,
-				"radius": 104
+				"radius": 100
 			},
-			"library": {
+			"cafe": {
 				"block": 52,
-				"radius": 82
-			},
-			"shop": {
-				"block": 50,
-				"radius": 80
+				"radius": 90
 			},
 			"apartment": {
 				"block": 120,
 				"radius": 230
 			},
-			"garden": {
+			"raised_beds": {
 				"block": 0,
 				"radius": 64
 			},
-			"laundry": {
+			"playground": {
 				"block": 0,
-				"radius": 70
+				"radius": 72
 			}
 		},
 		"residents": [
@@ -367,10 +371,10 @@
 				"dog": true
 			},
 			{
-				"job": "laundry",
+				"job": "stroll",
 				"home": "w14",
-				"work": "waesche",
-				"from": 0.3
+				"from": 0.3,
+				"dog": true
 			},
 			{
 				"job": "kid",

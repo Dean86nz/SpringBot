@@ -8,7 +8,9 @@ extends Node2D
 ## sapling (junger Baum); dazu rock, pond, bush; am Wegrand log, fence, stones; im Dorf house, fountain,
 ## church, school, library, shop, smithy, farmhouse, barn, stand (Honigstand), field, laundry (Wäscheleine), cemetery (Friedhof),
 ## in Felder und Vorort auch windmill (Windmühle, die Flügel drehen sich als eigener Knoten), silo, garden (Gemüsegarten),
-## in der Großstadt apartment (Wohnblock) und tower (Hochhaus) mit Flachdach, erwacht mit Dachgarten
+## Jede Region hat eigene Gebäude: im Vorort suburb (Einfamilienhaus), kita, bakery, pavilion; auf den Feldern manor
+## (Gutshof), machine_hall (Maschinenhalle), wheat (Weizenfeld); in der Großstadt apartment (Wohnblock) und tower
+## (Hochhaus) schräg von oben mit Fassade, dazu cathedral, museum, cafe, school_city, raised_beds, playground, fountain_city
 ## (angle dreht Gebäude so, dass ihre Vorderseite, lokal +y, zum Dorfplatz zeigt).
 ## Was sich im Dorf bewegt (Menschen, Wäsche, Honiggläser, Funken), zeichnet VillagerView.
 ## Jedes Objekt hat eine eigene Größe (size, über die Skalierung des Knotens).
@@ -203,9 +205,37 @@ func _draw() -> void:
 		"garden":
 			_garden(alive)
 		"apartment":
-			_flat_roof(APARTMENT, 1.0, alive)
+			_city_building(false, alive)
 		"tower":
-			_flat_roof(TOWER, 1.8, alive)
+			_city_building(true, alive)
+		"suburb":
+			_suburb(alive)
+		"kita":
+			_kita(alive)
+		"bakery":
+			_bakery(alive)
+		"pavilion":
+			_pavilion(alive)
+		"manor":
+			_manor(alive)
+		"machine_hall":
+			_machine_hall(alive)
+		"wheat":
+			_wheat(alive)
+		"cathedral":
+			_cathedral(alive)
+		"museum":
+			_museum(alive)
+		"cafe":
+			_cafe(alive)
+		"school_city":
+			_city_school(alive)
+		"raised_beds":
+			_raised_beds(alive)
+		"playground":
+			_playground(alive)
+		"fountain_city":
+			_fountain_city(alive)
 	draw_set_transform(Vector2.ZERO)
 
 
@@ -969,58 +999,484 @@ func _garden(alive: bool) -> void:
 		draw_line(Vector2(r.end.x + 4, -20), Vector2(r.end.x + 16, 26), wood, 3.0)   # umgefallenes Zaunstück
 
 
-## Flachdach von oben (Wohnblock, Hochhaus): Brüstung, Kies, Dachluke, Lüftung. height: Höhe (längerer Schatten).
-## Kaputt: Risse, dunkle Flecken, eingeschlagene Oberlichter, Schutt. Erwacht: Dachgarten mit Beeten,
-## kleinen Bäumen, Holzdeck und Solarzellen.
-func _flat_roof(e: Vector2, height: float, alive: bool) -> void:
-	draw_set_transform(Vector2(10, 14) * height, 0.0)   # Schatten fällt immer nach rechts unten
-	var sh := PackedVector2Array()
-	for c in [-e, Vector2(e.x, -e.y), e, Vector2(-e.x, e.y)]:
-		sh.append(c.rotated(angle))
-	_quad(PackedVector2Array([sh[0], sh[1], sh[2]]), SHADOW)
-	_quad(PackedVector2Array([sh[0], sh[2], sh[3]]), SHADOW)
-	_tf(Vector2.ZERO, angle)
-	var wall := Color(0.86, 0.80, 0.70) if alive else Color(0.66, 0.64, 0.61)
-	draw_rect(Rect2(-e, e * 2.0), wall)
-	var inner := Rect2(-e + Vector2(8, 8), e * 2.0 - Vector2(16, 16))
-	draw_rect(inner, Color(0.70, 0.70, 0.68) if alive else Color(0.58, 0.57, 0.55))
-	_outline(PackedVector2Array([-e, Vector2(e.x, -e.y), e, Vector2(-e.x, e.y)]), INK, 3.0)
-	_outline(PackedVector2Array([inner.position, Vector2(inner.end.x, inner.position.y), inner.end, Vector2(inner.position.x, inner.end.y)]), wall.darkened(0.25), 1.5)
+## --- Großstadt: Gebäude schräg von oben (Dach oben, darunter die Vorderseite mit Fenstern) ---
+## Stadtgebäude werden nicht gedreht, sondern am Bildschirm ausgerichtet: Die Grundfläche (e) liegt am Boden,
+## das Dach ist um die Fassadenhöhe nach oben versetzt, dazwischen sieht man die Vorderseite mit Stockwerken.
+## Liegt die Längsseite quer (angle ±90°), werden Breite und Tiefe getauscht.
+
+const FLOOR_PX := 15.0
+const WALLS := [Color(0.93, 0.87, 0.74), Color(0.86, 0.58, 0.45), Color(0.95, 0.85, 0.56), Color(0.70, 0.80, 0.88), Color(0.76, 0.84, 0.70), Color(0.74, 0.42, 0.34), Color(0.90, 0.78, 0.80)]
+const AWNINGS := [Color(0.88, 0.30, 0.28), Color(0.30, 0.56, 0.42), Color(0.26, 0.44, 0.74), Color(0.96, 0.72, 0.24)]
+
+
+## Grundfläche am Bildschirm (Breite und Tiefe getauscht, wenn das Gebäude quer steht).
+func _screen_extent(e: Vector2) -> Vector2:
+	return Vector2(e.y, e.x) if absf(sin(angle)) > 0.7 else e
+
+
+## Wohnblock (4 bis 6 Stockwerke, farbiger Putz oder Backstein, unten Läden) oder Hochhaus (9 bis 13 Stockwerke,
+## Glas oder Beton). Kaputt: graue Fassade, dunkle und eingeschlagene Fenster, Schmutzstreifen, Schutt auf dem Dach.
+## Erwacht: Farbe, helle und erleuchtete Fenster, Blumenkästen, Markisen, Dachgarten.
+func _city_building(tower: bool, alive: bool) -> void:
+	_tf()
 	_rng.seed = obj_seed
+	var e := _screen_extent(TOWER if tower else APARTMENT)
+	var floors := _rng.randi_range(9, 13) if tower else _rng.randi_range(4, 6)
+	var f := floors * FLOOR_PX + 14.0
+	var glass := tower and obj_seed % 2 == 0
+	var wall: Color = WALLS[obj_seed % WALLS.size()]
+	if tower:
+		wall = Color(0.46, 0.62, 0.74) if glass else Color(0.82, 0.82, 0.80)
 	if not alive:
-		for k in int(e.x * e.y / 2500.0):   # Risse
+		wall = wall.lerp(Color(0.62, 0.61, 0.59), 0.8)
+	# Schatten nach rechts unten, länger bei hohen Häusern
+	draw_rect(Rect2(Vector2(-e.x + 16, -e.y - f + 24), Vector2(e.x * 2 + f * 0.45, e.y * 2 + f - 12)), SHADOW)
+	# Vorderseite
+	var face := Rect2(Vector2(-e.x, e.y - f), Vector2(e.x * 2, f))
+	draw_rect(face, wall.darkened(0.12))
+	draw_rect(Rect2(face.position.x, face.end.y - 14, face.size.x, 14), wall.darkened(0.25))   # Sockel / Erdgeschoss
+	var cols := int((e.x * 2 - 12) / 20.0)
+	for k in floors:
+		var y := face.position.y + 6 + k * FLOOR_PX
+		if glass:
+			draw_line(Vector2(face.position.x, y - 3), Vector2(face.end.x, y - 3), wall.darkened(0.35), 1.0)
+		for c in cols:
+			var x := face.position.x + 10 + c * 20.0
+			var win := Rect2(Vector2(x, y), Vector2(12 if not glass else 18, 9))
+			var r := _rng.randf()
+			var col := Color(0.24, 0.24, 0.26)
+			if alive:
+				col = Color(1.0, 0.88, 0.58) if r < 0.18 else Color(0.74, 0.87, 0.96)
+				if glass:
+					col = Color(0.62, 0.82, 0.92) if r < 0.7 else Color(0.85, 0.95, 1.0)
+			draw_rect(win, col)
+			if not alive and r < 0.3:   # eingeschlagen
+				draw_line(win.position, win.end, Color(0.55, 0.58, 0.60), 1.2)
+				draw_line(Vector2(win.end.x, win.position.y), Vector2(win.position.x + 3, win.end.y), Color(0.55, 0.58, 0.60), 1.2)
+			elif alive and not tower and r > 0.78:   # Blumenkasten
+				draw_rect(Rect2(win.position + Vector2(-1, 9), Vector2(14, 3)), Color(0.55, 0.38, 0.24))
+				_dot(win.position + Vector2(3, 9), 2.2, FLOWERS[(c + k) % FLOWERS.size()])
+				_dot(win.position + Vector2(9, 9), 2.2, FLOWERS[(c + k + 2) % FLOWERS.size()])
+	if not alive:   # Schmutzstreifen
+		for k in 4:
+			var x := _rng.randf_range(face.position.x + 6, face.end.x - 6)
+			draw_line(Vector2(x, face.position.y + 4), Vector2(x + 2, face.position.y + f * _rng.randf_range(0.3, 0.8)), Color(0.40, 0.40, 0.40, 0.5), 3.0)
+	# Erdgeschoss: Tür, bei Wohnblocks Läden mit Markisen
+	draw_rect(Rect2(Vector2(-7, face.end.y - 13), Vector2(14, 13)), Color(0.36, 0.26, 0.20))
+	if not tower:
+		for side in [-1.0, 1.0]:
+			var ax: float = side * e.x * 0.55 - 26.0
+			var aw: Color = AWNINGS[(obj_seed + int(side + 1.0)) % AWNINGS.size()] if alive else Color(0.55, 0.53, 0.50)
+			for k in 5:
+				draw_rect(Rect2(Vector2(ax + k * 10.4, face.end.y - 20), Vector2(10.4, 7)), aw if k % 2 == 0 else aw.lightened(0.5))
+	_outline(PackedVector2Array([face.position, Vector2(face.end.x, face.position.y), face.end, Vector2(face.position.x, face.end.y)]), INK, 2.5)
+	# Dach
+	var roof := Rect2(Vector2(-e.x, -e.y - f), e * 2.0)
+	var top := wall.lightened(0.1) if not glass else Color(0.70, 0.72, 0.74)
+	draw_rect(roof, top)
+	var inner := roof.grow(-7.0)
+	draw_rect(inner, Color(0.72, 0.71, 0.68) if alive else Color(0.58, 0.57, 0.55))
+	_outline(PackedVector2Array([roof.position, Vector2(roof.end.x, roof.position.y), roof.end, Vector2(roof.position.x, roof.end.y)]), INK, 2.5)
+	# Aufzugshaus und Lüftung
+	var lift := Rect2(inner.position + Vector2(inner.size.x * 0.68, 8), Vector2(30, 22))
+	draw_rect(lift.grow(1.0), INK)
+	draw_rect(lift, top.darkened(0.08))
+	if not alive:
+		for k in int(inner.size.x * inner.size.y / 3000.0):   # Risse und Flecken
 			var a := Vector2(_rng.randf_range(inner.position.x, inner.end.x), _rng.randf_range(inner.position.y, inner.end.y))
-			var b := a + Vector2.from_angle(_rng.randf() * TAU) * _rng.randf_range(14, 30)
-			draw_line(a, b, Color(0.40, 0.39, 0.38), 1.5)
-			draw_line(b, b + Vector2.from_angle(_rng.randf() * TAU) * 10.0, Color(0.40, 0.39, 0.38), 1.2)
-		for k in 3:   # dunkle Flecken
-			_dot(Vector2(_rng.randf_range(inner.position.x + 10, inner.end.x - 10), _rng.randf_range(inner.position.y + 10, inner.end.y - 10)), _rng.randf_range(7, 13), Color(0.44, 0.43, 0.42, 0.6))
-		for k in 3:   # eingeschlagene Oberlichter
-			var r := Rect2(Vector2(-e.x * 0.7 + k * e.x * 0.5, -e.y * 0.4), Vector2(26, 18))
-			draw_rect(r, Color(0.24, 0.22, 0.21))
-			draw_line(r.position, r.end, Color(0.62, 0.66, 0.70), 1.5)
-			draw_line(Vector2(r.end.x, r.position.y), Vector2(r.position.x + 6, r.end.y), Color(0.62, 0.66, 0.70), 1.5)
-		for k in 6:   # Schutt an der Kante
-			_ring(Vector2(e.x + 6 + _rng.randf_range(0, 10), _rng.randf_range(-e.y, e.y)), _rng.randf_range(3, 6), Color(0.62, 0.60, 0.57), INK, 1.0)
+			draw_line(a, a + Vector2.from_angle(_rng.randf() * TAU) * _rng.randf_range(12, 26), Color(0.42, 0.41, 0.40), 1.5)
+		for k in 3:
+			_dot(Vector2(_rng.randf_range(inner.position.x + 12, inner.end.x - 12), _rng.randf_range(inner.position.y + 12, inner.end.y - 12)), _rng.randf_range(6, 11), Color(0.46, 0.45, 0.44, 0.6))
+		if tower:   # umgeknickte Antenne
+			draw_line(inner.position + Vector2(14, 14), inner.position + Vector2(34, 22), INK, 2.5)
 		return
-	# Dachgarten: Holzdeck, Beete, kleine Bäume, Solarzellen, Lüftung
-	var deck := Rect2(inner.position + Vector2(6, inner.size.y * 0.55), Vector2(inner.size.x * 0.4, inner.size.y * 0.4))
+	_roof_garden(Rect2(inner.position + Vector2(6, 6), Vector2(inner.size.x * 0.6, inner.size.y - 12)))
+	if tower:
+		_ring(inner.end - Vector2(18, 18), 11.0, Color(0.70, 0.72, 0.76), INK, 2.0)   # Wassertank
+		draw_line(inner.position + Vector2(14, 14), inner.position + Vector2(14, -8), INK, 2.0)   # Antenne
+		_dot(inner.position + Vector2(14, -8), 2.5, Color(1.0, 0.35, 0.3))
+
+
+## Dachgarten in r: Holzdeck, Beete mit Blumen, Bäumchen in Kübeln, Solarzellen.
+func _roof_garden(r: Rect2) -> void:
+	var deck := Rect2(r.position, Vector2(r.size.x * 0.35, r.size.y))
 	draw_rect(deck, Color(0.74, 0.58, 0.40))
 	for k in int(deck.size.x / 8.0):
 		draw_line(deck.position + Vector2(k * 8.0, 0), deck.position + Vector2(k * 8.0, deck.size.y), Color(0.62, 0.47, 0.32), 1.0)
-	var beds := Rect2(inner.position + Vector2(inner.size.x * 0.48, 6), Vector2(inner.size.x * 0.48, inner.size.y - 12))
-	for row in 3:
-		var r := Rect2(beds.position + Vector2(0, row * beds.size.y / 3.0), Vector2(beds.size.x, beds.size.y / 3.0 - 4))
-		_rect_ink(r, Color(0.46, 0.34, 0.22), 1.5)
-		for j in int(r.size.x / 10.0):
-			_dot(r.position + Vector2(6 + j * 10, r.size.y * 0.5), 4.0, Color(0.42, 0.74, 0.32) if (j + row) % 3 else FLOWERS[(j + row + obj_seed) % FLOWERS.size()])
-	for k in int(inner.size.x / 70.0):   # kleine Bäume in Kübeln
-		var tp := inner.position + Vector2(16 + k * 30, 16)
+	var beds := Rect2(r.position + Vector2(r.size.x * 0.4, 0), Vector2(r.size.x * 0.6, r.size.y))
+	var rows := maxi(int(beds.size.y / 22.0), 1)
+	for row in rows:
+		var b := Rect2(beds.position + Vector2(0, row * beds.size.y / rows), Vector2(beds.size.x, beds.size.y / rows - 4))
+		_rect_ink(b, Color(0.46, 0.34, 0.22), 1.5)
+		for j in int(b.size.x / 10.0):
+			_dot(b.position + Vector2(6 + j * 10, b.size.y * 0.5), 4.0, Color(0.42, 0.74, 0.32) if (j + row) % 3 else FLOWERS[(j + row + obj_seed) % FLOWERS.size()])
+	for k in 2:
+		var tp := deck.position + Vector2(deck.size.x * 0.5, 14 + k * (deck.size.y - 28))
 		_ring(tp, 9.0, Color(0.36, 0.64, 0.32), Color(0.26, 0.48, 0.24), 1.5)
 		_dot(tp + Vector2(-3, -3), 4.0, Color(0.50, 0.78, 0.40))
-	var solar := Rect2(Vector2(inner.position.x + 6, inner.position.y + inner.size.y * 0.32), Vector2(inner.size.x * 0.38, 12))
-	draw_rect(solar, Color(0.24, 0.36, 0.60))
+
+
+## --- Vorort ---
+
+## Walmdach (vier Dachflächen, kurzer First quer) mit Ziegelreihen. Tot: grau, mit Löchern.
+func _hip(w: float, h: float, alive: bool, roof_alive: Color, holes: int = 3) -> void:
+	_tf(Vector2(8, 10), angle)
+	draw_rect(Rect2(-w, -h, w * 2, h * 2), SHADOW)
+	_tf(Vector2.ZERO, angle)
+	var roof := roof_alive if alive else Color(0.56, 0.52, 0.48)
+	var a := Vector2(-w + h, 0)
+	var b := Vector2(w - h, 0)
+	_quad(PackedVector2Array([Vector2(-w, -h), Vector2(w, -h), b]), roof.lightened(0.1))
+	_quad(PackedVector2Array([Vector2(-w, -h), b, a]), roof.lightened(0.1))
+	_quad(PackedVector2Array([Vector2(-w, h), Vector2(w, h), b]), roof.darkened(0.14))
+	_quad(PackedVector2Array([Vector2(-w, h), b, a]), roof.darkened(0.14))
+	_quad(PackedVector2Array([Vector2(-w, -h), a, Vector2(-w, h)]), roof.darkened(0.02))
+	_quad(PackedVector2Array([Vector2(w, -h), b, Vector2(w, h)]), roof.darkened(0.22))
+	for k in 3:   # Ziegelreihen
+		var t := 0.25 + k * 0.25
+		draw_line(Vector2(-w + h * t, -h * (1.0 - t)), Vector2(w - h * t, -h * (1.0 - t)), roof.darkened(0.12), 1.2)
+		draw_line(Vector2(-w + h * t, h * (1.0 - t)), Vector2(w - h * t, h * (1.0 - t)), roof.darkened(0.3), 1.2)
+	for p in [[Vector2(-w, -h), a], [Vector2(w, -h), b], [Vector2(-w, h), a], [Vector2(w, h), b], [a, b]]:
+		draw_line(p[0], p[1], INK, 2.0)
+	_outline(PackedVector2Array([Vector2(-w, -h), Vector2(w, -h), Vector2(w, h), Vector2(-w, h)]), INK, 3.0)
+	if not alive:
+		_ruin(w, h, holes)
+
+
+const SUBURB_ROOFS := [Color(0.36, 0.38, 0.42), Color(0.58, 0.30, 0.26), Color(0.52, 0.40, 0.32), Color(0.42, 0.50, 0.58), Color(0.30, 0.44, 0.40)]
+
+
+## Einfamilienhaus im Vorort: Walmdach, Garage mit Einfahrt, Garten mit Hecke hinten und je nach Haus
+## Pool, Trampolin oder Terrasse mit Sonnenschirm. Kaputt: Hecke kahl, Pool leer und rissig.
+func _suburb(alive: bool) -> void:
+	_tf(Vector2.ZERO, angle)
+	var hedge := Color(0.30, 0.52, 0.28) if alive else Color(0.52, 0.47, 0.40)
+	# Garten hinten (lokal −y) mit Hecke
+	for k in 9:
+		var p := Vector2(-74 + k * 18.5, -96)
+		_dot(p, 10.0 if alive else 6.0, hedge)
+	for k in 3:
+		_dot(Vector2(-78, -78 + k * 18), 10.0 if alive else 6.0, hedge)
+		_dot(Vector2(78, -78 + k * 18), 10.0 if alive else 6.0, hedge)
+	match obj_seed % 3:
+		0:   # Pool
+			var pool := Rect2(-34, -86, 56, 28)
+			draw_rect(pool.grow(4), Color(0.86, 0.84, 0.80))
+			draw_rect(pool, Color(0.40, 0.72, 0.92) if alive else Color(0.56, 0.55, 0.52))
+			if alive:
+				draw_line(pool.position + Vector2(8, 8), pool.position + Vector2(24, 8), Color(1, 1, 1, 0.7), 2.0)
+			else:
+				draw_line(pool.position + Vector2(10, 4), pool.position + Vector2(30, 22), Color(0.40, 0.38, 0.36), 1.5)
+		1:   # Trampolin
+			_ring(Vector2(-10, -72), 20.0, Color(0.20, 0.22, 0.26) if alive else Color(0.46, 0.45, 0.44), Color(0.30, 0.50, 0.86) if alive else Color(0.55, 0.53, 0.50), 4.0)
+		_:   # Terrasse mit Sonnenschirm
+			draw_rect(Rect2(-40, -76, 60, 26), Color(0.72, 0.58, 0.42) if alive else Color(0.58, 0.55, 0.50))
+			if alive:
+				for k in 8:
+					_quad(PackedVector2Array([Vector2(-10, -64), Vector2(-10, -64) + Vector2.from_angle(k * TAU / 8.0) * 18.0, Vector2(-10, -64) + Vector2.from_angle((k + 1) * TAU / 8.0) * 18.0]), Color(0.95, 0.40, 0.36) if k % 2 == 0 else Color(0.98, 0.96, 0.92))
+	# Einfahrt und Garage rechts
+	draw_rect(Rect2(62, -18, 40, 74), Color(0.66, 0.66, 0.66) if alive else Color(0.58, 0.57, 0.55))
+	_tf(Vector2(68, -8), angle)
+	draw_rect(Rect2(0, -26, 40, 52), SHADOW)
+	_tf(Vector2.ZERO, angle)
+	_rect_ink(Rect2(62, -34, 40, 52), Color(0.80, 0.80, 0.78) if alive else Color(0.60, 0.58, 0.56))
+	draw_rect(Rect2(66, 14, 32, 4), Color(0.45, 0.48, 0.52))   # Garagentor
+	_hip(54.0, 40.0, alive, SUBURB_ROOFS[obj_seed % SUBURB_ROOFS.size()], 3)
+	_tf(Vector2.ZERO, angle)
+	# Weg zur Haustür, Briefkasten, Beet
+	draw_rect(Rect2(-8, 40, 16, 22), Color(0.78, 0.74, 0.68) if alive else Color(0.60, 0.58, 0.55))
+	_rect_ink(Rect2(-30, 58, 8, 6), Color(0.86, 0.30, 0.26) if alive else Color(0.55, 0.52, 0.50), 1.2)
+	if alive:
+		for k in 5:
+			_flower(Vector2(14 + k * 8, 50), FLOWERS[(obj_seed + k) % FLOWERS.size()], 3.0)
+
+
+## Kita: flaches, buntes Gebäude, davor ein umzäunter Spielplatz mit Sandkasten, Rutsche und Schaukel.
+func _kita(alive: bool) -> void:
+	_tf(Vector2(8, 10), angle)
+	draw_rect(Rect2(-64, -36, 128, 72), SHADOW)
+	_tf(Vector2.ZERO, angle)
+	var colors := [Color(0.98, 0.70, 0.30), Color(0.50, 0.78, 0.46), Color(0.46, 0.68, 0.92), Color(0.96, 0.52, 0.56)]
 	for k in 4:
-		draw_line(solar.position + Vector2(k * solar.size.x / 4.0, 0), solar.position + Vector2(k * solar.size.x / 4.0, solar.size.y), Color(0.60, 0.70, 0.86), 1.0)
-	if height > 1.2:   # Hochhaus: Wassertank
-		_ring(Vector2(e.x * 0.6, -e.y * 0.6), 11.0, Color(0.70, 0.72, 0.76), INK, 2.0)
+		draw_rect(Rect2(-64 + k * 32, -36, 32, 72), colors[k] if alive else Color(0.62, 0.60, 0.57).darkened(0.03 * k))
+	_outline(PackedVector2Array([Vector2(-64, -36), Vector2(64, -36), Vector2(64, 36), Vector2(-64, 36)]), INK, 3.0)
+	for k in 4:   # Oberlichter
+		_rect_ink(Rect2(-56 + k * 32, -8, 16, 16), Color(0.80, 0.90, 0.96) if alive else Color(0.30, 0.30, 0.30), 1.5)
+	var yard := Rect2(-70, 44, 140, 66)
+	draw_rect(yard, Color(0.56, 0.78, 0.42) if alive else Color(0.62, 0.60, 0.55))
+	var fence := Color(0.96, 0.96, 0.92) if alive else Color(0.55, 0.53, 0.50)
+	_outline(PackedVector2Array([Vector2(yard.position.x, yard.position.y), Vector2(yard.position.x, yard.end.y), yard.end, Vector2(yard.end.x, yard.position.y)]), fence, 2.0, false)
+	_rect_ink(Rect2(-60, 56, 40, 34), Color(0.94, 0.86, 0.62) if alive else Color(0.60, 0.58, 0.54), 2.0)   # Sandkasten
+	if alive:
+		_dot(Vector2(-46, 72), 4.0, Color(0.92, 0.32, 0.30))   # Eimerchen
+	draw_rect(Rect2(0, 54, 12, 44), Color(0.96, 0.82, 0.24) if alive else Color(0.56, 0.54, 0.50))   # Rutsche
+	for k in 4:
+		draw_line(Vector2(0, 58 + k * 10), Vector2(12, 58 + k * 10), INK, 1.0)
+	draw_line(Vector2(30, 60), Vector2(60, 60), INK, 3.0)   # Schaukel
+	for x in [38.0, 52.0]:
+		draw_line(Vector2(x, 60), Vector2(x, 76 if alive else 70), INK, 1.0)
+		draw_rect(Rect2(x - 4, 76 if alive else 70, 8, 4), Color(0.86, 0.30, 0.28) if alive else Color(0.50, 0.48, 0.46))
+	if not alive:
+		_ruin(64.0, 36.0, 2)
+
+
+## Bäckerei: kleines Haus mit Walmdach, vorne Schaufenster, Brezel-Schild, Tischchen und Fahrradständer.
+func _bakery(alive: bool) -> void:
+	_hip(42.0, 32.0, alive, Color(0.72, 0.36, 0.24), 2)
+	_tf(Vector2.ZERO, angle)
+	draw_rect(Rect2(-34, 32, 68, 8), Color(0.80, 0.90, 0.96) if alive else Color(0.30, 0.30, 0.30))   # Schaufenster
+	var pretzel := Color(0.66, 0.42, 0.20) if alive else Color(0.52, 0.48, 0.44)
+	draw_arc(Vector2(-6, 50), 5.0, 0.0, TAU, 16, pretzel, 2.5)
+	draw_arc(Vector2(4, 50), 5.0, 0.0, TAU, 16, pretzel, 2.5)
+	_ring(Vector2(34, 56), 9.0, Color(0.92, 0.92, 0.90) if alive else Color(0.58, 0.56, 0.54), INK, 1.5)   # Tischchen
+	for k in 3:   # Fahrradständer
+		draw_line(Vector2(-46 + k * 6, 48), Vector2(-46 + k * 6, 62), Color(0.55, 0.58, 0.62), 2.0)
+
+
+## Pavillon auf dem Vorplatz: achteckiges Dach auf Säulen, ringsum Bänke und Blumen.
+func _pavilion(alive: bool) -> void:
+	_tf(Vector2(8, 10))
+	_dot(Vector2.ZERO, 44.0, SHADOW)
+	_tf()
+	var roof := Color(0.36, 0.56, 0.52) if alive else Color(0.56, 0.54, 0.51)
+	var pts := PackedVector2Array()
+	for k in 8:
+		pts.append(Vector2.from_angle(k * TAU / 8.0 + TAU / 16.0) * 42.0)
+	for k in 8:
+		_quad(PackedVector2Array([Vector2.ZERO, pts[k], pts[(k + 1) % 8]]), roof.lightened(0.08) if k % 2 == 0 else roof.darkened(0.08))
+	_outline(pts, INK, 2.5)
+	for k in 8:
+		draw_line(Vector2.ZERO, pts[k], INK, 1.2)
+	_ring(Vector2.ZERO, 6.0, Color(0.95, 0.85, 0.40) if alive else Color(0.55, 0.52, 0.48), INK, 1.5)
+	if alive:
+		for k in 12:
+			_flower(Vector2.from_angle(k * TAU / 12.0) * 54.0, FLOWERS[k % FLOWERS.size()], 3.2)
+	else:
+		_ruin(30.0, 30.0, 1)
+
+
+## --- Felder: Gutshof, Maschinenhalle, Weizenfeld ---
+
+## Gutshof: großes Haus mit dunklem Walmdach und Gauben, dazu ein Seitenflügel (L-Form).
+func _manor(alive: bool) -> void:
+	_tf(Vector2(8, 10), angle)
+	draw_rect(Rect2(-100, -2, 44, 90), SHADOW)
+	_tf(Vector2.ZERO, angle)
+	var wing := Color(0.70, 0.30, 0.24) if alive else Color(0.56, 0.52, 0.48)
+	draw_rect(Rect2(-100, 0, 44, 86), wing.darkened(0.06))
+	draw_line(Vector2(-78, 4), Vector2(-78, 84), INK, 2.0)
+	_outline(PackedVector2Array([Vector2(-100, 0), Vector2(-56, 0), Vector2(-56, 86), Vector2(-100, 86)]), INK, 2.5)
+	_hip(72.0, 42.0, alive, Color(0.30, 0.32, 0.36), 4)
+	_tf(Vector2.ZERO, angle)
+	for k in 3:   # Gauben
+		var gp := Vector2(-36 + k * 36, 22)
+		_rect_ink(Rect2(gp - Vector2(8, 6), Vector2(16, 12)), Color(0.86, 0.84, 0.78) if alive else Color(0.56, 0.54, 0.50), 1.5)
+		draw_rect(Rect2(gp - Vector2(4, 2), Vector2(8, 6)), Color(0.74, 0.87, 0.96) if alive else Color(0.24, 0.24, 0.26))
+	draw_rect(Rect2(-9, 40, 18, 9), Color(0.40, 0.28, 0.20))
+
+
+## Maschinenhalle: Wellblechdach mit Rippen, offene Seite mit Traktor davor. Kaputt: Rost und Löcher.
+func _machine_hall(alive: bool) -> void:
+	_tf(Vector2(8, 10), angle)
+	draw_rect(Rect2(-84, -48, 168, 96), SHADOW)
+	_tf(Vector2.ZERO, angle)
+	var tin := Color(0.70, 0.76, 0.80) if alive else Color(0.58, 0.56, 0.53)
+	draw_rect(Rect2(-84, -48, 168, 48), tin.lightened(0.06))
+	draw_rect(Rect2(-84, 0, 168, 48), tin.darkened(0.1))
+	for k in 21:
+		var x := -84.0 + 4 + k * 8.0
+		draw_line(Vector2(x, -46), Vector2(x, 46), tin.darkened(0.22), 1.5)
+	draw_line(Vector2(-84, 0), Vector2(84, 0), INK, 2.5)
+	_outline(PackedVector2Array([Vector2(-84, -48), Vector2(84, -48), Vector2(84, 48), Vector2(-84, 48)]), INK, 3.0)
+	_rng.seed = obj_seed
+	if not alive:
+		for k in 4:
+			var p := Vector2(_rng.randf_range(-70, 70), _rng.randf_range(-36, 36))
+			_dot(p, _rng.randf_range(8, 14), Color(0.62, 0.38, 0.22, 0.7))
+			if k % 2 == 0:
+				_dot(p, 5.0, Color(0.24, 0.22, 0.21))
+	# Traktor vor dem offenen Tor
+	var t := Vector2(-20, 70)
+	var body := Color(0.30, 0.60, 0.30) if alive else Color(0.55, 0.42, 0.32)
+	_rect_ink(Rect2(t + Vector2(-16, -12), Vector2(44, 24)), body, 1.5)
+	_rect_ink(Rect2(t + Vector2(-14, -9), Vector2(16, 18)), Color(0.80, 0.90, 0.96) if alive else Color(0.40, 0.40, 0.40), 1.2)   # Kabine
+	for w in [Vector2(-8, -16), Vector2(-8, 16)]:
+		draw_rect(Rect2(t + w - Vector2(9, 4), Vector2(18, 8)), Color(0.18, 0.18, 0.20))   # große Räder
+	for w in [Vector2(22, -14), Vector2(22, 14)]:
+		draw_rect(Rect2(t + w - Vector2(5, 3), Vector2(10, 6)), Color(0.18, 0.18, 0.20))
+	_dot(t + Vector2(14, -6), 2.5, INK)   # Auspuff
+
+
+## Weizenfeld: goldene Halme in Reihen, am Rand Mohn, Fahrspuren. Tot: graue Stoppeln.
+func _wheat(alive: bool) -> void:
+	_tf()
+	var r := Rect2(-104, -64, 208, 128)
+	draw_rect(r, Color(0.90, 0.76, 0.36) if alive else Color(0.64, 0.60, 0.53))
+	_rng.seed = obj_seed
+	for k in 16:
+		var y := r.position.y + 6 + k * 7.6
+		for j in 26:
+			var x := r.position.x + 4 + j * 8.0 + (k % 2) * 4.0
+			if alive:
+				draw_line(Vector2(x, y + 3), Vector2(x + 1.5, y - 3), Color(0.78, 0.60, 0.22), 1.6)
+				_dot(Vector2(x + 1.5, y - 3), 1.6, Color(0.98, 0.86, 0.46))
+			elif (j + k) % 3 == 0:
+				draw_line(Vector2(x, y + 1), Vector2(x + 1, y - 2), Color(0.52, 0.49, 0.44), 1.2)
+	for x in [-40.0, 40.0]:   # Fahrspuren
+		draw_line(Vector2(x, r.position.y + 2), Vector2(x, r.end.y - 2), Color(0.74, 0.60, 0.30) if alive else Color(0.56, 0.53, 0.48), 3.0)
+	if alive:
+		for k in 14:
+			_dot(Vector2(_rng.randf_range(r.position.x + 4, r.end.x - 4), r.end.y - _rng.randf_range(2, 10)), 2.6, Color(0.92, 0.22, 0.20))
+	_outline(PackedVector2Array([r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x, r.end.y)]), Color(0.62, 0.48, 0.24) if alive else Color(0.50, 0.47, 0.42), 2.0)
+
+
+## --- Großstadt: Altstadt ---
+
+## Dom: langes Kirchenschiff mit Querhaus (Kreuzform), Kupferdach, vorne zwei Türme mit grünen Spitzen.
+func _cathedral(alive: bool) -> void:
+	_tf(Vector2(10, 14), angle)
+	draw_rect(Rect2(-40, -84, 80, 168), SHADOW)
+	draw_rect(Rect2(-70, -40, 140, 50), SHADOW)
+	_tf(Vector2.ZERO, angle)
+	var roof := Color(0.40, 0.66, 0.58) if alive else Color(0.56, 0.54, 0.51)
+	for r in [Rect2(-40, -84, 80, 150), Rect2(-70, -44, 140, 46)]:
+		draw_rect(Rect2(r.position, Vector2(r.size.x * 0.5, r.size.y)), roof.lightened(0.08))
+		draw_rect(Rect2(r.position + Vector2(r.size.x * 0.5, 0), Vector2(r.size.x * 0.5, r.size.y)), roof.darkened(0.1))
+		_outline(PackedVector2Array([r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x, r.end.y)]), INK, 3.0)
+	draw_line(Vector2(0, -84), Vector2(0, 66), INK, 2.5)
+	draw_line(Vector2(-70, -21), Vector2(70, -21), INK, 2.0)
+	_ring(Vector2(0, -21), 16.0, roof.lightened(0.2), INK, 2.5)   # Vierungskuppel
+	var stone := Color(0.84, 0.80, 0.72) if alive else Color(0.62, 0.60, 0.57)
+	for sx in [-24.0, 24.0]:   # Türme vorne
+		var c := Vector2(sx, 82)
+		var pts := PackedVector2Array([c + Vector2(-18, -18), c + Vector2(18, -18), c + Vector2(18, 18), c + Vector2(-18, 18)])
+		draw_rect(Rect2(c - Vector2(18, 18), Vector2(36, 36)), stone)
+		for k in 4:
+			_quad(PackedVector2Array([c, pts[k], pts[(k + 1) % 4]]), roof.lightened(0.12) if k % 2 == 0 else roof.darkened(0.1))
+		_outline(pts, INK, 2.5)
+		_dot(c, 3.0, Color(1.0, 0.84, 0.35) if alive else Color(0.45, 0.42, 0.40))
+	if not alive:
+		_ruin(40.0, 70.0, 4)
+
+
+## Museum (Stadtbibliothek): flaches Steindach mit Kuppel, vorne eine Säulenreihe und Treppe.
+func _museum(alive: bool) -> void:
+	_tf(Vector2(8, 10), angle)
+	draw_rect(Rect2(-62, -46, 124, 92), SHADOW)
+	_tf(Vector2.ZERO, angle)
+	var stone := Color(0.90, 0.87, 0.80) if alive else Color(0.62, 0.60, 0.57)
+	_rect_ink(Rect2(-62, -46, 124, 92), stone, 3.0)
+	_rect_ink(Rect2(-54, -38, 108, 76), stone.darkened(0.06), 1.5)
+	_ring(Vector2(0, -4), 26.0, Color(0.50, 0.66, 0.78) if alive else Color(0.56, 0.55, 0.53), INK, 2.5)
+	_ring(Vector2(0, -4), 14.0, Color(0.62, 0.76, 0.86) if alive else Color(0.60, 0.59, 0.57), INK, 1.5)
+	_dot(Vector2(-6, -10), 5.0, Color(1, 1, 1, 0.35 if alive else 0.1))
+	for k in 6:   # Säulen
+		_ring(Vector2(-45 + k * 18, 54), 5.0, stone.lightened(0.05), INK, 1.5)
+	for k in 3:   # Treppe
+		draw_line(Vector2(-52, 62 + k * 4), Vector2(52, 62 + k * 4), stone.darkened(0.15 + k * 0.05), 3.0)
+	if not alive:
+		_ruin(62.0, 46.0, 2)
+
+
+## Café: Haus schräg von oben (zwei Stockwerke) mit Markise, davor Tische mit Sonnenschirmen.
+func _cafe(alive: bool) -> void:
+	_tf()
+	_rng.seed = obj_seed
+	var e := _screen_extent(Vector2(52, 30))
+	var f := 2 * FLOOR_PX + 14.0
+	var wall: Color = WALLS[obj_seed % WALLS.size()] if alive else Color(0.62, 0.61, 0.59)
+	draw_rect(Rect2(Vector2(-e.x + 12, -e.y - f + 18), Vector2(e.x * 2 + 20, e.y * 2 + f - 10)), SHADOW)
+	var face := Rect2(Vector2(-e.x, e.y - f), Vector2(e.x * 2, f))
+	draw_rect(face, wall.darkened(0.1))
+	for k in int((e.x * 2 - 12) / 20.0):
+		draw_rect(Rect2(Vector2(face.position.x + 10 + k * 20, face.position.y + 6), Vector2(12, 9)), Color(0.74, 0.87, 0.96) if alive else Color(0.24, 0.24, 0.26))
+	var aw: Color = AWNINGS[obj_seed % AWNINGS.size()] if alive else Color(0.55, 0.53, 0.50)
+	for k in int(e.x * 2 / 12.0):
+		draw_rect(Rect2(Vector2(-e.x + k * 12, face.end.y - 16), Vector2(12, 9)), aw if k % 2 == 0 else Color(0.98, 0.96, 0.92) if alive else aw.lightened(0.2))
+	_outline(PackedVector2Array([face.position, Vector2(face.end.x, face.position.y), face.end, Vector2(face.position.x, face.end.y)]), INK, 2.0)
+	var roof := Rect2(Vector2(-e.x, -e.y - f), e * 2.0)
+	draw_rect(roof, Color(0.72, 0.42, 0.32) if alive else Color(0.56, 0.52, 0.48))
+	for k in int(roof.size.y / 7.0):
+		draw_line(roof.position + Vector2(2, 4 + k * 7), roof.position + Vector2(roof.size.x - 2, 4 + k * 7), Color(0.50, 0.30, 0.24, 0.6), 1.2)
+	_outline(PackedVector2Array([roof.position, Vector2(roof.end.x, roof.position.y), roof.end, Vector2(roof.position.x, roof.end.y)]), INK, 2.5)
+	for k in 3:   # Tische mit Schirmen vor dem Haus
+		var c := Vector2(-e.x + 18 + k * (e.x * 2 - 36) / 2.0, e.y + 26)
+		if alive:
+			for s in 8:
+				_quad(PackedVector2Array([c, c + Vector2.from_angle(s * TAU / 8.0) * 16.0, c + Vector2.from_angle((s + 1) * TAU / 8.0) * 16.0]), aw if s % 2 == 0 else Color(0.98, 0.96, 0.92))
+			_dot(c, 2.0, INK)
+		else:
+			_ring(c, 7.0, Color(0.58, 0.56, 0.54), INK, 1.2)
+
+
+## Stadtschule: Gebäude schräg von oben (drei Stockwerke, orange) mit Sportplatz daneben.
+func _city_school(alive: bool) -> void:
+	_tf()
+	var court := Rect2(-70, 46, 140, 70)
+	draw_rect(court, Color(0.86, 0.46, 0.34) if alive else Color(0.58, 0.56, 0.53))
+	var line := Color(1, 1, 1, 0.9) if alive else Color(0.70, 0.70, 0.68)
+	_outline(PackedVector2Array([court.position + Vector2(6, 6), Vector2(court.end.x - 6, court.position.y + 6), court.end - Vector2(6, 6), Vector2(court.position.x + 6, court.end.y - 6)]), line, 1.5)
+	draw_line(Vector2(0, court.position.y + 6), Vector2(0, court.end.y - 6), line, 1.5)
+	draw_arc(court.get_center(), 12.0, 0.0, TAU, 20, line, 1.5)
+	for x in [court.position.x + 8, court.end.x - 8]:
+		draw_line(Vector2(x, court.get_center().y - 10), Vector2(x, court.get_center().y + 10), Color(0.95, 0.95, 0.95), 3.0)   # Tore
+	var e := Vector2(64, 30)
+	var f := 3 * FLOOR_PX + 14.0
+	var wall := Color(0.96, 0.66, 0.36) if alive else Color(0.62, 0.61, 0.59)
+	draw_rect(Rect2(Vector2(-e.x + 12, -e.y - f + 18), Vector2(e.x * 2 + 24, e.y * 2 + f - 10)), SHADOW)
+	var face := Rect2(Vector2(-e.x, e.y - f), Vector2(e.x * 2, f))
+	draw_rect(face, wall.darkened(0.1))
+	for k in 3:
+		for c in 6:
+			draw_rect(Rect2(Vector2(face.position.x + 8 + c * 20, face.position.y + 6 + k * FLOOR_PX), Vector2(14, 9)), Color(0.74, 0.87, 0.96) if alive else Color(0.24, 0.24, 0.26))
+	_outline(PackedVector2Array([face.position, Vector2(face.end.x, face.position.y), face.end, Vector2(face.position.x, face.end.y)]), INK, 2.0)
+	var roof := Rect2(Vector2(-e.x, -e.y - f), e * 2.0)
+	_rect_ink(roof, wall.lightened(0.15) if alive else Color(0.60, 0.59, 0.57), 2.5)
+	if alive:   # Uhr über dem Eingang
+		_ring(Vector2(0, face.position.y + 4), 6.0, Color(0.98, 0.98, 0.96), INK, 1.5)
+
+
+## Hochbeete der Gemeinschaftsgärten: Holzkästen im Raster mit Gemüse und Blumen. Kaputt: leer und morsch.
+func _raised_beds(alive: bool) -> void:
+	_tf()
+	var wood := Color(0.66, 0.48, 0.30) if alive else Color(0.55, 0.51, 0.46)
+	for row in 2:
+		for col in 3:
+			var r := Rect2(Vector2(-48 + col * 34, -30 + row * 32), Vector2(28, 24))
+			_rect_ink(r, wood, 1.5)
+			draw_rect(r.grow(-3), Color(0.40, 0.30, 0.20) if alive else Color(0.58, 0.55, 0.50))
+			if alive:
+				for j in 3:
+					_dot(r.position + Vector2(7 + j * 7, 12), 3.5, Color(0.42, 0.74, 0.32) if (row + col + j) % 3 else FLOWERS[(row + col + j) % FLOWERS.size()])
+
+
+## Spielplatz: Klettergerüst, Wippe, Sandkasten auf Fallschutz.
+func _playground(alive: bool) -> void:
+	_tf()
+	var base := Rect2(-56, -40, 112, 80)
+	draw_rect(base, Color(0.86, 0.52, 0.40) if alive else Color(0.60, 0.58, 0.54))
+	_outline(PackedVector2Array([base.position, Vector2(base.end.x, base.position.y), base.end, Vector2(base.position.x, base.end.y)]), INK, 2.0)
+	_rect_ink(Rect2(-48, -32, 34, 34), Color(0.94, 0.86, 0.62) if alive else Color(0.62, 0.60, 0.56), 1.5)
+	var metal := Color(0.30, 0.52, 0.86) if alive else Color(0.50, 0.48, 0.46)
+	for k in 4:   # Klettergerüst
+		draw_line(Vector2(4 + k * 12, -30), Vector2(4 + k * 12, 6), metal, 2.5)
+		draw_line(Vector2(4, -30 + k * 12), Vector2(40, -30 + k * 12), metal, 2.5)
+	draw_line(Vector2(-40, 24), Vector2(10, 18 if alive else 30), Color(0.96, 0.80, 0.24) if alive else Color(0.55, 0.53, 0.50), 6.0)   # Wippe
+	_dot(Vector2(-15, 21), 4.0, INK)
+
+
+## Stadtbrunnen: quadratisches Becken mit Fontänen in den Ecken und einer Statue in der Mitte.
+func _fountain_city(alive: bool) -> void:
+	_tf(Vector2(8, 10))
+	draw_rect(Rect2(-48, -48, 96, 96), SHADOW)
+	_tf()
+	_rect_ink(Rect2(-48, -48, 96, 96), Color(0.76, 0.74, 0.70), 3.0)
+	draw_rect(Rect2(-40, -40, 80, 80), Color(0.40, 0.66, 0.88) if alive else Color(0.60, 0.57, 0.52))
+	if alive:
+		for c in [Vector2(-26, -26), Vector2(26, -26), Vector2(-26, 26), Vector2(26, 26)]:
+			for k in 6:
+				_dot(c + Vector2.from_angle(k * TAU / 6.0) * 7.0, 2.5, Color(0.92, 0.97, 1.0))
+			_dot(c, 3.5, Color(1, 1, 1))
+	_ring(Vector2.ZERO, 14.0, Color(0.70, 0.70, 0.72), INK, 2.0)   # Sockel
+	_ring(Vector2(0, -2), 8.0, Color(0.52, 0.66, 0.60) if alive else Color(0.56, 0.55, 0.53), INK, 1.5)   # Statue (Bronze)
+	_dot(Vector2(0, -4), 3.5, Color(0.60, 0.74, 0.68) if alive else Color(0.60, 0.59, 0.57))

@@ -78,7 +78,7 @@ var _ball_target := Vector2.ZERO
 var _rng := RandomNumberGenerator.new()
 
 ## Halbe Größe der Beete (wie in world_object.gd), in denen Bauern und Gärtner arbeiten.
-const PLOTS := {"field": Vector2(104, 64), "garden": Vector2(46, 32)}
+const PLOTS := {"field": Vector2(104, 64), "wheat": Vector2(104, 64), "garden": Vector2(46, 32), "raised_beds": Vector2(48, 30)}
 const LINE_SLOTS := 6
 const MAX_JARS := 6
 
